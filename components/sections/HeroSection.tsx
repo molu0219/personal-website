@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
 import NeonButton from '@/components/ui/NeonButton'
 
 interface Props {
@@ -9,6 +10,54 @@ interface Props {
   description?: string
   statusText?: string
   statusActive?: boolean
+}
+
+function TypewriterName({ text }: { text: string }) {
+  const [displayed, setDisplayed] = useState('')
+  const [typing, setTyping] = useState(true)
+
+  useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout>
+
+    const typeOut = () => {
+      let i = 0
+      setTyping(true)
+      setDisplayed('')
+
+      const type = () => {
+        i++
+        setDisplayed(text.slice(0, i))
+        if (i < text.length) {
+          timeout = setTimeout(type, 80)
+        } else {
+          setTyping(false)
+          // wait until 5s total has elapsed then restart
+          const typeTime = text.length * 80
+          const pause = 5000 - typeTime
+          timeout = setTimeout(typeOut, Math.max(pause, 500))
+        }
+      }
+      type()
+    }
+
+    typeOut()
+    return () => clearTimeout(timeout)
+  }, [text])
+
+  return (
+    <span className="gradient-text-animated">
+      {displayed}
+      <span
+        className="inline-block w-[3px] h-[0.85em] ml-1 align-middle"
+        style={{
+          background: 'var(--cyan)',
+          borderRadius: 2,
+          opacity: typing ? 1 : 0,
+          transition: 'opacity 0.3s',
+        }}
+      />
+    </span>
+  )
 }
 
 export default function HeroSection({
@@ -44,7 +93,7 @@ export default function HeroSection({
             style={{ fontFamily: 'Space Grotesk, sans-serif' }}
           >
             <span style={{ color: 'var(--text-primary)' }}>Hey, I&apos;m </span>
-            <span className="gradient-text-animated">{name}</span>
+            <TypewriterName text={name} />
           </h1>
 
           <p className="text-lg md:text-xl mb-4" style={{ color: 'var(--text-secondary)', fontFamily: 'Inter, sans-serif' }}>
