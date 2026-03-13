@@ -26,10 +26,11 @@ function tagGradient(tags: string[]) {
 export default async function HomePage() {
   let projects: any[] = []
   let posts: any[] = []
+  let about: any = null
 
   try {
     const supabase = await createClient()
-    const [{ data: p }, { data: b }] = await Promise.all([
+    const [{ data: p }, { data: b }, { data: a }] = await Promise.all([
       supabase
         .from('projects')
         .select('id,slug,title,description,tags,cover_url,featured')
@@ -43,15 +44,23 @@ export default async function HomePage() {
         .eq('published', true)
         .order('published_at', { ascending: false })
         .limit(5),
+      supabase.from('about').select('name,title,hero_description,status_text,status_active').single(),
     ])
     projects = p ?? []
     posts = b ?? []
+    about = a
   } catch {}
 
   return (
     <>
       <AuroraCanvas />
-      <HeroSection />
+      <HeroSection
+        name={about?.name}
+        tagline={about?.title}
+        description={about?.hero_description}
+        statusText={about?.status_text}
+        statusActive={about?.status_active ?? true}
+      />
 
       {/* Recent Posts */}
       {posts.length > 0 && (

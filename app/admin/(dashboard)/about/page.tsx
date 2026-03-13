@@ -50,11 +50,35 @@ export default function AdminAbout() {
         About Info
       </h1>
       <GlassCard className="p-6 space-y-4">
+        <p className="text-xs uppercase tracking-widest font-semibold pt-2" style={{ color: 'var(--cyan)', fontFamily: 'Space Grotesk, sans-serif' }}>Home / Hero</p>
         <GlassInput label="Name" value={data.name ?? ''} onChange={e => setData({ ...data, name: e.target.value })} className="w-full" />
-        <GlassInput label="Title / Role" value={data.title ?? ''} onChange={e => setData({ ...data, title: e.target.value })} className="w-full" />
+        <GlassInput label="Tagline (hero subtitle)" value={data.title ?? ''} onChange={e => setData({ ...data, title: e.target.value })} className="w-full" />
+        <div>
+          <label className="text-sm mb-2 block" style={{ color: 'var(--text-secondary)' }}>Hero Description</label>
+          <textarea
+            className="w-full px-4 py-2.5 rounded-lg text-sm outline-none min-h-24"
+            style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-primary)', resize: 'vertical' }}
+            value={data.hero_description ?? ''}
+            onChange={e => setData({ ...data, hero_description: e.target.value })}
+          />
+        </div>
+        <div className="flex items-center gap-4">
+          <GlassInput label="Status Pill Text" value={data.status_text ?? ''} onChange={e => setData({ ...data, status_text: e.target.value })} className="flex-1" />
+          <label className="flex items-center gap-2 mt-5 cursor-pointer select-none" style={{ color: 'var(--text-secondary)' }}>
+            <input
+              type="checkbox"
+              checked={data.status_active ?? true}
+              onChange={e => setData({ ...data, status_active: e.target.checked })}
+              className="w-4 h-4 accent-cyan-400"
+            />
+            <span className="text-sm">Show</span>
+          </label>
+        </div>
+
+        <p className="text-xs uppercase tracking-widest font-semibold pt-4" style={{ color: 'var(--purple)', fontFamily: 'Space Grotesk, sans-serif' }}>About Page</p>
         <GlassInput label="Avatar URL" value={data.avatar_url ?? ''} onChange={e => setData({ ...data, avatar_url: e.target.value })} className="w-full" />
         <div>
-          <label className="text-sm mb-2 block" style={{ color: 'var(--text-secondary)' }}>Bio</label>
+          <label className="text-sm mb-2 block" style={{ color: 'var(--text-secondary)' }}>Bio (about page)</label>
           <textarea
             className="w-full px-4 py-2.5 rounded-lg text-sm outline-none min-h-32"
             style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-primary)', resize: 'vertical' }}
