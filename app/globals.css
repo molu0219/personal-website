@@ -1,0 +1,292 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+@import "tailwindcss";
+
+/* ── Light mode (default) ── */
+:root {
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --border: #e2e8f0;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --cyan: #0891b2;
+  --purple: #7c3aed;
+  --pink: #db2777;
+  /* backward-compat aliases */
+  --glass: #ffffff;
+  --glass-border: #e2e8f0;
+  --glass-hover: #f1f5f9;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-hover: 0 8px 30px rgba(0,0,0,0.12), 0 4px 8px rgba(0,0,0,0.06);
+}
+
+/* ── Dark mode ── */
+.dark {
+  --bg: #050510;
+  --surface: rgba(255,255,255,0.04);
+  --border: rgba(255,255,255,0.1);
+  --text-primary: rgba(255,255,255,0.95);
+  --text-secondary: rgba(255,255,255,0.6);
+  --text-muted: rgba(255,255,255,0.35);
+  --cyan: #00d4ff;
+  --purple: #bf00ff;
+  --pink: #ff00a8;
+  --glass: rgba(255,255,255,0.04);
+  --glass-border: rgba(255,255,255,0.1);
+  --glass-hover: rgba(255,255,255,0.08);
+  --shadow-sm: 0 1px 3px rgba(0,212,255,0.05);
+  --shadow-md: 0 0 20px rgba(0,212,255,0.1);
+  --shadow-hover: 0 0 40px rgba(0,212,255,0.15);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-cyan: var(--cyan);
+  --color-purple: var(--purple);
+  --color-pink: var(--pink);
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+  cursor: none;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--cyan) 40%, transparent);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--cyan) 70%, transparent);
+}
+
+/* Glass panel utility */
+.glass {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.glass-hover:hover {
+  background: var(--glass-hover);
+  border-color: color-mix(in srgb, var(--cyan) 30%, transparent);
+}
+
+/* Carousel card hover variants */
+.card-hover-cyan {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.card-hover-cyan:hover {
+  border-color: color-mix(in srgb, var(--cyan) 50%, transparent);
+  box-shadow: var(--shadow-hover);
+}
+.card-hover-purple {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.card-hover-purple:hover {
+  border-color: color-mix(in srgb, var(--purple) 50%, transparent);
+  box-shadow: var(--shadow-hover);
+}
+
+/* Neon glow utilities */
+.glow-cyan {
+  box-shadow: 0 0 20px color-mix(in srgb, var(--cyan) 30%, transparent),
+              0 0 60px color-mix(in srgb, var(--cyan) 10%, transparent);
+}
+.glow-purple {
+  box-shadow: 0 0 20px color-mix(in srgb, var(--purple) 30%, transparent),
+              0 0 60px color-mix(in srgb, var(--purple) 10%, transparent);
+}
+.glow-pink {
+  box-shadow: 0 0 20px color-mix(in srgb, var(--pink) 30%, transparent),
+              0 0 60px color-mix(in srgb, var(--pink) 10%, transparent);
+}
+
+.text-glow-cyan {
+  text-shadow: 0 0 20px color-mix(in srgb, var(--cyan) 80%, transparent),
+               0 0 40px color-mix(in srgb, var(--cyan) 40%, transparent);
+}
+
+/* Neon gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, var(--cyan) 0%, var(--purple) 50%, var(--pink) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Animated gradient text */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.gradient-text-animated {
+  background: linear-gradient(135deg, var(--cyan), var(--purple), var(--pink), var(--cyan));
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 4s ease infinite;
+}
+
+/* Mesh gradient animation */
+@keyframes meshMove {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(30px, -20px) rotate(120deg); }
+  66% { transform: translate(-20px, 20px) rotate(240deg); }
+}
+
+/* Selection */
+::selection {
+  background: color-mix(in srgb, var(--cyan) 30%, transparent);
+  color: var(--text-primary);
+}
+
+/* Nav link hover underline */
+.nav-link-hover {
+  position: relative;
+}
+.nav-link-hover::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--cyan);
+  transition: width 0.25s ease;
+  border-radius: 1px;
+}
+.nav-link-hover:hover::after {
+  width: 100%;
+}
+
+/* Prose styles for markdown — theme-aware */
+.prose-cyberpunk,
+.prose-theme {
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+.prose-cyberpunk h1, .prose-cyberpunk h2, .prose-cyberpunk h3,
+.prose-theme h1, .prose-theme h2, .prose-theme h3 {
+  color: var(--text-primary);
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+.prose-cyberpunk h2, .prose-theme h2 {
+  color: var(--cyan);
+  font-size: 1.4rem;
+}
+.prose-cyberpunk h3, .prose-theme h3 {
+  font-size: 1.15rem;
+}
+.prose-cyberpunk a, .prose-theme a {
+  color: var(--cyan);
+  text-decoration: none;
+}
+.prose-cyberpunk a:hover, .prose-theme a:hover {
+  text-decoration: underline;
+}
+.prose-cyberpunk code, .prose-theme code {
+  background: color-mix(in srgb, var(--cyan) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--cyan) 25%, transparent);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.875em;
+  color: var(--cyan);
+}
+.prose-cyberpunk pre, .prose-theme pre {
+  background: color-mix(in srgb, var(--bg) 85%, black) !important;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow-x: auto;
+  padding: 1rem;
+  margin: 1.25rem 0;
+}
+.prose-cyberpunk pre code, .prose-theme pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--text-secondary);
+}
+.prose-cyberpunk blockquote, .prose-theme blockquote {
+  border-left: 3px solid var(--purple);
+  padding-left: 1rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 1.25rem 0;
+}
+.prose-cyberpunk ul, .prose-theme ul,
+.prose-cyberpunk ol, .prose-theme ol {
+  padding-left: 1.5rem;
+  margin: 0.75rem 0;
+}
+.prose-cyberpunk li, .prose-theme li {
+  margin: 0.35rem 0;
+}
+.prose-cyberpunk p, .prose-theme p {
+  margin: 0.85rem 0;
+}
+.prose-cyberpunk table, .prose-theme table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+.prose-cyberpunk th, .prose-theme th {
+  background: color-mix(in srgb, var(--cyan) 10%, var(--surface));
+  color: var(--text-primary);
+  font-weight: 600;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  text-align: left;
+}
+.prose-cyberpunk td, .prose-theme td {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.prose-cyberpunk tr:nth-child(even) td, .prose-theme tr:nth-child(even) td {
+  background: color-mix(in srgb, var(--surface) 80%, var(--border));
+}
+
+/* Heading anchor links from rehype-autolink-headings */
+.prose-theme [data-heading-link] {
+  opacity: 0;
+  margin-left: 0.4rem;
+  font-size: 0.85em;
+  transition: opacity 0.15s;
+}
+.prose-theme h2:hover [data-heading-link],
+.prose-theme h3:hover [data-heading-link] {
+  opacity: 1;
+}
