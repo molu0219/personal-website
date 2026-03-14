@@ -21,6 +21,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <p className="text-xs font-semibold px-3 mb-2" style={{ color: 'var(--text-muted)', letterSpacing: '0.1em' }}>ADMIN</p>
         {[
           { href: '/admin', label: 'Dashboard' },
+          { href: '/admin/analytics', label: 'Analytics' },
           { href: '/admin/projects', label: 'Projects' },
           { href: '/admin/posts', label: 'Blog Posts' },
           { href: '/admin/about', label: 'About' },

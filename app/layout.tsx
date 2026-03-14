@@ -4,6 +4,7 @@ import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import NeonCursor from '@/components/art/NeonCursor'
 import ThemeProvider from '@/components/ThemeProvider'
+import PageViewTracker from '@/components/PageViewTracker'
 
 export const metadata: Metadata = {
   title: 'Joey Chen — Developer & Builder',
@@ -15,6 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <body>
         <ThemeProvider>
+          <PageViewTracker />
           <NeonCursor />
           <Navbar />
           <main>{children}</main>
