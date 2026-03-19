@@ -138,8 +138,48 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           <div className="absolute top-3 left-3">
             <NeonBadge color={color}>{category}</NeonBadge>
           </div>
-          {project.featured && (
-            <div className="absolute top-3 right-3">
+          <div className="absolute top-3 right-3 flex items-center gap-2">
+            {project.github_url && (
+              <a
+                href={project.github_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={e => { e.stopPropagation(); e.preventDefault(); window.open(e.currentTarget.href, '_blank') }}
+                className="flex items-center justify-center w-7 h-7 rounded-md transition-all duration-200"
+                style={{
+                  background: 'rgba(0,0,0,0.5)',
+                  backdropFilter: 'blur(8px)',
+                  color: 'var(--text-muted)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                }}
+                title="GitHub"
+                onMouseEnter={e => { e.currentTarget.style.color = 'var(--text-primary)'; e.currentTarget.style.background = 'rgba(0,0,0,0.7)' }}
+                onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.background = 'rgba(0,0,0,0.5)' }}
+              >
+                <GitHubIcon />
+              </a>
+            )}
+            {project.url && (
+              <a
+                href={project.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={e => { e.stopPropagation(); e.preventDefault(); window.open(e.currentTarget.href, '_blank') }}
+                className="flex items-center justify-center w-7 h-7 rounded-md transition-all duration-200"
+                style={{
+                  background: 'rgba(0,0,0,0.5)',
+                  backdropFilter: 'blur(8px)',
+                  color: 'var(--text-muted)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                }}
+                title="Live Demo"
+                onMouseEnter={e => { e.currentTarget.style.color = `var(--${color})`; e.currentTarget.style.background = 'rgba(0,0,0,0.7)' }}
+                onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.background = 'rgba(0,0,0,0.5)' }}
+              >
+                <ExternalIcon />
+              </a>
+            )}
+            {project.featured && (
               <span
                 className="text-xs px-2 py-0.5 rounded font-mono font-medium"
                 style={{
@@ -149,10 +189,10 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
                   letterSpacing: '0.1em',
                 }}
               >
-                ★ Featured
+                ★
               </span>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         {/* Body */}
@@ -176,7 +216,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           </p>
 
           {/* Tags */}
-          <div className="flex flex-wrap gap-1.5 mb-4">
+          <div className="flex flex-wrap gap-1.5">
             {project.tags?.slice(0, 4).map(tag => (
               <span
                 key={tag}
@@ -187,63 +227,6 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
               </span>
             ))}
           </div>
-
-          {/* Footer: links */}
-          {(project.github_url || project.url) && (
-          <div className="flex items-center gap-2 pt-3" style={{ borderTop: '1px solid var(--border)' }}>
-            <div className="flex-1" />
-            {project.github_url && (
-              <a
-                href={project.github_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={e => e.stopPropagation()}
-                className="flex items-center justify-center w-8 h-8 rounded-md transition-all duration-200 flex-shrink-0"
-                style={{ border: '1px solid var(--border)', color: 'var(--text-muted)' }}
-                title="GitHub"
-                onMouseEnter={e => {
-                  const el = e.currentTarget as HTMLElement
-                  el.style.color = 'var(--text-primary)'
-                  el.style.borderColor = 'var(--border)'
-                  el.style.background = 'var(--glass-hover)'
-                }}
-                onMouseLeave={e => {
-                  const el = e.currentTarget as HTMLElement
-                  el.style.color = 'var(--text-muted)'
-                  el.style.borderColor = 'var(--border)'
-                  el.style.background = 'transparent'
-                }}
-              >
-                <GitHubIcon />
-              </a>
-            )}
-            {project.url && (
-              <a
-                href={project.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={e => e.stopPropagation()}
-                className="flex items-center justify-center w-8 h-8 rounded-md transition-all duration-200 flex-shrink-0"
-                style={{ border: '1px solid var(--border)', color: 'var(--text-muted)' }}
-                title="Live Demo"
-                onMouseEnter={e => {
-                  const el = e.currentTarget as HTMLElement
-                  el.style.color = `var(--${color})`
-                  el.style.borderColor = `color-mix(in srgb, var(--${color}) 40%, transparent)`
-                  el.style.background = `color-mix(in srgb, var(--${color}) 8%, transparent)`
-                }}
-                onMouseLeave={e => {
-                  const el = e.currentTarget as HTMLElement
-                  el.style.color = 'var(--text-muted)'
-                  el.style.borderColor = 'var(--border)'
-                  el.style.background = 'transparent'
-                }}
-              >
-                <ExternalIcon />
-              </a>
-            )}
-          </div>
-          )}
         </div>
       </Link>
     </motion.div>
@@ -255,10 +238,11 @@ type SortKey = 'newest' | 'oldest' | 'featured'
 export default function ProjectGrid({ projects }: { projects: Project[] }) {
   const [query, setQuery] = useState('')
   const [sort, setSort] = useState<SortKey>('newest')
-  const [activeCategory, setActiveCategory] = useState('All')
+  const [activeTag, setActiveTag] = useState('All')
 
-  const allCategories = useMemo(
-    () => ['All', ...Array.from(new Set(projects.map(p => detectCategory(p.tags))))],
+  // Collect all unique tags from projects
+  const allTags = useMemo(
+    () => ['All', ...Array.from(new Set(projects.flatMap(p => p.tags ?? [])))],
     [projects]
   )
 
@@ -272,8 +256,8 @@ export default function ProjectGrid({ projects }: { projects: Project[] }) {
         p.tags?.some(t => t.toLowerCase().includes(q))
       )
     }
-    if (activeCategory !== 'All') {
-      list = list.filter(p => detectCategory(p.tags) === activeCategory)
+    if (activeTag !== 'All') {
+      list = list.filter(p => p.tags?.some(t => t === activeTag))
     }
     list.sort((a, b) => {
       if (sort === 'featured') return (b.featured ? 1 : 0) - (a.featured ? 1 : 0)
@@ -282,7 +266,7 @@ export default function ProjectGrid({ projects }: { projects: Project[] }) {
       return sort === 'newest' ? tb - ta : ta - tb
     })
     return list
-  }, [projects, query, sort, activeCategory])
+  }, [projects, query, sort, activeTag])
 
   if (projects.length === 0) {
     return (
@@ -342,29 +326,28 @@ export default function ProjectGrid({ projects }: { projects: Project[] }) {
         </div>
       </div>
 
-      {/* ── Category filter chips ── */}
+      {/* ── Tag filter chips ── */}
       <div className="flex flex-wrap gap-2 mb-8">
-        {allCategories.map(cat => {
-          const isActive = activeCategory === cat
-          const color = cat === 'All' ? 'cyan' : CATEGORY_COLORS[cat] ?? 'cyan'
+        {allTags.map(tag => {
+          const isActive = activeTag === tag
           return (
             <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
+              key={tag}
+              onClick={() => setActiveTag(tag)}
               className="px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-200"
               style={{
                 fontFamily: 'Space Grotesk, sans-serif',
                 letterSpacing: '0.08em',
-                background: isActive ? `color-mix(in srgb, var(--${color}) 15%, transparent)` : 'transparent',
-                border: `1px solid ${isActive ? `color-mix(in srgb, var(--${color}) 50%, transparent)` : 'var(--border)'}`,
-                color: isActive ? `var(--${color})` : 'var(--text-muted)',
+                background: isActive ? 'color-mix(in srgb, var(--cyan) 15%, transparent)' : 'transparent',
+                border: `1px solid ${isActive ? 'color-mix(in srgb, var(--cyan) 50%, transparent)' : 'var(--border)'}`,
+                color: isActive ? 'var(--cyan)' : 'var(--text-muted)',
               }}
             >
-              {cat}
+              {tag}
               <span className="ml-1.5 opacity-60" style={{ fontFamily: 'Inter, sans-serif' }}>
-                {cat === 'All'
+                {tag === 'All'
                   ? projects.length
-                  : projects.filter(p => detectCategory(p.tags) === cat).length}
+                  : projects.filter(p => p.tags?.includes(tag)).length}
               </span>
             </button>
           )
