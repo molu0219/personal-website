@@ -13,7 +13,7 @@ interface Skill {
   description: string
   repo_url: string
   install_command: string
-  skill_type: 'general' | 'claude-code-cli'
+  claude_install_command: string
   stars: number
   forks: number
   published: boolean
@@ -158,31 +158,24 @@ export default function AdminSkills() {
           <GlassInput label="Repo URL" value={editing.repo_url ?? ''} onChange={e => setEditing({ ...editing, repo_url: e.target.value })} className="w-full" />
 
           <div>
-            <label className="text-sm mb-2 block" style={{ color: 'var(--text-secondary)' }}>Skill Type</label>
-            <div className="flex gap-4">
-              {(['general', 'claude-code-cli'] as const).map(t => (
-                <label key={t} className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                  <input
-                    type="radio"
-                    name="skill_type"
-                    checked={(editing.skill_type ?? 'general') === t}
-                    onChange={() => setEditing({ ...editing, skill_type: t })}
-                    style={{ accentColor: 'var(--cyan)' }}
-                  />
-                  {t === 'general' ? 'General' : 'Claude Code CLI'}
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <label className="text-sm mb-2 block" style={{ color: 'var(--text-secondary)' }}>Install Command</label>
+            <label className="text-sm mb-2 block" style={{ color: 'var(--text-secondary)' }}>Install Command (CLI)</label>
             <textarea
-              className="w-full px-4 py-2.5 rounded-lg text-sm outline-none min-h-24 font-mono"
+              className="w-full px-4 py-2.5 rounded-lg text-sm outline-none min-h-20 font-mono"
               style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-primary)', resize: 'vertical' }}
               placeholder="npx agent-skills-cli add user/repo"
               value={editing.install_command ?? ''}
               onChange={e => setEditing({ ...editing, install_command: e.target.value })}
+            />
+          </div>
+
+          <div>
+            <label className="text-sm mb-2 block" style={{ color: 'var(--purple)' }}>Install Command (Claude Code CLI)</label>
+            <textarea
+              className="w-full px-4 py-2.5 rounded-lg text-sm outline-none min-h-20 font-mono"
+              style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-primary)', resize: 'vertical' }}
+              placeholder="/install github:user/repo"
+              value={(editing as any).claude_install_command ?? ''}
+              onChange={e => setEditing({ ...editing, claude_install_command: e.target.value } as any)}
             />
           </div>
 
@@ -228,7 +221,8 @@ export default function AdminSkills() {
                 <div className="flex items-center gap-2 mb-1">
                   <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{skill.name}</span>
                   {skill.published ? <NeonBadge color="cyan">Published</NeonBadge> : <NeonBadge color="white">Draft</NeonBadge>}
-                  {skill.skill_type === 'claude-code-cli' && <NeonBadge color="purple">Claude Code</NeonBadge>}
+                  {skill.install_command && <NeonBadge color="cyan">CLI</NeonBadge>}
+                  {skill.claude_install_command && <NeonBadge color="purple">Claude Code</NeonBadge>}
                   <span className="text-xs" style={{ color: 'var(--text-muted)' }}>⭐ {skill.stars} · 🍴 {skill.forks}</span>
                 </div>
                 <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{skill.description}</span>
