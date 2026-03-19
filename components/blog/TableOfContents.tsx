@@ -53,7 +53,7 @@ export default function TableOfContents({ content }: { content: string }) {
   if (headings.length === 0) return null
 
   return (
-    <nav className="sticky top-24">
+    <nav>
       <p
         className="text-xs font-semibold uppercase tracking-wider mb-4"
         style={{ color: 'var(--text-muted)' }}

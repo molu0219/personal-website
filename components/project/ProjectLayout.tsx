@@ -88,9 +88,9 @@ export default function ProjectLayout({
           </article>
 
           {/* Sticky sidebar */}
-          <aside className="hidden lg:block">
+          <aside className="hidden lg:block sticky top-24 self-start max-h-[calc(100vh-8rem)] overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: 'var(--border) transparent' }}>
             <div
-              className="sticky top-24 rounded-2xl p-5 space-y-5"
+              className="rounded-2xl p-5 space-y-5"
               style={{
                 background: 'var(--surface)',
                 border: '1px solid var(--border)',

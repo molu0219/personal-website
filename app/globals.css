@@ -278,6 +278,13 @@ body {
 .prose-cyberpunk tr:nth-child(even) td, .prose-theme tr:nth-child(even) td {
   background: color-mix(in srgb, var(--surface) 80%, var(--border));
 }
+.prose-cyberpunk img, .prose-theme img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  margin: 1.5rem 0;
+}
 
 /* Heading anchor links from rehype-autolink-headings */
 .prose-theme [data-heading-link] {
