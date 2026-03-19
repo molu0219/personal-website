@@ -21,16 +21,16 @@ export default async function SkillsPage() {
           className="font-mono uppercase text-xs mb-4"
           style={{ color: 'var(--text-muted)', letterSpacing: '0.25em' }}
         >
-          AI Agent Toolkit
+          Skills Hub
         </p>
         <h1
           className="text-4xl md:text-5xl font-bold mb-4"
           style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-primary)' }}
         >
-          AI <span className="gradient-text">Skills</span>
+          AI <span className="gradient-text">Skills Hub</span>
         </h1>
         <p style={{ color: 'var(--text-secondary)' }}>
-          Curated collection of AI agent skills. Select and generate a single install script.
+          Curated collection of AI agent skills. Select, sort, and generate a single install script.
         </p>
       </div>
 

@@ -16,6 +16,7 @@ export default function SkillsView({ skills }: { skills: Skill[] }) {
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [copied, setCopied] = useState(false)
   const [mode, setMode] = useState<'script' | 'terminal'>('terminal')
+  const [sortDir, setSortDir] = useState<'desc' | 'asc'>('desc')
 
   const toggleSkill = (id: string) => {
     setSelected(prev => {
@@ -31,7 +32,13 @@ export default function SkillsView({ skills }: { skills: Skill[] }) {
     else setSelected(new Set(skills.map(s => s.id)))
   }
 
-  const commands = skills
+  const sortedSkills = [...skills].sort((a, b) =>
+    sortDir === 'desc' ? b.stars - a.stars : a.stars - b.stars
+  )
+
+  const toggleSort = () => setSortDir(d => d === 'desc' ? 'asc' : 'desc')
+
+  const commands = sortedSkills
     .filter(s => selected.has(s.id))
     .map(s => s.install_command)
 
@@ -83,7 +90,13 @@ export default function SkillsView({ skills }: { skills: Skill[] }) {
             </div>
             <div>Name</div>
             <div className="hidden md:block">Description</div>
-            <div className="text-right">Stars</div>
+            <div
+              className="text-right"
+              style={{ cursor: 'pointer', userSelect: 'none' }}
+              onClick={toggleSort}
+            >
+              Stars {sortDir === 'desc' ? '↓' : '↑'}
+            </div>
             <div className="text-right">Forks</div>
             <div />
           </div>
@@ -94,7 +107,7 @@ export default function SkillsView({ skills }: { skills: Skill[] }) {
               No skills available yet.
             </div>
           ) : (
-            skills.map(skill => (
+            sortedSkills.map(skill => (
               <div
                 key={skill.id}
                 className="grid items-center gap-4 px-4 py-3 transition-colors"
