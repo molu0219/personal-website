@@ -96,7 +96,7 @@
 - [x] 建立 CrtAdTerminal 元件（CRT 外框 + scanline overlay + 綠光暈 + title bar + 關閉按鈕）
 - [x] 實作拖曳功能（純 pointer events，不引入新套件）
 - [x] 實作關閉邏輯（sessionStorage 記住關閉狀態）
-- [x] 手機端隱藏（< 768px）
+- [x] 手機端（< 768px）改為頁面底部內嵌 CRT 區塊（不浮動、不可拖曳、寬度跟隨螢幕、可關閉）
 - [x] 在 root layout 或 `next/script` 載入 AdSense script（afterInteractive）
 - [x] 在 CrtAdTerminal 內容區嵌入 AdSense 廣告單元
 - [x] 在 /blog、/blog/[slug]、/projects、/projects/[slug] 四個頁面放置 CrtAdTerminal

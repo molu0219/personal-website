@@ -266,7 +266,7 @@
 
 ### F015 廣告系統（CRT 終端機風格） `✅ 已完成`
 
-**使用者能做什麼**：訪客在 Blog 列表、Blog 文章頁、Projects 列表、Project 詳情頁看到一個復古 CRT 終端機風格的浮動視窗，內嵌 Google AdSense 廣告。視窗可拖曳移動、可關閉（關閉後該次 session 不再顯示）。
+**使用者能做什麼**：訪客在 Blog 列表、Blog 文章頁、Projects 列表、Project 詳情頁看到一個復古 CRT 終端機風格的廣告容器，內嵌 Google AdSense 廣告。桌面端為浮動視窗（可拖曳、可關閉），手機端為頁面底部內嵌區塊（可關閉）。關閉後該次 session 不再顯示。
 
 **視覺設計**：
 - 外框模擬老式 CRT 螢幕 / 終端機（圓角邊框、scanline overlay、微綠光暈）
@@ -275,10 +275,9 @@
 - 整體風格與網站 Cyberpunk 主題一致
 
 **行為**：
-- 預設顯示在頁面右下角（不遮擋主內容）
-- 可拖曳（純 pointer events 實作，不引入新套件）
+- **桌面端（≥ 768px）**：fixed 浮動在頁面右下角，可拖曳（純 pointer events），不遮擋主內容
+- **手機端（< 768px）**：頁面底部內嵌 CRT 區塊（不浮動、不可拖曳），寬度跟隨螢幕
 - 關閉後存 `sessionStorage`，同一 session 不再顯示
-- 手機端不顯示（螢幕 < 768px 隱藏）
 
 **放置頁面**：
 - `/blog` — Blog 列表頁
@@ -287,10 +286,10 @@
 - `/projects/[slug]` — Project 詳情頁
 
 **驗收條件**：
-- [x] 在 4 個目標頁面顯示 CRT 終端機浮動視窗
-- [x] 視窗可拖曳移動（純 pointer events，無新套件）
+- [x] 在 4 個目標頁面顯示 CRT 終端機廣告容器
+- [x] 桌面端：浮動視窗可拖曳移動（純 pointer events，無新套件）
 - [x] 點擊 `[X]` 關閉，sessionStorage 記住關閉狀態
-- [x] 手機端（< 768px）不顯示
+- [x] 手機端（< 768px）：頁面底部內嵌 CRT 區塊，寬度跟隨螢幕，不浮動不可拖曳，可關閉
 - [x] AdSense script 透過 `next/script` 載入（`afterInteractive`）
 - [x] 廣告單元放在容器內容區，不遮蓋/不修改廣告元素（符合 AdSense TOS）
 - [x] CRT 視覺效果：scanline overlay + 綠光暈 + monospace 標題列 + 圓角邊框
