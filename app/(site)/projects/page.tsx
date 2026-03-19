@@ -1,5 +1,11 @@
+import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import ProjectGrid from '@/components/sections/ProjectGrid'
+
+export const metadata: Metadata = {
+  title: 'Projects — Joey Chen',
+  description: 'Blockchain, AI, and Web3 projects by Joey Chen.',
+}
 
 export default async function ProjectsPage() {
   let projects: any[] = []

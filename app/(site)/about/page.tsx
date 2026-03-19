@@ -1,4 +1,10 @@
+import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
+
+export const metadata: Metadata = {
+  title: 'About — Joey Chen',
+  description: 'About Joey Chen — blockchain developer, builder, and creator.',
+}
 import GlassCard from '@/components/ui/GlassCard'
 import NeonBadge from '@/components/ui/NeonBadge'
 import NeonButton from '@/components/ui/NeonButton'

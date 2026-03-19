@@ -1,5 +1,11 @@
+import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import SkillsView from '@/components/skills/SkillsView'
+
+export const metadata: Metadata = {
+  title: 'Skills Hub — Joey Chen',
+  description: 'Curated collection of AI agent skills. Select and generate install scripts.',
+}
 
 export default async function SkillsPage() {
   let skills: any[] = []

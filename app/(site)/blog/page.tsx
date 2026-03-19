@@ -1,5 +1,11 @@
+import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import BlogList from '@/components/sections/BlogList'
+
+export const metadata: Metadata = {
+  title: 'Blog — Joey Chen',
+  description: 'Thoughts on blockchain, code, and creativity.',
+}
 
 export default async function BlogPage() {
   let posts: any[] = []
