@@ -8,6 +8,24 @@ export const metadata: Metadata = {
 import GlassCard from '@/components/ui/GlassCard'
 import NeonBadge from '@/components/ui/NeonBadge'
 import NeonButton from '@/components/ui/NeonButton'
+import { Github, Globe, Youtube, Instagram, Send } from 'lucide-react'
+
+function XIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+    </svg>
+  )
+}
+
+const SOCIAL_ICONS: Record<string, React.ElementType> = {
+  github: Github,
+  twitter: XIcon,
+  x: XIcon,
+  youtube: Youtube,
+  instagram: Instagram,
+  telegram: Send,
+}
 
 export default async function AboutPage() {
   let about: any = null
@@ -101,11 +119,15 @@ export default async function AboutPage() {
 
             {Object.keys(social).length > 0 && (
               <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
-                {Object.entries(social).map(([key, url]) => (
-                  <NeonButton key={key} href={url as string} variant="ghost">
-                    {key.charAt(0).toUpperCase() + key.slice(1)}
-                  </NeonButton>
-                ))}
+                {Object.entries(social).map(([key, url]) => {
+                  const Icon = SOCIAL_ICONS[key.toLowerCase()] ?? Globe
+                  return (
+                    <NeonButton key={key} href={url as string} variant="ghost">
+                      <Icon size={16} />
+                      <span className="ml-1.5">{key.charAt(0).toUpperCase() + key.slice(1)}</span>
+                    </NeonButton>
+                  )
+                })}
               </div>
             )}
           </div>
