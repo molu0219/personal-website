@@ -140,44 +140,42 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           </div>
           <div className="absolute top-3 right-3 flex items-center gap-2">
             {project.github_url && (
-              <a
-                href={project.github_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={e => { e.stopPropagation(); e.preventDefault(); window.open(e.currentTarget.href, '_blank') }}
+              <button
+                type="button"
+                onClick={e => { e.stopPropagation(); e.preventDefault(); window.open(project.github_url, '_blank') }}
                 className="flex items-center justify-center w-7 h-7 rounded-md transition-all duration-200"
                 style={{
                   background: 'rgba(0,0,0,0.5)',
                   backdropFilter: 'blur(8px)',
                   color: 'var(--text-muted)',
                   border: '1px solid rgba(255,255,255,0.1)',
+                  cursor: 'pointer',
                 }}
                 title="GitHub"
                 onMouseEnter={e => { e.currentTarget.style.color = 'var(--text-primary)'; e.currentTarget.style.background = 'rgba(0,0,0,0.7)' }}
                 onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.background = 'rgba(0,0,0,0.5)' }}
               >
                 <GitHubIcon />
-              </a>
+              </button>
             )}
             {project.url && (
-              <a
-                href={project.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={e => { e.stopPropagation(); e.preventDefault(); window.open(e.currentTarget.href, '_blank') }}
+              <button
+                type="button"
+                onClick={e => { e.stopPropagation(); e.preventDefault(); window.open(project.url, '_blank') }}
                 className="flex items-center justify-center w-7 h-7 rounded-md transition-all duration-200"
                 style={{
                   background: 'rgba(0,0,0,0.5)',
                   backdropFilter: 'blur(8px)',
                   color: 'var(--text-muted)',
                   border: '1px solid rgba(255,255,255,0.1)',
+                  cursor: 'pointer',
                 }}
                 title="Live Demo"
                 onMouseEnter={e => { e.currentTarget.style.color = `var(--${color})`; e.currentTarget.style.background = 'rgba(0,0,0,0.7)' }}
                 onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.background = 'rgba(0,0,0,0.5)' }}
               >
                 <ExternalIcon />
-              </a>
+              </button>
             )}
             {project.featured && (
               <span
