@@ -65,12 +65,18 @@ export default function TableOfContents({ content }: { content: string }) {
           <li key={h.id} style={{ paddingLeft: h.level === 3 ? '12px' : '0' }}>
             <a
               href={`#${h.id}`}
+              onClick={e => {
+                e.preventDefault()
+                const el = document.getElementById(h.id)
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+              }}
               className="text-sm block py-1 transition-all"
               style={{
                 color: activeId === h.id ? 'var(--cyan)' : 'var(--text-secondary)',
                 borderLeft: `2px solid ${activeId === h.id ? 'var(--cyan)' : 'transparent'}`,
                 paddingLeft: '8px',
                 fontWeight: activeId === h.id ? 500 : 400,
+                cursor: 'pointer',
               }}
             >
               {h.text}
