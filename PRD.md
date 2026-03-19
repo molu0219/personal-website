@@ -23,7 +23,7 @@
 | F013 | 佈局與主題系統（Navbar/Footer/Theme） | ✅ 已完成 |
 | F014 | 視覺效果（Aurora/Neon/Mesh） | ✅ 已完成 |
 | F015 | 廣告系統（CRT 終端機風格） | ✅ 已完成 |
-| F016 | AI Skills Hub | ✅ 已完成 |
+| F016 | AI Skills Hub | 🔄 進行中 |
 
 ## 專案概述
 
@@ -300,7 +300,7 @@
 
 ---
 
-### F016 AI Skills Hub `✅ 已完成`
+### F016 AI Skills Hub `🔄 進行中`
 
 **使用者能做什麼**：訪客在 `/skills` 頁面（AI Skills Hub）瀏覽 AI Agent Skills 列表（table 格式），可按 Stars 排序，勾選多個 skills 後，右側 CRT 終端機面板即時產生安裝腳本，支援 Terminal 和 Script 兩種輸出格式，可一鍵複製。Description 欄位 hover 可展開完整內容。
 
@@ -308,13 +308,20 @@
 - **左側 Table**：checkbox、skill 名稱、description（hover tooltip）、⭐ stars（可排序）、🍴 forks、GitHub 連結
 - **右側 Script Panel**：CRT 終端機風格 code block，含 Terminal / Script 模式切換 tab + 一鍵複製按鈕
 
+**Skill 類型**：
+- **general**（預設）：通用安裝指令，支援 Terminal / Script 兩種輸出模式
+- **claude-code-cli**：Claude Code 專用 skill，使用 Claude Code CLI 安裝指令
+
 **Script 輸出模式**：
-- **Terminal 模式**（預設）：顯示 `$ command` 格式，複製純指令（直接貼到 terminal）
-- **Script 模式**：顯示 `#!/bin/bash` header + 完整腳本，複製後可存成 `.sh` 執行
+- **Terminal 模式**（預設，general 類型）：顯示 `$ command` 格式，複製純指令
+- **Script 模式**（general 類型）：顯示 `#!/bin/bash` header + 完整腳本
+- **Claude Code CLI 模式**（claude-code-cli 類型）：顯示 Claude Code CLI 安裝指令
+- **混合選擇衝突**：若同時勾選 general 和 claude-code-cli 類型的 skills，顯示錯誤提示
 
 **Admin 後台 `/admin/skills`**：
 - 新增時貼 GitHub repo URL → 自動抓 repo metadata（name, description, stars, forks）
 - 安裝指令由 Admin 手動填寫（從 README 複製）
+- Skill 類型選擇（general / claude-code-cli）
 - CRUD 管理（編輯、刪除、發布/下架）
 - Admin sidebar 含 Skills 連結
 - "Refresh Stars" 按鈕手動更新所有 skills 的 stars/forks
@@ -322,7 +329,7 @@
 **Stars/Forks 更新**：手動觸發（Admin 頁面按鈕 或 `/api/skills/refresh` API）
 
 **Supabase `skills` 表**：
-- id, name, description, repo_url, install_command, stars, forks, published, created_at, updated_at
+- id, name, description, repo_url, install_command, skill_type, stars, forks, published, created_at, updated_at
 
 **驗收條件**：
 - [x] `/skills` 公開頁面：左右分欄佈局
@@ -338,5 +345,9 @@
 - [x] `/api/skills/refresh` API route（手動更新 stars/forks）
 - [x] Navbar 新增 Skills 連結
 - [x] `/skills` 頁面含 CRT 廣告終端機
+- [ ] Supabase `skills` 表新增 `skill_type` 欄位（`general` / `claude-code-cli`）
+- [ ] Admin 後台 skill 編輯含類型選擇
+- [ ] 前端：claude-code-cli 類型 skill 被選時，script panel 只顯示 Claude Code CLI 模式
+- [ ] 前端：混合選擇（general + claude-code-cli）時顯示錯誤提示
 
 **範圍限制**：不做使用者帳號、不做評分/評論、不做自動偵測已安裝、不做分類篩選、不做安裝指令自動解析、不做 Cron 自動更新（手動觸發）

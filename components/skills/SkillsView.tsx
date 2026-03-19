@@ -8,6 +8,7 @@ interface Skill {
   description: string
   repo_url: string
   install_command: string
+  skill_type: 'general' | 'claude-code-cli'
   stars: number
   forks: number
 }
@@ -38,9 +39,17 @@ export default function SkillsView({ skills }: { skills: Skill[] }) {
 
   const toggleSort = () => setSortDir(d => d === 'desc' ? 'asc' : 'desc')
 
-  const commands = sortedSkills
-    .filter(s => selected.has(s.id))
-    .map(s => s.install_command)
+  const selectedSkills = sortedSkills.filter(s => selected.has(s.id))
+  const commands = selectedSkills.map(s => s.install_command)
+
+  // Detect mixed type conflict
+  const hasGeneral = selectedSkills.some(s => (s.skill_type ?? 'general') === 'general')
+  const hasClaude = selectedSkills.some(s => s.skill_type === 'claude-code-cli')
+  const isMixed = hasGeneral && hasClaude
+  const isClaudeOnly = hasClaude && !hasGeneral
+
+  // Auto-switch mode based on selection
+  const effectiveMode = isClaudeOnly ? 'claude-code-cli' as const : mode
 
   const rawScript = commands.join('\n')
 
@@ -50,12 +59,9 @@ export default function SkillsView({ skills }: { skills: Skill[] }) {
 
   const terminalOutput = commands.map(c => `$ ${c}`).join('\n')
 
-  const currentOutput = mode === 'script' ? scriptOutput : terminalOutput
-
   const copyScript = async () => {
-    if (!currentOutput) return
-    // Copy raw commands for terminal mode, full script for script mode
-    const copyText = mode === 'script' ? scriptOutput : rawScript
+    if (isMixed || !rawScript) return
+    const copyText = effectiveMode === 'script' ? scriptOutput : rawScript
     await navigator.clipboard.writeText(copyText)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
@@ -220,7 +226,24 @@ export default function SkillsView({ skills }: { skills: Skill[] }) {
               <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#febc2e', display: 'inline-block' }} />
               <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#28c840', display: 'inline-block' }} />
               {/* Mode tabs */}
-              {(['terminal', 'script'] as const).map(m => (
+              {isClaudeOnly ? (
+                <span
+                  style={{
+                    fontFamily: '"Courier New", Courier, monospace',
+                    fontSize: 11,
+                    color: 'rgba(0, 255, 136, 0.9)',
+                    background: 'rgba(0, 255, 136, 0.1)',
+                    border: '1px solid rgba(0, 255, 136, 0.25)',
+                    borderRadius: 3,
+                    padding: '1px 8px',
+                    marginLeft: 6,
+                    letterSpacing: '0.05em',
+                    lineHeight: 1.4,
+                  }}
+                >
+                  claude code
+                </span>
+              ) : (['terminal', 'script'] as const).map(m => (
                 <button
                   key={m}
                   onClick={() => setMode(m)}
@@ -309,14 +332,32 @@ export default function SkillsView({ skills }: { skills: Skill[] }) {
                 wordBreak: 'break-all',
               }}
             >
-              {rawScript ? (
-                mode === 'script' ? (
+              {isMixed ? (
+                <span style={{ color: 'rgba(255, 80, 80, 0.9)' }}>
+                  {'⚠ ERROR: Cannot mix general and Claude Code CLI skills.\n\n'}
+                  <span style={{ color: 'rgba(255, 80, 80, 0.5)' }}>
+                    {'> Claude Code CLI skills use a different install\n> method. Please select only one type at a time.\n>\n> _'}
+                  </span>
+                </span>
+              ) : rawScript ? (
+                effectiveMode === 'script' ? (
                   <>
                     <span style={{ color: 'rgba(0, 255, 136, 0.4)' }}>#!/bin/bash</span>
                     {'\n'}
                     <span style={{ color: 'rgba(0, 255, 136, 0.4)' }}># Install {commands.length} selected AI skill{commands.length > 1 ? 's' : ''}</span>
                     {'\n\n'}
                     {rawScript}
+                  </>
+                ) : effectiveMode === 'claude-code-cli' ? (
+                  <>
+                    <span style={{ color: 'rgba(0, 255, 136, 0.4)' }}># Run in Claude Code CLI</span>
+                    {'\n\n'}
+                    {commands.map((cmd, i) => (
+                      <span key={i}>
+                        {cmd}
+                        {'\n'}
+                      </span>
+                    ))}
                   </>
                 ) : (
                   <>

@@ -13,6 +13,7 @@ interface Skill {
   description: string
   repo_url: string
   install_command: string
+  skill_type: 'general' | 'claude-code-cli'
   stars: number
   forks: number
   published: boolean
@@ -157,6 +158,24 @@ export default function AdminSkills() {
           <GlassInput label="Repo URL" value={editing.repo_url ?? ''} onChange={e => setEditing({ ...editing, repo_url: e.target.value })} className="w-full" />
 
           <div>
+            <label className="text-sm mb-2 block" style={{ color: 'var(--text-secondary)' }}>Skill Type</label>
+            <div className="flex gap-4">
+              {(['general', 'claude-code-cli'] as const).map(t => (
+                <label key={t} className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                  <input
+                    type="radio"
+                    name="skill_type"
+                    checked={(editing.skill_type ?? 'general') === t}
+                    onChange={() => setEditing({ ...editing, skill_type: t })}
+                    style={{ accentColor: 'var(--cyan)' }}
+                  />
+                  {t === 'general' ? 'General' : 'Claude Code CLI'}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div>
             <label className="text-sm mb-2 block" style={{ color: 'var(--text-secondary)' }}>Install Command</label>
             <textarea
               className="w-full px-4 py-2.5 rounded-lg text-sm outline-none min-h-24 font-mono"
@@ -209,6 +228,7 @@ export default function AdminSkills() {
                 <div className="flex items-center gap-2 mb-1">
                   <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{skill.name}</span>
                   {skill.published ? <NeonBadge color="cyan">Published</NeonBadge> : <NeonBadge color="white">Draft</NeonBadge>}
+                  {skill.skill_type === 'claude-code-cli' && <NeonBadge color="purple">Claude Code</NeonBadge>}
                   <span className="text-xs" style={{ color: 'var(--text-muted)' }}>⭐ {skill.stars} · 🍴 {skill.forks}</span>
                 </div>
                 <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{skill.description}</span>

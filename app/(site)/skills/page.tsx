@@ -8,7 +8,7 @@ export default async function SkillsPage() {
     const supabase = await createClient()
     const { data } = await supabase
       .from('skills')
-      .select('id, name, description, repo_url, install_command, stars, forks')
+      .select('id, name, description, repo_url, install_command, skill_type, stars, forks')
       .eq('published', true)
       .order('stars', { ascending: false })
     skills = data ?? []
