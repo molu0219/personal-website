@@ -284,6 +284,11 @@ body {
   border-radius: 12px;
   border: 1px solid var(--border);
   margin: 1.5rem 0;
+  cursor: zoom-in;
+  transition: opacity 0.2s;
+}
+.prose-cyberpunk img:hover, .prose-theme img:hover {
+  opacity: 0.9;
 }
 
 /* Heading anchor links from rehype-autolink-headings */

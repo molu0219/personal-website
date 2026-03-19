@@ -7,6 +7,7 @@ import NeonCursor from '@/components/art/NeonCursor'
 import ThemeProvider from '@/components/ThemeProvider'
 import PageViewTracker from '@/components/PageViewTracker'
 import CrtAdLoader from '@/components/ad/CrtAdLoader'
+import ImageLightbox from '@/components/ui/ImageLightbox'
 
 export const metadata: Metadata = {
   title: 'Joey Chen — Developer & Builder',
@@ -34,6 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <main>{children}</main>
           <Footer />
           <CrtAdLoader />
+          <ImageLightbox />
         </ThemeProvider>
       </body>
     </html>
