@@ -8,7 +8,7 @@ export default async function AuthorCard() {
     const supabase = await createClient()
     const { data } = await supabase
       .from('about')
-      .select('name, avatar_url, signature_description, signature_tags')
+      .select('name, avatar_url, signature_description, signature_tags, social_links')
       .single()
     author = data
   } catch {}
@@ -19,6 +19,7 @@ export default async function AuthorCard() {
   const description = author.signature_description ?? ''
   const tags: string[] = author.signature_tags ?? []
   const avatar = author.avatar_url
+  const socials: Record<string, string> = author.social_links ?? {}
 
   return (
     <div
@@ -46,9 +47,25 @@ export default async function AuthorCard() {
           </p>
         )}
         {tags.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-1.5 mb-2">
             {tags.map(tag => (
               <NeonBadge key={tag} color="cyan">{tag}</NeonBadge>
+            ))}
+          </div>
+        )}
+        {Object.keys(socials).length > 0 && (
+          <div className="flex items-center gap-3">
+            {Object.entries(socials).map(([key, href]) => (
+              <a
+                key={key}
+                href={href}
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs transition-colors"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                {key}
+              </a>
             ))}
           </div>
         )}
