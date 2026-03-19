@@ -78,6 +78,8 @@
 - [x] 建立 PageViewTracker 元件
 - [x] 建立 /api/analytics/track route
 - [x] 建立 /api/analytics/stats route
+- [x] localhost / 127.0.0.1 不追蹤
+- [x] Admin 登入後設 localStorage `is_admin` 標記，有標記的不追蹤
 
 ## F013 佈局與主題系統（Navbar/Footer/Theme）
 

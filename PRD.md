@@ -226,12 +226,14 @@
 
 ### F012 頁面瀏覽追蹤 `✅ 已完成`
 
-**使用者能做什麼**：系統自動記錄每次頁面瀏覽（路徑、來源、UA），供 Analytics 面板使用
+**使用者能做什麼**：系統自動記錄每次頁面瀏覽（路徑、來源、UA），供 Analytics 面板使用。localhost 和 admin 登入用戶的瀏覽不記錄。
 
 **驗收條件**：
 - [x] `PageViewTracker` 元件在每次導航時發送 POST 至 `/api/analytics/track`
 - [x] 記錄 path, referrer, user_agent 至 `page_views` 表
 - [x] `/api/analytics/stats` 回傳聚合統計數據
+- [x] localhost / 127.0.0.1 不追蹤
+- [x] Admin 登入後設 localStorage 標記，有標記的不追蹤
 
 **範圍限制**：不做 unique visitor 識別、不做 session 追蹤
 

@@ -26,6 +26,7 @@ export default function LoginPage() {
       setError(err.message)
       setLoading(false)
     } else {
+      localStorage.setItem('is_admin', '1')
       router.push('/admin')
       router.refresh()
     }

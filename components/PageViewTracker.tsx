@@ -9,6 +9,9 @@ export default function PageViewTracker() {
 
   useEffect(() => {
     if (pathname === lastTracked.current) return
+    // Skip localhost and admin users
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') return
+    if (localStorage.getItem('is_admin') === '1') return
     lastTracked.current = pathname
 
     fetch('/api/analytics/track', {
