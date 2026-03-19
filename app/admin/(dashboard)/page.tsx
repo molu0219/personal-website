@@ -38,7 +38,7 @@ export default async function AdminDashboard() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <GlassCard className="p-6">
           <h2 className="font-semibold mb-3" style={{ color: 'var(--cyan)' }}>Projects</h2>
           <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>Manage your portfolio projects</p>
@@ -53,6 +53,11 @@ export default async function AdminDashboard() {
           <h2 className="font-semibold mb-3" style={{ color: 'var(--pink)' }}>About</h2>
           <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>Update your bio and skills</p>
           <NeonButton href="/admin/about" variant="pink">Edit →</NeonButton>
+        </GlassCard>
+        <GlassCard className="p-6">
+          <h2 className="font-semibold mb-3" style={{ color: 'var(--cyan)' }}>AI Skills</h2>
+          <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>Curate AI agent skills</p>
+          <NeonButton href="/admin/skills" variant="cyan">Manage →</NeonButton>
         </GlassCard>
       </div>
     </div>

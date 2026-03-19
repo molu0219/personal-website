@@ -11,6 +11,7 @@ const links = [
   { href: '/about', label: 'About' },
   { href: '/projects', label: 'Projects' },
   { href: '/blog', label: 'Blog' },
+  { href: '/skills', label: 'Skills' },
 ]
 
 export default function Navbar() {

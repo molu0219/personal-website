@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation'
 import CrtAdTerminal from './CrtAdTerminal'
 
-const AD_PATHS = ['/blog', '/projects']
+const AD_PATHS = ['/blog', '/projects', '/skills']
 
 export default function CrtAdLoader() {
   const pathname = usePathname()

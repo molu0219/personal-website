@@ -104,12 +104,12 @@
 
 ## F016 AI Skills 市集
 
-- [ ] 建立 Supabase `skills` 表（id, name, description, repo_url, install_command, stars, forks, published, created_at, updated_at）
-- [ ] 建立 `/api/skills` route（GET 列表 + POST/PUT/DELETE CRUD）
-- [ ] 建立 `/api/skills/github` route（貼 GitHub URL → 回傳 repo name, description, stars, forks）
-- [ ] 建立 `/admin/skills` 管理頁面（CRUD + GitHub URL 自動抓 metadata + 手動填安裝指令）
-- [ ] 建立 `/skills` 公開頁面（左右分欄：左側 table + 右側 CRT script panel）
-- [ ] 實作 table 勾選 → 右側即時合併安裝腳本
-- [ ] 實作 CRT 風格 script panel + 一鍵複製按鈕
-- [ ] 建立 Stars/Forks 每日更新機制（`/api/skills/refresh` API）
-- [ ] Navbar 新增 Skills 連結
+- [~] 建立 Supabase `skills` 表（id, name, description, repo_url, install_command, stars, forks, published, created_at, updated_at）
+- [x] 建立 `/api/skills` route（GET 列表 + POST/PUT/DELETE CRUD）
+- [x] 建立 `/api/skills/github` route（貼 GitHub URL → 回傳 repo name, description, stars, forks）
+- [x] 建立 `/admin/skills` 管理頁面（CRUD + GitHub URL 自動抓 metadata + 手動填安裝指令）
+- [x] 建立 `/skills` 公開頁面（左右分欄：左側 table + 右側 CRT script panel）
+- [x] 實作 table 勾選 → 右側即時合併安裝腳本
+- [x] 實作 CRT 風格 script panel + 一鍵複製按鈕
+- [x] 建立 Stars/Forks 每日更新機制（`/api/skills/refresh` API）
+- [x] Navbar 新增 Skills 連結
