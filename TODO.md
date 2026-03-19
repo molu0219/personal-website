@@ -102,14 +102,20 @@
 - [x] 在 /blog、/blog/[slug]、/projects、/projects/[slug] 四個頁面放置 CrtAdTerminal
 - [x] 建立 /public/ads.txt
 
-## F016 AI Skills 市集
+## F016 AI Skills Hub
 
 - [x] 建立 Supabase `skills` 表（id, name, description, repo_url, install_command, stars, forks, published, created_at, updated_at）
 - [x] 建立 `/api/skills` route（GET 列表 + POST/PUT/DELETE CRUD）
 - [x] 建立 `/api/skills/github` route（貼 GitHub URL → 回傳 repo name, description, stars, forks）
-- [x] 建立 `/admin/skills` 管理頁面（CRUD + GitHub URL 自動抓 metadata + 手動填安裝指令）
+- [x] 建立 `/api/skills/refresh` route（手動更新所有 skills 的 stars/forks）
+- [x] 建立 `/admin/skills` 管理頁面（CRUD + GitHub URL 自動抓 metadata + 手動填安裝指令 + Refresh Stars 按鈕）
+- [x] Admin sidebar 新增 Skills 連結
+- [x] Admin dashboard 新增 Skills 卡片
 - [x] 建立 `/skills` 公開頁面（左右分欄：左側 table + 右側 CRT script panel）
+- [x] 頁面標題改為 AI Skills Hub
+- [x] Description 欄位 hover 展開完整內容（title tooltip）
+- [x] Stars 欄位可點擊排序（升序/降序）
 - [x] 實作 table 勾選 → 右側即時合併安裝腳本
-- [x] 實作 CRT 風格 script panel + 一鍵複製按鈕
-- [x] 建立 Stars/Forks 每日更新機制（`/api/skills/refresh` API）
+- [x] CRT script panel 含 Terminal / Script 模式切換 tab + 一鍵複製
 - [x] Navbar 新增 Skills 連結
+- [x] `/skills` 頁面納入 CRT 廣告終端機顯示範圍

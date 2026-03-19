@@ -23,7 +23,7 @@
 | F013 | 佈局與主題系統（Navbar/Footer/Theme） | ✅ 已完成 |
 | F014 | 視覺效果（Aurora/Neon/Mesh） | ✅ 已完成 |
 | F015 | 廣告系統（CRT 終端機風格） | ✅ 已完成 |
-| F016 | AI Skills 市集 | ✅ 已完成 |
+| F016 | AI Skills Hub | ✅ 已完成 |
 
 ## 專案概述
 
@@ -300,36 +300,43 @@
 
 ---
 
-### F016 AI Skills 市集 `✅ 已完成`
+### F016 AI Skills Hub `✅ 已完成`
 
-**使用者能做什麼**：訪客在 `/skills` 頁面瀏覽 AI Agent Skills 列表（table 格式），勾選多個 skills 後，右側即時產生合併的安裝腳本（`.sh`），可一鍵複製。
+**使用者能做什麼**：訪客在 `/skills` 頁面（AI Skills Hub）瀏覽 AI Agent Skills 列表（table 格式），可按 Stars 排序，勾選多個 skills 後，右側 CRT 終端機面板即時產生安裝腳本，支援 Terminal 和 Script 兩種輸出格式，可一鍵複製。Description 欄位 hover 可展開完整內容。
 
 **頁面佈局（左右分欄）**：
-- **左側 Table**：checkbox、skill 名稱、description、⭐ stars、🍴 forks、GitHub 連結
-- **右側 Script Panel**：CRT 終端機風格 code block，隨勾選即時更新，含一鍵複製按鈕；未勾選時顯示提示文字
+- **左側 Table**：checkbox、skill 名稱、description（hover tooltip）、⭐ stars（可排序）、🍴 forks、GitHub 連結
+- **右側 Script Panel**：CRT 終端機風格 code block，含 Terminal / Script 模式切換 tab + 一鍵複製按鈕
+
+**Script 輸出模式**：
+- **Terminal 模式**（預設）：顯示 `$ command` 格式，複製純指令（直接貼到 terminal）
+- **Script 模式**：顯示 `#!/bin/bash` header + 完整腳本，複製後可存成 `.sh` 執行
 
 **Admin 後台 `/admin/skills`**：
 - 新增時貼 GitHub repo URL → 自動抓 repo metadata（name, description, stars, forks）
 - 安裝指令由 Admin 手動填寫（從 README 複製）
 - CRUD 管理（編輯、刪除、發布/下架）
+- Admin sidebar 含 Skills 連結
+- "Refresh Stars" 按鈕手動更新所有 skills 的 stars/forks
 
-**Stars/Forks 更新**：每日自動更新一次（Cron 或手動觸發 API）
+**Stars/Forks 更新**：手動觸發（Admin 頁面按鈕 或 `/api/skills/refresh` API）
 
 **Supabase `skills` 表**：
 - id, name, description, repo_url, install_command, stars, forks, published, created_at, updated_at
 
 **驗收條件**：
 - [x] `/skills` 公開頁面：左右分欄佈局
-- [x] 左側 table 含 checkbox、name、description、stars、forks、GitHub link
-- [x] 勾選後右側即時產生合併 `.sh` 安裝腳本
-- [x] Script panel 使用 CRT 風格 + 一鍵複製按鈕
-- [x] `/admin/skills` CRUD 管理頁面
+- [x] 左側 table 含 checkbox、name、description（hover tooltip）、stars（可排序）、forks、GitHub link
+- [x] 勾選後右側即時產生安裝腳本
+- [x] Script panel 含 Terminal / Script 模式切換 tab + 一鍵複製
+- [x] `/admin/skills` CRUD 管理頁面 + Admin sidebar 連結
 - [x] 貼 GitHub URL 自動抓 repo name、description、stars、forks
 - [x] 安裝指令 Admin 手動填寫
 - [x] Supabase `skills` 表建立
 - [x] `/api/skills` API route（CRUD）
 - [x] `/api/skills/github` API route（抓 GitHub repo metadata）
-- [x] Stars/Forks 每日更新機制
+- [x] `/api/skills/refresh` API route（手動更新 stars/forks）
 - [x] Navbar 新增 Skills 連結
+- [x] `/skills` 頁面含 CRT 廣告終端機
 
-**範圍限制**：不做使用者帳號、不做評分/評論、不做自動偵測已安裝、不做分類篩選、不做安裝指令自動解析
+**範圍限制**：不做使用者帳號、不做評分/評論、不做自動偵測已安裝、不做分類篩選、不做安裝指令自動解析、不做 Cron 自動更新（手動觸發）
