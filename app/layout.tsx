@@ -11,15 +11,18 @@ import CrtAdLoader from '@/components/ad/CrtAdLoader'
 export const metadata: Metadata = {
   title: 'Joey Chen — Developer & Builder',
   description: 'Personal website of Joey Chen — blockchain developer, builder, and creator.',
+  other: {
+    'google-adsense-account': 'ca-pub-9548192708890896',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <Script
+        <script
+          async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9548192708890896"
-          strategy="beforeInteractive"
           crossOrigin="anonymous"
         />
       </head>
