@@ -11,109 +11,115 @@ interface Props {
   minHeight?: string
 }
 
-// Toolbar button config
-const TOOLBAR = [
-  { key: 'b', label: 'B', title: 'Bold (Ctrl+B)', wrap: ['**', '**'], style: { fontWeight: 700 } },
-  { key: 'i', label: 'I', title: 'Italic (Ctrl+I)', wrap: ['*', '*'], style: { fontStyle: 'italic' } },
-  { key: 's', label: 'S', title: 'Strikethrough (Ctrl+S)', wrap: ['~~', '~~'], style: { textDecoration: 'line-through' } },
-  null, // separator
+// Toolbar buttons - using plain text labels to avoid encoding issues
+const TOOLBAR: (ToolDef | null)[] = [
+  { key: 'b', label: 'B', title: 'Bold (Ctrl+B)', wrap: ['**', '**'], labelStyle: { fontWeight: 700 } },
+  { key: 'i', label: 'I', title: 'Italic (Ctrl+I)', wrap: ['*', '*'], labelStyle: { fontStyle: 'italic' } },
+  { key: 's', label: 'S', title: 'Strikethrough', wrap: ['~~', '~~'], labelStyle: { textDecoration: 'line-through' } },
+  null,
   { key: 'h2', label: 'H2', title: 'Heading 2', prefix: '## ' },
   { key: 'h3', label: 'H3', title: 'Heading 3', prefix: '### ' },
   null,
-  { key: 'ul', label: '???', title: 'Bullet List', prefix: '- ' },
+  { key: 'ul', label: '- ', title: 'Bullet List', prefix: '- ' },
   { key: 'ol', label: '1.', title: 'Numbered List', prefix: '1. ' },
-  { key: 'quote', label: '???', title: 'Quote', prefix: '> ' },
+  { key: 'quote', label: '> ', title: 'Quote', prefix: '> ' },
   null,
-  { key: 'code', label: '`', title: 'Inline Code (Ctrl+`)', wrap: ['`', '`'] },
-  { key: 'codeblock', label: '```', title: 'Code Block', wrap: ['```\n', '\n```'] },
-  { key: 'link', label: '????', title: 'Link (Ctrl+K)', action: 'link' },
-] as const
+  { key: 'code', label: '<>', title: 'Inline Code (Ctrl+`)', wrap: ['`', '`'] },
+  { key: 'codeblock', label: '{ }', title: 'Code Block', wrap: ['```\n', '\n```'] },
+  { key: 'link', label: 'Link', title: 'Link (Ctrl+K)', action: 'link' as const },
+]
 
-type ToolItem = (typeof TOOLBAR)[number]
+interface ToolDef {
+  key: string
+  label: string
+  title: string
+  wrap?: [string, string]
+  prefix?: string
+  action?: 'link'
+  labelStyle?: React.CSSProperties
+}
 
 export default function MarkdownEditor({ label, value, onChange, placeholder, minHeight = '240px' }: Props) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
 
-  // Get selection helper
+  // Use execCommand-based insertion to preserve undo history
+  const insertText = useCallback((text: string) => {
+    const ta = textareaRef.current
+    if (!ta) return
+    ta.focus()
+    // execCommand('insertText') preserves native undo/redo
+    document.execCommand('insertText', false, text)
+  }, [])
+
+  // Get current selection
   const getSelection = useCallback(() => {
     const ta = textareaRef.current
-    if (!ta) return { start: value.length, end: value.length, text: '' }
+    if (!ta) return { start: 0, end: 0, text: '' }
     return { start: ta.selectionStart, end: ta.selectionEnd, text: value.slice(ta.selectionStart, ta.selectionEnd) }
   }, [value])
 
-  // Replace selection and position cursor
-  const replaceSelection = useCallback((start: number, end: number, replacement: string, cursorOffset?: number) => {
-    const newValue = value.slice(0, start) + replacement + value.slice(end)
-    onChange(newValue)
-    const cursorPos = cursorOffset !== undefined ? start + cursorOffset : start + replacement.length
-    requestAnimationFrame(() => {
-      const ta = textareaRef.current
-      if (ta) { ta.selectionStart = ta.selectionEnd = cursorPos; ta.focus() }
-    })
-  }, [value, onChange])
-
-  const insertAtCursor = useCallback((text: string) => {
-    const { start, end } = getSelection()
-    replaceSelection(start, end, text)
-  }, [getSelection, replaceSelection])
-
-  // Wrap selected text or insert placeholder
+  // Wrap selected text
   const wrapSelection = useCallback((before: string, after: string) => {
+    const ta = textareaRef.current
+    if (!ta) return
+    ta.focus()
     const { start, end, text } = getSelection()
-    if (text) {
-      replaceSelection(start, end, before + text + after, start + before.length + text.length + after.length)
-    } else {
-      const placeholder = 'text'
-      replaceSelection(start, end, before + placeholder + after, start + before.length)
-      // Select the placeholder
-      requestAnimationFrame(() => {
-        const ta = textareaRef.current
-        if (ta) { ta.selectionStart = start + before.length; ta.selectionEnd = start + before.length + placeholder.length; ta.focus() }
-      })
-    }
-  }, [getSelection, replaceSelection])
+    const selected = text || 'text'
+    const replacement = before + selected + after
 
-  // Add prefix to current line(s)
+    ta.setSelectionRange(start, end)
+    document.execCommand('insertText', false, replacement)
+
+    // Select the inner text
+    requestAnimationFrame(() => {
+      ta.setSelectionRange(start + before.length, start + before.length + selected.length)
+    })
+  }, [getSelection])
+
+  // Prefix current line
   const prefixLine = useCallback((prefix: string) => {
-    const { start, end } = getSelection()
-    // Find line start
+    const ta = textareaRef.current
+    if (!ta) return
+    ta.focus()
+    const { start } = getSelection()
     const lineStart = value.lastIndexOf('\n', start - 1) + 1
-    const lineEnd = value.indexOf('\n', end)
-    const actualEnd = lineEnd === -1 ? value.length : lineEnd
-    const lines = value.slice(lineStart, actualEnd).split('\n')
-    const prefixed = lines.map(l => prefix + l).join('\n')
-    replaceSelection(lineStart, actualEnd, prefixed)
-  }, [value, getSelection, replaceSelection])
+
+    ta.setSelectionRange(lineStart, lineStart)
+    document.execCommand('insertText', false, prefix)
+  }, [value, getSelection])
 
   // Insert link
   const insertLink = useCallback(() => {
+    const ta = textareaRef.current
+    if (!ta) return
+    ta.focus()
     const { start, end, text } = getSelection()
+
     if (text) {
-      replaceSelection(start, end, `[${text}](url)`, start + text.length + 3)
+      ta.setSelectionRange(start, end)
+      document.execCommand('insertText', false, `[${text}](url)`)
       requestAnimationFrame(() => {
-        const ta = textareaRef.current
-        if (ta) { ta.selectionStart = start + text.length + 3; ta.selectionEnd = start + text.length + 6; ta.focus() }
+        ta.setSelectionRange(start + text.length + 3, start + text.length + 6)
       })
     } else {
-      replaceSelection(start, end, '[link text](url)', start + 1)
+      ta.setSelectionRange(start, end)
+      document.execCommand('insertText', false, '[link text](url)')
       requestAnimationFrame(() => {
-        const ta = textareaRef.current
-        if (ta) { ta.selectionStart = start + 1; ta.selectionEnd = start + 10; ta.focus() }
+        ta.setSelectionRange(start + 1, start + 10)
       })
     }
-  }, [getSelection, replaceSelection])
+  }, [getSelection])
 
   // Handle toolbar click
-  const handleToolAction = useCallback((tool: ToolItem) => {
-    if (!tool) return
-    if ('action' in tool && tool.action === 'link') return insertLink()
-    if ('wrap' in tool && tool.wrap) return wrapSelection(tool.wrap[0], tool.wrap[1])
-    if ('prefix' in tool && tool.prefix) return prefixLine(tool.prefix)
+  const handleToolAction = useCallback((tool: ToolDef) => {
+    if (tool.action === 'link') return insertLink()
+    if (tool.wrap) return wrapSelection(tool.wrap[0], tool.wrap[1])
+    if (tool.prefix) return prefixLine(tool.prefix)
   }, [insertLink, wrapSelection, prefixLine])
 
-  // Keyboard shortcuts
+  // Keyboard shortcuts - only intercept specific combos, let everything else through
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (!e.ctrlKey && !e.metaKey) return
     const key = e.key.toLowerCase()
@@ -121,6 +127,7 @@ export default function MarkdownEditor({ label, value, onChange, placeholder, mi
     else if (key === 'i') { e.preventDefault(); wrapSelection('*', '*') }
     else if (key === 'k') { e.preventDefault(); insertLink() }
     else if (key === '`') { e.preventDefault(); wrapSelection('`', '`') }
+    // Do NOT intercept Ctrl+Z, Ctrl+Y, Ctrl+S, space, or anything else
   }, [wrapSelection, insertLink])
 
   // Image upload
@@ -142,7 +149,7 @@ export default function MarkdownEditor({ label, value, onChange, placeholder, mi
     setUploading(true)
     for (const file of images) {
       const url = await uploadFile(file)
-      if (url) insertAtCursor(`\n![${file.name}](${url})\n`)
+      if (url) insertText(`\n![${file.name}](${url})\n`)
     }
     setUploading(false)
   }
@@ -161,7 +168,7 @@ export default function MarkdownEditor({ label, value, onChange, placeholder, mi
     await handleFiles(Array.from(e.dataTransfer.files))
   }
 
-  const btnStyle = {
+  const btnBase: React.CSSProperties = {
     background: 'none',
     border: '1px solid var(--border)',
     borderRadius: 4,
@@ -190,14 +197,15 @@ export default function MarkdownEditor({ label, value, onChange, placeholder, mi
         }}
       >
         {TOOLBAR.map((tool, i) => {
-          if (!tool) return <div key={i} style={{ width: 1, height: 16, background: 'var(--border)', margin: '0 2px' }} />
+          if (!tool) return <div key={`sep-${i}`} style={{ width: 1, height: 16, background: 'var(--border)', margin: '0 2px' }} />
           return (
             <button
               key={tool.key}
               type="button"
               title={tool.title}
+              tabIndex={-1}
               onClick={() => handleToolAction(tool)}
-              style={{ ...btnStyle, ...('style' in tool && tool.style ? tool.style as any : {}) }}
+              style={{ ...btnBase, ...(tool.labelStyle ?? {}) }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--cyan)'; e.currentTarget.style.color = 'var(--cyan)' }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-muted)' }}
             >
@@ -212,12 +220,13 @@ export default function MarkdownEditor({ label, value, onChange, placeholder, mi
         <button
           type="button"
           title="Upload Image"
+          tabIndex={-1}
           onClick={() => fileInputRef.current?.click()}
-          style={btnStyle}
+          style={btnBase}
           onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--cyan)'; e.currentTarget.style.color = 'var(--cyan)' }}
           onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-muted)' }}
         >
-          + Image
+          + Img
         </button>
       </div>
 
@@ -256,9 +265,8 @@ export default function MarkdownEditor({ label, value, onChange, placeholder, mi
         }}
       />
 
-      {/* Shortcut hint */}
       <p className="text-xs mt-1.5" style={{ color: 'var(--text-muted)' }}>
-        Ctrl+B bold · Ctrl+I italic · Ctrl+K link · Ctrl+` code · Paste/drag images
+        Ctrl+B bold · Ctrl+I italic · Ctrl+K link · Ctrl+` code · Ctrl+Z undo · Paste/drag images
       </p>
     </div>
   )
