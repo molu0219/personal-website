@@ -122,9 +122,8 @@ export default async function AboutPage() {
                 {Object.entries(social).map(([key, url]) => {
                   const Icon = SOCIAL_ICONS[key.toLowerCase()] ?? Globe
                   return (
-                    <NeonButton key={key} href={url as string} variant="ghost">
+                    <NeonButton key={key} href={url as string} variant="ghost" aria-label={key}>
                       <Icon size={16} />
-                      <span className="ml-1.5">{key.charAt(0).toUpperCase() + key.slice(1)}</span>
                     </NeonButton>
                   )
                 })}
