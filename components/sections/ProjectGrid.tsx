@@ -134,10 +134,6 @@ function ProjectCard({ project, index, views }: { project: Project; index: numbe
               </span>
             </div>
           )}
-          {/* Category chip */}
-          <div className="absolute top-3 left-3">
-            <NeonBadge color={color}>{category}</NeonBadge>
-          </div>
           <div className="absolute top-3 right-3 flex items-center gap-2">
             {project.github_url && (
               <button
