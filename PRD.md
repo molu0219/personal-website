@@ -23,7 +23,7 @@
 | F013 | 佈局與主題系統（Navbar/Footer/Theme） | ✅ 已完成 |
 | F014 | 視覺效果（Aurora/Neon/Mesh） | ✅ 已完成 |
 | F015 | 廣告系統（CRT 終端機風格） | ✅ 已完成 |
-| F016 | AI Skills 市集 | 📋 待開發 |
+| F016 | AI Skills 市集 | ✅ 已完成 |
 
 ## 專案概述
 
@@ -300,7 +300,7 @@
 
 ---
 
-### F016 AI Skills 市集 `📋 待開發`
+### F016 AI Skills 市集 `✅ 已完成`
 
 **使用者能做什麼**：訪客在 `/skills` 頁面瀏覽 AI Agent Skills 列表（table 格式），勾選多個 skills 後，右側即時產生合併的安裝腳本（`.sh`），可一鍵複製。
 
@@ -319,17 +319,17 @@
 - id, name, description, repo_url, install_command, stars, forks, published, created_at, updated_at
 
 **驗收條件**：
-- [ ] `/skills` 公開頁面：左右分欄佈局
-- [ ] 左側 table 含 checkbox、name、description、stars、forks、GitHub link
-- [ ] 勾選後右側即時產生合併 `.sh` 安裝腳本
-- [ ] Script panel 使用 CRT 風格 + 一鍵複製按鈕
-- [ ] `/admin/skills` CRUD 管理頁面
-- [ ] 貼 GitHub URL 自動抓 repo name、description、stars、forks
-- [ ] 安裝指令 Admin 手動填寫
-- [ ] Supabase `skills` 表建立
-- [ ] `/api/skills` API route（CRUD）
-- [ ] `/api/skills/github` API route（抓 GitHub repo metadata）
-- [ ] Stars/Forks 每日更新機制
-- [ ] Navbar 新增 Skills 連結
+- [x] `/skills` 公開頁面：左右分欄佈局
+- [x] 左側 table 含 checkbox、name、description、stars、forks、GitHub link
+- [x] 勾選後右側即時產生合併 `.sh` 安裝腳本
+- [x] Script panel 使用 CRT 風格 + 一鍵複製按鈕
+- [x] `/admin/skills` CRUD 管理頁面
+- [x] 貼 GitHub URL 自動抓 repo name、description、stars、forks
+- [x] 安裝指令 Admin 手動填寫
+- [x] Supabase `skills` 表建立
+- [x] `/api/skills` API route（CRUD）
+- [x] `/api/skills/github` API route（抓 GitHub repo metadata）
+- [x] Stars/Forks 每日更新機制
+- [x] Navbar 新增 Skills 連結
 
 **範圍限制**：不做使用者帳號、不做評分/評論、不做自動偵測已安裝、不做分類篩選、不做安裝指令自動解析

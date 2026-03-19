@@ -104,7 +104,7 @@
 
 ## F016 AI Skills 市集
 
-- [~] 建立 Supabase `skills` 表（id, name, description, repo_url, install_command, stars, forks, published, created_at, updated_at）
+- [x] 建立 Supabase `skills` 表（id, name, description, repo_url, install_command, stars, forks, published, created_at, updated_at）
 - [x] 建立 `/api/skills` route（GET 列表 + POST/PUT/DELETE CRUD）
 - [x] 建立 `/api/skills/github` route（貼 GitHub URL → 回傳 repo name, description, stars, forks）
 - [x] 建立 `/admin/skills` 管理頁面（CRUD + GitHub URL 自動抓 metadata + 手動填安裝指令）
