@@ -7,6 +7,7 @@ import NeonButton from '@/components/ui/NeonButton'
 import NeonBadge from '@/components/ui/NeonBadge'
 import GlassInput from '@/components/ui/GlassInput'
 import ImageUpload from '@/components/ui/ImageUpload'
+import MarkdownEditor from '@/components/ui/MarkdownEditor'
 
 interface Post {
   id: string
@@ -80,15 +81,12 @@ export default function AdminPosts() {
             value={(editing as any).cover_url ?? ''}
             onChange={url => setEditing({ ...editing, cover_url: url } as any)}
           />
-          <div>
-            <label className="text-sm mb-2 block" style={{ color: 'var(--text-secondary)' }}>Content (Markdown)</label>
-            <textarea
-              className="w-full px-4 py-2.5 rounded-lg text-sm outline-none min-h-64 font-mono"
-              style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-primary)', resize: 'vertical' }}
-              value={editing.content ?? ''}
-              onChange={e => setEditing({ ...editing, content: e.target.value })}
-            />
-          </div>
+          <MarkdownEditor
+            label="Content (Markdown)"
+            value={editing.content ?? ''}
+            onChange={v => setEditing({ ...editing, content: v })}
+            minHeight="320px"
+          />
           <label className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)', cursor: 'none' }}>
             <input type="checkbox" checked={editing.published ?? false} onChange={e => setEditing({ ...editing, published: e.target.checked })} />
             Published
