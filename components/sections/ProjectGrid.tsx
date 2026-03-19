@@ -89,9 +89,10 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
       transition={{ delay: index * 0.06, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
       className="h-full"
     >
-      <div
-        className="group h-full flex flex-col overflow-hidden rounded-xl transition-all duration-300"
-        style={{ border: '1px solid var(--border)', background: 'var(--surface)' }}
+      <Link
+        href={`/projects/${project.slug}`}
+        className="group h-full flex flex-col overflow-hidden rounded-xl transition-all duration-300 no-underline"
+        style={{ border: '1px solid var(--border)', background: 'var(--surface)', display: 'flex' }}
         onMouseEnter={e => {
           const el = e.currentTarget as HTMLElement
           el.style.borderColor = `color-mix(in srgb, var(--${color}) 50%, transparent)`
@@ -188,27 +189,9 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           </div>
 
           {/* Footer: links */}
+          {(project.github_url || project.url) && (
           <div className="flex items-center gap-2 pt-3" style={{ borderTop: '1px solid var(--border)' }}>
-            <Link
-              href={`/projects/${project.slug}`}
-              className="flex-1 text-xs font-medium py-1.5 text-center rounded-md transition-colors duration-200"
-              style={{
-                color: 'var(--text-secondary)',
-                border: '1px solid var(--border)',
-              }}
-              onMouseEnter={e => {
-                const el = e.currentTarget as HTMLElement
-                el.style.color = `var(--${color})`
-                el.style.borderColor = `color-mix(in srgb, var(--${color}) 40%, transparent)`
-              }}
-              onMouseLeave={e => {
-                const el = e.currentTarget as HTMLElement
-                el.style.color = 'var(--text-secondary)'
-                el.style.borderColor = 'var(--border)'
-              }}
-            >
-              View Details
-            </Link>
+            <div className="flex-1" />
             {project.github_url && (
               <a
                 href={project.github_url}
@@ -260,8 +243,9 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
               </a>
             )}
           </div>
+          )}
         </div>
-      </div>
+      </Link>
     </motion.div>
   )
 }
