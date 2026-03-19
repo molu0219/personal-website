@@ -119,7 +119,7 @@
 - [x] CRT script panel 含 Terminal / Script 模式切換 tab + 一鍵複製
 - [x] Navbar 新增 Skills 連結
 - [x] `/skills` 頁面納入 CRT 廣告終端機顯示範圍
-- [~] Supabase `skills` 表新增 `skill_type` 欄位（預設 `general`，可選 `claude-code-cli`）
+- [x] Supabase `skills` 表新增 `skill_type` 欄位（預設 `general`，可選 `claude-code-cli`）
 - [x] Admin 後台 skill 編輯表單新增類型選擇（general / claude-code-cli）
 - [x] 前端 SkillsView：claude-code-cli 類型被選時 script panel 只顯示 Claude Code CLI 模式
 - [x] 前端 SkillsView：混合選擇（general + claude-code-cli）時顯示錯誤提示

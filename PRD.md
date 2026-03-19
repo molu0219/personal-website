@@ -23,7 +23,7 @@
 | F013 | 佈局與主題系統（Navbar/Footer/Theme） | ✅ 已完成 |
 | F014 | 視覺效果（Aurora/Neon/Mesh） | ✅ 已完成 |
 | F015 | 廣告系統（CRT 終端機風格） | ✅ 已完成 |
-| F016 | AI Skills Hub | 🔄 進行中 |
+| F016 | AI Skills Hub | ✅ 已完成 |
 
 ## 專案概述
 
@@ -300,7 +300,7 @@
 
 ---
 
-### F016 AI Skills Hub `🔄 進行中`
+### F016 AI Skills Hub `✅ 已完成`
 
 **使用者能做什麼**：訪客在 `/skills` 頁面（AI Skills Hub）瀏覽 AI Agent Skills 列表（table 格式），可按 Stars 排序，勾選多個 skills 後，右側 CRT 終端機面板即時產生安裝腳本，支援 Terminal 和 Script 兩種輸出格式，可一鍵複製。Description 欄位 hover 可展開完整內容。
 
@@ -345,9 +345,9 @@
 - [x] `/api/skills/refresh` API route（手動更新 stars/forks）
 - [x] Navbar 新增 Skills 連結
 - [x] `/skills` 頁面含 CRT 廣告終端機
-- [ ] Supabase `skills` 表新增 `skill_type` 欄位（`general` / `claude-code-cli`）
-- [ ] Admin 後台 skill 編輯含類型選擇
-- [ ] 前端：claude-code-cli 類型 skill 被選時，script panel 只顯示 Claude Code CLI 模式
-- [ ] 前端：混合選擇（general + claude-code-cli）時顯示錯誤提示
+- [x] Supabase `skills` 表新增 `skill_type` 欄位（`general` / `claude-code-cli`）
+- [x] Admin 後台 skill 編輯含類型選擇
+- [x] 前端：claude-code-cli 類型 skill 被選時，script panel 只顯示 Claude Code CLI 模式
+- [x] 前端：混合選擇（general + claude-code-cli）時顯示錯誤提示
 
 **範圍限制**：不做使用者帳號、不做評分/評論、不做自動偵測已安裝、不做分類篩選、不做安裝指令自動解析、不做 Cron 自動更新（手動觸發）
