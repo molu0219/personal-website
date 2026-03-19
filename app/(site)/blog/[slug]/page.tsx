@@ -6,6 +6,7 @@ import remarkGfm from 'remark-gfm'
 import rehypeSlug from 'rehype-slug'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import ArticleLayout from '@/components/blog/ArticleLayout'
+import AuthorCard from '@/components/blog/AuthorCard'
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
@@ -37,6 +38,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       >
         {post.content}
       </ReactMarkdown>
+      <AuthorCard />
     </ArticleLayout>
   )
 }

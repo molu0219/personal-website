@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import GlassCard from '@/components/ui/GlassCard'
 import NeonButton from '@/components/ui/NeonButton'
 import GlassInput from '@/components/ui/GlassInput'
+import ImageUpload from '@/components/ui/ImageUpload'
 
 export default function AdminAbout() {
   const [data, setData] = useState<any>({})
@@ -75,8 +76,19 @@ export default function AdminAbout() {
           </label>
         </div>
 
-        <p className="text-xs uppercase tracking-widest font-semibold pt-4" style={{ color: 'var(--purple)', fontFamily: 'Space Grotesk, sans-serif' }}>About Page</p>
-        <GlassInput label="Avatar URL" value={data.avatar_url ?? ''} onChange={e => setData({ ...data, avatar_url: e.target.value })} className="w-full" />
+        <p className="text-xs uppercase tracking-widest font-semibold pt-4" style={{ color: 'var(--purple)', fontFamily: 'Space Grotesk, sans-serif' }}>Author Signature / About Page</p>
+        <ImageUpload
+          label="Avatar"
+          value={data.avatar_url ?? ''}
+          onChange={url => setData({ ...data, avatar_url: url })}
+        />
+        <GlassInput label="Signature Description (short bio for article footer)" value={data.signature_description ?? ''} onChange={e => setData({ ...data, signature_description: e.target.value })} className="w-full" />
+        <GlassInput
+          label="Signature Tags (comma-separated, e.g. Blockchain, AI, Web3)"
+          value={Array.isArray(data.signature_tags) ? data.signature_tags.join(', ') : ''}
+          onChange={e => setData({ ...data, signature_tags: e.target.value.split(',').map((s: string) => s.trim()).filter(Boolean) })}
+          className="w-full"
+        />
         <div>
           <label className="text-sm mb-2 block" style={{ color: 'var(--text-secondary)' }}>Bio (about page)</label>
           <textarea
