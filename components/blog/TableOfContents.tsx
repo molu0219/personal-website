@@ -10,16 +10,20 @@ interface Heading {
 
 function parseHeadings(markdown: string): Heading[] {
   const headings: Heading[] = []
+  const idCount: Record<string, number> = {}
   for (const line of markdown.split('\n')) {
     const match = line.match(/^(#{2,3})\s+(.+)/)
     if (match) {
       const level = match[1].length
       const text = match[2].replace(/[*_`]/g, '').trim()
-      const id = text
+      let id = text
         .toLowerCase()
         .replace(/[^\w\s-]/g, '')
         .replace(/\s+/g, '-')
         .replace(/-+/g, '-')
+      // Deduplicate IDs (matches rehype-slug behavior)
+      idCount[id] = (idCount[id] ?? 0) + 1
+      if (idCount[id] > 1) id = `${id}-${idCount[id] - 1}`
       headings.push({ id, text, level })
     }
   }
