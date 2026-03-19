@@ -15,6 +15,7 @@ interface Skill {
 export default function SkillsView({ skills }: { skills: Skill[] }) {
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [copied, setCopied] = useState(false)
+  const [mode, setMode] = useState<'script' | 'terminal'>('terminal')
 
   const toggleSkill = (id: string) => {
     setSelected(prev => {
@@ -34,15 +35,21 @@ export default function SkillsView({ skills }: { skills: Skill[] }) {
     .filter(s => selected.has(s.id))
     .map(s => s.install_command)
 
-  const script = commands.join('\n')
+  const rawScript = commands.join('\n')
 
-  const fullScript = script
-    ? `#!/bin/bash\n# Install ${commands.length} selected AI skill${commands.length > 1 ? 's' : ''}\n\n${script}`
+  const scriptOutput = rawScript
+    ? `#!/bin/bash\n# Install ${commands.length} selected AI skill${commands.length > 1 ? 's' : ''}\n\n${rawScript}`
     : ''
 
+  const terminalOutput = commands.map(c => `$ ${c}`).join('\n')
+
+  const currentOutput = mode === 'script' ? scriptOutput : terminalOutput
+
   const copyScript = async () => {
-    if (!fullScript) return
-    await navigator.clipboard.writeText(fullScript)
+    if (!currentOutput) return
+    // Copy raw commands for terminal mode, full script for script mode
+    const copyText = mode === 'script' ? scriptOutput : rawScript
+    await navigator.clipboard.writeText(copyText)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -199,19 +206,30 @@ export default function SkillsView({ skills }: { skills: Skill[] }) {
               <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#ff5f57', display: 'inline-block' }} />
               <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#febc2e', display: 'inline-block' }} />
               <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#28c840', display: 'inline-block' }} />
-              <span
-                style={{
-                  fontFamily: '"Courier New", Courier, monospace',
-                  fontSize: 11,
-                  color: 'rgba(0, 255, 136, 0.7)',
-                  marginLeft: 6,
-                  letterSpacing: '0.05em',
-                }}
-              >
-                install.sh
-              </span>
+              {/* Mode tabs */}
+              {(['terminal', 'script'] as const).map(m => (
+                <button
+                  key={m}
+                  onClick={() => setMode(m)}
+                  style={{
+                    fontFamily: '"Courier New", Courier, monospace',
+                    fontSize: 11,
+                    color: mode === m ? 'rgba(0, 255, 136, 0.9)' : 'rgba(0, 255, 136, 0.35)',
+                    background: mode === m ? 'rgba(0, 255, 136, 0.1)' : 'none',
+                    border: mode === m ? '1px solid rgba(0, 255, 136, 0.25)' : '1px solid transparent',
+                    borderRadius: 3,
+                    padding: '1px 8px',
+                    cursor: 'pointer',
+                    marginLeft: m === 'terminal' ? 6 : 0,
+                    letterSpacing: '0.05em',
+                    lineHeight: 1.4,
+                  }}
+                >
+                  {m === 'terminal' ? '> terminal' : '.sh script'}
+                </button>
+              ))}
             </div>
-            {script && (
+            {rawScript && (
               <button
                 onClick={copyScript}
                 style={{
@@ -278,14 +296,26 @@ export default function SkillsView({ skills }: { skills: Skill[] }) {
                 wordBreak: 'break-all',
               }}
             >
-              {script ? (
-                <>
-                  <span style={{ color: 'rgba(0, 255, 136, 0.4)' }}>#!/bin/bash</span>
-                  {'\n'}
-                  <span style={{ color: 'rgba(0, 255, 136, 0.4)' }}># Install {commands.length} selected AI skill{commands.length > 1 ? 's' : ''}</span>
-                  {'\n\n'}
-                  {script}
-                </>
+              {rawScript ? (
+                mode === 'script' ? (
+                  <>
+                    <span style={{ color: 'rgba(0, 255, 136, 0.4)' }}>#!/bin/bash</span>
+                    {'\n'}
+                    <span style={{ color: 'rgba(0, 255, 136, 0.4)' }}># Install {commands.length} selected AI skill{commands.length > 1 ? 's' : ''}</span>
+                    {'\n\n'}
+                    {rawScript}
+                  </>
+                ) : (
+                  <>
+                    {commands.map((cmd, i) => (
+                      <span key={i}>
+                        <span style={{ color: 'rgba(0, 255, 136, 0.5)' }}>$ </span>
+                        {cmd}
+                        {'\n'}
+                      </span>
+                    ))}
+                  </>
+                )
               ) : (
                 <span style={{ color: 'rgba(0, 255, 136, 0.3)' }}>
                   {'> select skills from the list to\n> generate install script...\n>\n> _'}
