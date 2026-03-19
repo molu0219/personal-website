@@ -308,46 +308,45 @@
 - **左側 Table**：checkbox、skill 名稱、description（hover tooltip）、⭐ stars（可排序）、🍴 forks、GitHub 連結
 - **右側 Script Panel**：CRT 終端機風格 code block，含 Terminal / Script 模式切換 tab + 一鍵複製按鈕
 
-**Skill 類型**：
-- **general**（預設）：通用安裝指令，支援 Terminal / Script 兩種輸出模式
-- **claude-code-cli**：Claude Code 專用 skill，使用 Claude Code CLI 安裝指令
+**安裝方式（雙指令模式）**：
+- 每個 skill 可同時有 CLI 安裝指令 (`install_command`) 和 Claude Code CLI 安裝指令 (`claude_install_command`)，兩者都可填或只填一個
+- 前端 table 每行顯示支援的安裝方式標籤（`CLI` / `Claude Code`）
+- Filter bar：All / CLI / Claude Code，含數量統計
 
 **Script 輸出模式**：
-- **Terminal 模式**（預設，general 類型）：顯示 `$ command` 格式，複製純指令
-- **Script 模式**（general 類型）：顯示 `#!/bin/bash` header + 完整腳本
-- **Claude Code CLI 模式**（claude-code-cli 類型）：顯示 Claude Code CLI 安裝指令
-- **混合選擇衝突**：若同時勾選 general 和 claude-code-cli 類型的 skills，顯示錯誤提示
+- **Terminal 模式**（預設）：顯示 `$ command` 格式，複製純指令
+- **Script 模式**：顯示 `#!/bin/bash` header + 完整腳本
+- **Claude Code CLI 模式**：顯示 Claude Code CLI 安裝指令
+- Tab 根據選中 skills 的共同可用安裝方式動態顯示
+- 若選中 skills 無共同安裝方式，顯示警告提示
 
 **Admin 後台 `/admin/skills`**：
 - 新增時貼 GitHub repo URL → 自動抓 repo metadata（name, description, stars, forks）
-- 安裝指令由 Admin 手動填寫（從 README 複製）
-- Skill 類型選擇（general / claude-code-cli）
-- CRUD 管理（編輯、刪除、發布/下架）
+- 兩個安裝指令輸入框：CLI + Claude Code CLI（都可填或只填一個）
+- CRUD 管理（編輯、刪除、發布/下架）+ 安裝方式標籤（CLI / Claude Code）
 - Admin sidebar 含 Skills 連結
 - "Refresh Stars" 按鈕手動更新所有 skills 的 stars/forks
 
 **Stars/Forks 更新**：手動觸發（Admin 頁面按鈕 或 `/api/skills/refresh` API）
 
 **Supabase `skills` 表**：
-- id, name, description, repo_url, install_command, skill_type, stars, forks, published, created_at, updated_at
+- id, name, description, repo_url, install_command, claude_install_command, stars, forks, published, created_at, updated_at
 
 **驗收條件**：
 - [x] `/skills` 公開頁面：左右分欄佈局
-- [x] 左側 table 含 checkbox、name、description（hover tooltip）、stars（可排序）、forks、GitHub link
+- [x] 左側 table 含 checkbox、name、安裝方式標籤、description（hover tooltip）、stars（可排序）、forks、GitHub link
+- [x] Filter bar（All / CLI / Claude Code）含數量統計
 - [x] 勾選後右側即時產生安裝腳本
-- [x] Script panel 含 Terminal / Script 模式切換 tab + 一鍵複製
+- [x] Script panel 根據選中 skills 共同可用方式動態顯示 tab + 一鍵複製
+- [x] 無共同安裝方式時顯示警告
 - [x] `/admin/skills` CRUD 管理頁面 + Admin sidebar 連結
+- [x] Admin 兩個安裝指令輸入框（CLI + Claude Code CLI）
 - [x] 貼 GitHub URL 自動抓 repo name、description、stars、forks
-- [x] 安裝指令 Admin 手動填寫
-- [x] Supabase `skills` 表建立
+- [x] Supabase `skills` 表建立（含 claude_install_command 欄位）
 - [x] `/api/skills` API route（CRUD）
 - [x] `/api/skills/github` API route（抓 GitHub repo metadata）
 - [x] `/api/skills/refresh` API route（手動更新 stars/forks）
-- [x] Navbar 新增 Skills 連結
+- [x] Navbar 新增 Skills Hub 連結
 - [x] `/skills` 頁面含 CRT 廣告終端機
-- [x] Supabase `skills` 表新增 `skill_type` 欄位（`general` / `claude-code-cli`）
-- [x] Admin 後台 skill 編輯含類型選擇
-- [x] 前端：claude-code-cli 類型 skill 被選時，script panel 只顯示 Claude Code CLI 模式
-- [x] 前端：混合選擇（general + claude-code-cli）時顯示錯誤提示
 
-**範圍限制**：不做使用者帳號、不做評分/評論、不做自動偵測已安裝、不做分類篩選、不做安裝指令自動解析、不做 Cron 自動更新（手動觸發）
+**範圍限制**：不做使用者帳號、不做評分/評論、不做自動偵測已安裝、不做安裝指令自動解析、不做 Cron 自動更新（手動觸發）

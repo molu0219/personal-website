@@ -120,7 +120,7 @@
 - [x] Navbar 新增 Skills 連結
 - [x] `/skills` 頁面納入 CRT 廣告終端機顯示範圍
 - [x] ~~Supabase `skills` 表新增 `skill_type` 欄位~~ → 改為雙指令欄位模式
-- [~] Supabase `skills` 表新增 `claude_install_command` 欄位
+- [x] Supabase `skills` 表新增 `claude_install_command` 欄位
 - [x] Admin 後台 skill 編輯：兩個安裝指令輸入框（CLI + Claude Code CLI）
 - [x] 前端 table 每行顯示安裝方式標籤（CLI / Claude Code）
 - [x] 前端 filter bar（All / CLI / Claude Code）
