@@ -8,6 +8,7 @@ import NeonBadge from '@/components/ui/NeonBadge'
 import GlassInput from '@/components/ui/GlassInput'
 import ImageUpload from '@/components/ui/ImageUpload'
 import MarkdownEditor from '@/components/ui/MarkdownEditor'
+import TagInput from '@/components/ui/TagInput'
 
 interface Project {
   id: string
@@ -79,7 +80,7 @@ export default function AdminProjects() {
           <GlassInput label="Title" value={editing.title ?? ''} onChange={e => setEditing({ ...editing, title: e.target.value })} className="w-full" />
           <GlassInput label="Slug" value={editing.slug ?? ''} onChange={e => setEditing({ ...editing, slug: e.target.value })} className="w-full" />
           <GlassInput label="Description" value={editing.description ?? ''} onChange={e => setEditing({ ...editing, description: e.target.value })} className="w-full" />
-          <GlassInput label="Tags (comma-separated)" value={editing.tags?.join(', ') ?? ''} onChange={e => setEditing({ ...editing, tags: e.target.value.split(',').map(t => t.trim()).filter(Boolean) })} className="w-full" />
+          <TagInput label="Tags (comma-separated)" value={editing.tags ?? []} onChange={tags => setEditing({ ...editing, tags })} className="w-full" />
           <GlassInput label="Live URL" value={editing.url ?? ''} onChange={e => setEditing({ ...editing, url: e.target.value })} className="w-full" />
           <GlassInput label="GitHub URL" value={editing.github_url ?? ''} onChange={e => setEditing({ ...editing, github_url: e.target.value })} className="w-full" />
           <ImageUpload

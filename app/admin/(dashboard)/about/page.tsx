@@ -6,6 +6,7 @@ import GlassCard from '@/components/ui/GlassCard'
 import NeonButton from '@/components/ui/NeonButton'
 import GlassInput from '@/components/ui/GlassInput'
 import ImageUpload from '@/components/ui/ImageUpload'
+import TagInput from '@/components/ui/TagInput'
 
 export default function AdminAbout() {
   const [data, setData] = useState<any>({})
@@ -83,10 +84,10 @@ export default function AdminAbout() {
           onChange={url => setData({ ...data, avatar_url: url })}
         />
         <GlassInput label="Signature Description (short bio for article footer)" value={data.signature_description ?? ''} onChange={e => setData({ ...data, signature_description: e.target.value })} className="w-full" />
-        <GlassInput
+        <TagInput
           label="Signature Tags (comma-separated, e.g. Blockchain, AI, Web3)"
-          value={Array.isArray(data.signature_tags) ? data.signature_tags.join(', ') : ''}
-          onChange={e => setData({ ...data, signature_tags: e.target.value.split(',').map((s: string) => s.trim()).filter(Boolean) })}
+          value={Array.isArray(data.signature_tags) ? data.signature_tags : []}
+          onChange={tags => setData({ ...data, signature_tags: tags })}
           className="w-full"
         />
         <div>
@@ -98,10 +99,10 @@ export default function AdminAbout() {
             onChange={e => setData({ ...data, bio: e.target.value })}
           />
         </div>
-        <GlassInput
+        <TagInput
           label="Skills (comma-separated)"
-          value={Array.isArray(data.skills) ? data.skills.join(', ') : ''}
-          onChange={e => setData({ ...data, skills: e.target.value.split(',').map((s: string) => s.trim()).filter(Boolean) })}
+          value={Array.isArray(data.skills) ? data.skills : []}
+          onChange={tags => setData({ ...data, skills: tags })}
           className="w-full"
         />
         <div>

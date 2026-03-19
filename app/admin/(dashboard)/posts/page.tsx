@@ -8,6 +8,7 @@ import NeonBadge from '@/components/ui/NeonBadge'
 import GlassInput from '@/components/ui/GlassInput'
 import ImageUpload from '@/components/ui/ImageUpload'
 import MarkdownEditor from '@/components/ui/MarkdownEditor'
+import TagInput from '@/components/ui/TagInput'
 
 interface Post {
   id: string
@@ -75,7 +76,7 @@ export default function AdminPosts() {
           <GlassInput label="Title" value={editing.title ?? ''} onChange={e => setEditing({ ...editing, title: e.target.value })} className="w-full" />
           <GlassInput label="Slug" value={editing.slug ?? ''} onChange={e => setEditing({ ...editing, slug: e.target.value })} className="w-full" />
           <GlassInput label="Excerpt" value={editing.excerpt ?? ''} onChange={e => setEditing({ ...editing, excerpt: e.target.value })} className="w-full" />
-          <GlassInput label="Tags (comma-separated)" value={editing.tags?.join(', ') ?? ''} onChange={e => setEditing({ ...editing, tags: e.target.value.split(',').map(t => t.trim()).filter(Boolean) })} className="w-full" />
+          <TagInput label="Tags (comma-separated)" value={editing.tags ?? []} onChange={tags => setEditing({ ...editing, tags })} className="w-full" />
           <ImageUpload
             label="Cover Image"
             value={(editing as any).cover_url ?? ''}
