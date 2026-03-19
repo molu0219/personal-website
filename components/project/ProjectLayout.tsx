@@ -19,9 +19,11 @@ interface Project {
 export default function ProjectLayout({
   project,
   children,
+  views,
 }: {
   project: Project
   children: React.ReactNode
+  views?: number
 }) {
   const isLive = !project.status || project.status === 'live'
 
@@ -73,15 +75,22 @@ export default function ProjectLayout({
 
             {project.description && (
               <p
-                className="text-lg mb-8 pb-8"
+                className="text-lg mb-4"
                 style={{
                   color: 'var(--text-secondary)',
-                  borderBottom: '1px solid var(--border)',
                   lineHeight: '1.7',
                 }}
               >
                 {project.description}
               </p>
+            )}
+            {views != null && views > 0 && (
+              <p className="text-sm mb-8 pb-8" style={{ color: 'var(--text-muted)', borderBottom: '1px solid var(--border)' }}>
+                {views.toLocaleString()} views
+              </p>
+            )}
+            {(!views || views === 0) && project.description && (
+              <div className="mb-8 pb-8" style={{ borderBottom: '1px solid var(--border)' }} />
             )}
 
             <div className="prose-theme">{children}</div>

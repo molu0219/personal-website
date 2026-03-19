@@ -21,9 +21,11 @@ function readingTime(content: string): number {
 export default function ArticleLayout({
   post,
   children,
+  views,
 }: {
   post: Post
   children: React.ReactNode
+  views?: number
 }) {
   const minutes = readingTime(post.content)
 
@@ -63,6 +65,12 @@ export default function ArticleLayout({
               )}
               <span>·</span>
               <span>{minutes} min read</span>
+              {views != null && views > 0 && (
+                <>
+                  <span>·</span>
+                  <span>{views.toLocaleString()} views</span>
+                </>
+              )}
             </div>
 
             <h1

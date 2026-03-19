@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
+import { getViewCounts } from '@/lib/view-counts'
 import BlogList from '@/components/sections/BlogList'
 
 export const metadata: Metadata = {
@@ -20,6 +21,8 @@ export default async function BlogPage() {
     posts = data ?? []
   } catch {}
 
+  const viewCounts = await getViewCounts(posts.map(p => `/blog/${p.slug}`))
+
   return (
     <div className="relative z-10 min-h-screen px-6 pt-32 pb-20 max-w-6xl mx-auto">
       <div className="mb-12">
@@ -30,7 +33,7 @@ export default async function BlogPage() {
           Thoughts on blockchain, code, and creativity.
         </p>
       </div>
-      <BlogList posts={posts} />
+      <BlogList posts={posts} viewCounts={viewCounts} />
     </div>
   )
 }

@@ -201,7 +201,7 @@ function HeroCard({ post }: { post: Post }) {
   )
 }
 
-function PostCard({ post, index }: { post: Post; index: number }) {
+function PostCard({ post, index, views }: { post: Post; index: number; views?: number }) {
   return (
     <motion.div
       layout
@@ -252,11 +252,18 @@ function PostCard({ post, index }: { post: Post; index: number }) {
             />
           </div>
           <div className="flex flex-col flex-1 p-5">
-            {post.published_at && (
-              <p className="text-xs font-mono mb-2" style={{ color: 'var(--text-muted)', letterSpacing: '0.12em' }}>
-                {formatDate(post.published_at)}
-              </p>
-            )}
+            <div className="flex items-center gap-3 mb-2">
+              {post.published_at && (
+                <span className="text-xs font-mono" style={{ color: 'var(--text-muted)', letterSpacing: '0.12em' }}>
+                  {formatDate(post.published_at)}
+                </span>
+              )}
+              {views != null && views > 0 && (
+                <span className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
+                  {views} views
+                </span>
+              )}
+            </div>
             <h3
               className="font-bold leading-snug mb-2"
               style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '1.05rem', color: 'var(--text-primary)' }}
@@ -281,7 +288,7 @@ function PostCard({ post, index }: { post: Post; index: number }) {
 }
 
 /* ── Main export ─────────────────────────────────────────── */
-export default function BlogList({ posts }: { posts: Post[] }) {
+export default function BlogList({ posts, viewCounts = {} }: { posts: Post[]; viewCounts?: Record<string, number> }) {
   const [query, setQuery] = useState('')
   const [sort, setSort] = useState<SortKey>('newest')
   const [activeTag, setActiveTag] = useState('All')
@@ -344,7 +351,7 @@ export default function BlogList({ posts }: { posts: Post[] }) {
                 <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                   <AnimatePresence mode="popLayout">
                     {rest.map((post, i) => (
-                      <PostCard key={post.id} post={post} index={i} />
+                      <PostCard key={post.id} post={post} index={i} views={viewCounts[`/blog/${post.slug}`]} />
                     ))}
                   </AnimatePresence>
                 </motion.div>

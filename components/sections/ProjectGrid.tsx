@@ -75,7 +75,7 @@ function ExternalIcon() {
   )
 }
 
-function ProjectCard({ project, index }: { project: Project; index: number }) {
+function ProjectCard({ project, index, views }: { project: Project; index: number; views?: number }) {
   const category = detectCategory(project.tags)
   const color = CATEGORY_COLORS[category]
   const grad = COVER_GRADIENTS[category]
@@ -213,8 +213,13 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             {project.description}
           </p>
 
-          {/* Tags */}
-          <div className="flex flex-wrap gap-1.5">
+          {/* Tags + Views */}
+          <div className="flex flex-wrap items-center gap-1.5">
+            {views != null && views > 0 && (
+              <span className="text-xs font-mono mr-2" style={{ color: 'var(--text-muted)' }}>
+                {views} views
+              </span>
+            )}
             {project.tags?.slice(0, 4).map(tag => (
               <span
                 key={tag}
@@ -233,7 +238,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
 
 type SortKey = 'newest' | 'oldest' | 'featured'
 
-export default function ProjectGrid({ projects }: { projects: Project[] }) {
+export default function ProjectGrid({ projects, viewCounts = {} }: { projects: Project[]; viewCounts?: Record<string, number> }) {
   const [query, setQuery] = useState('')
   const [sort, setSort] = useState<SortKey>('newest')
   const [activeTag, setActiveTag] = useState('All')
@@ -361,7 +366,7 @@ export default function ProjectGrid({ projects }: { projects: Project[] }) {
         <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           <AnimatePresence mode="popLayout">
             {filtered.map((project, i) => (
-              <ProjectCard key={project.id} project={project} index={i} />
+              <ProjectCard key={project.id} project={project} index={i} views={viewCounts[`/projects/${project.slug}`]} />
             ))}
           </AnimatePresence>
         </motion.div>

@@ -7,6 +7,7 @@ import rehypeSlug from 'rehype-slug'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import ProjectLayout from '@/components/project/ProjectLayout'
 import AuthorCard from '@/components/blog/AuthorCard'
+import { getViewCount } from '@/lib/view-counts'
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
@@ -30,8 +31,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
   if (!project) notFound()
 
+  const views = await getViewCount(`/projects/${slug}`)
+
   return (
-    <ProjectLayout project={project}>
+    <ProjectLayout project={project} views={views}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeSlug, rehypeAutolinkHeadings]}

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
+import { getViewCounts } from '@/lib/view-counts'
 import ProjectGrid from '@/components/sections/ProjectGrid'
 
 export const metadata: Metadata = {
@@ -19,6 +20,8 @@ export default async function ProjectsPage() {
       .order('created_at', { ascending: false })
     projects = data ?? []
   } catch {}
+
+  const viewCounts = await getViewCounts(projects.map((p: any) => `/projects/${p.slug}`))
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
@@ -52,7 +55,7 @@ export default async function ProjectsPage() {
       <div style={{ borderTop: '1px solid var(--border)' }} />
 
       <div className="px-8 py-16 max-w-6xl mx-auto">
-        <ProjectGrid projects={projects} />
+        <ProjectGrid projects={projects} viewCounts={viewCounts} />
       </div>
     </div>
   )
