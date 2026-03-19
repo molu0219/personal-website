@@ -67,8 +67,8 @@ async function getStats() {
     supabase.from('page_views').select('*', { count: 'exact', head: true }).gte('created_at', d60.toISOString()).lt('created_at', d30.toISOString()),
     supabase.from('page_views').select('*', { count: 'exact', head: true }),
     supabase.from('page_views').select('created_at').gte('created_at', d30.toISOString()),
-    supabase.from('page_views').select('path, referrer, user_agent').gte('created_at', d30.toISOString()),
-    supabase.from('page_views').select('path, referrer, user_agent, created_at').order('created_at', { ascending: false }).limit(25),
+    supabase.from('page_views').select('path, referrer, user_agent, visitor_hash').gte('created_at', d30.toISOString()),
+    supabase.from('page_views').select('path, referrer, user_agent, visitor_hash, created_at').order('created_at', { ascending: false }).limit(25),
   ])
 
   // daily chart (30d)
@@ -88,8 +88,10 @@ async function getStats() {
   const deviceCount = { Mobile: 0, Desktop: 0 }
   const browserCount: Record<string, number> = {}
   const refCount: Record<string, number> = {}
+  const uniqueVisitors = new Set<string>()
 
   for (const row of allRows ?? []) {
+    if (row.visitor_hash) uniqueVisitors.add(row.visitor_hash)
     pageCount[row.path] = (pageCount[row.path] ?? 0) + 1
     const dev = parseDevice(row.user_agent)
     deviceCount[dev]++
@@ -115,6 +117,7 @@ async function getStats() {
       prevMonth: prevMonth ?? 0,
       total: total ?? 0,
       uniquePages: Object.keys(pageCount).length,
+      uniqueVisitors: uniqueVisitors.size,
     },
     daily,
     pages: {
@@ -276,6 +279,25 @@ export default async function AnalyticsPage() {
           color="var(--purple)"
         />
       </div>
+
+      {/* Unique Visitors */}
+      {summary.uniqueVisitors > 0 && (
+        <div className="mb-6">
+          <GlassCard className="p-5 flex items-center justify-between">
+            <div>
+              <div className="text-xs font-semibold mb-1" style={{ color: 'var(--text-muted)', letterSpacing: '0.08em' }}>
+                UNIQUE VISITORS (30D)
+              </div>
+              <div className="text-2xl font-bold" style={{ color: 'var(--cyan)', fontFamily: 'Space Grotesk, sans-serif' }}>
+                {summary.uniqueVisitors.toLocaleString()}
+              </div>
+            </div>
+            <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
+              Based on hashed IP
+            </div>
+          </GlassCard>
+        </div>
+      )}
 
       {/* Line Chart */}
       <GlassCard className="p-6">
