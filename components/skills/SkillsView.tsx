@@ -31,7 +31,7 @@ export default function SkillsView({ skills }: { skills: Skill[] }) {
   const [copied, setCopied] = useState(false)
   const [mode, setMode] = useState<OutputMode>('terminal')
   const [sortDir, setSortDir] = useState<'desc' | 'asc'>('desc')
-  const [filter, setFilter] = useState<'all' | InstallMethod>('all')
+  const [filter, setFilter] = useState<InstallMethod>('cli')
 
   const toggleSkill = (id: string) => {
     setSelected(prev => {
@@ -42,18 +42,17 @@ export default function SkillsView({ skills }: { skills: Skill[] }) {
     })
   }
 
-  const filteredSkills = skills.filter(s => {
-    if (filter === 'all') return true
-    const methods = getMethodsForSkill(s)
-    return methods.includes(filter)
-  })
+  // Filter: CLI shows skills with install_command, Claude Code shows skills with claude_install_command
+  const filteredSkills = skills.filter(s =>
+    filter === 'cli' ? !!s.install_command : !!s.claude_install_command
+  )
 
   const sortedSkills = [...filteredSkills].sort((a, b) =>
     sortDir === 'desc' ? b.stars - a.stars : a.stars - b.stars
   )
 
   const toggleAll = () => {
-    if (selected.size === sortedSkills.length && sortedSkills.every(s => selected.has(s.id))) {
+    if (sortedSkills.length > 0 && sortedSkills.every(s => selected.has(s.id))) {
       setSelected(new Set())
     } else {
       setSelected(new Set(sortedSkills.map(s => s.id)))
@@ -64,23 +63,14 @@ export default function SkillsView({ skills }: { skills: Skill[] }) {
 
   const selectedSkills = sortedSkills.filter(s => selected.has(s.id))
 
-  // Determine which output modes are available for the selected set
-  const allHaveCli = selectedSkills.length > 0 && selectedSkills.every(s => s.install_command)
-  const allHaveClaude = selectedSkills.length > 0 && selectedSkills.every(s => s.claude_install_command)
-
-  const availableModes: OutputMode[] = []
-  if (allHaveCli) { availableModes.push('terminal'); availableModes.push('script') }
-  if (allHaveClaude) availableModes.push('claude-code')
-
-  // If current mode isn't available, auto-switch
-  const effectiveMode = availableModes.includes(mode)
-    ? mode
-    : availableModes[0] ?? 'terminal'
-
-  // Build commands based on effective mode
+  // Commands always use the current filter's command type
   const commands = selectedSkills.map(s =>
-    effectiveMode === 'claude-code' ? s.claude_install_command : s.install_command
-  )
+    filter === 'claude-code' ? s.claude_install_command : s.install_command
+  ).filter(Boolean)
+
+  // For Claude Code filter, only claude-code tab; for CLI filter, terminal/script tabs
+  const effectiveMode = filter === 'claude-code' ? 'claude-code' as const : mode
+
   const rawScript = commands.join('\n')
 
   const scriptOutput = rawScript
@@ -106,9 +96,8 @@ export default function SkillsView({ skills }: { skills: Skill[] }) {
         {/* Filter bar */}
         <div className="flex gap-2 mb-4">
           {([
-            { key: 'all' as const, label: `All (${skills.length})` },
-            { key: 'cli' as const, label: `CLI (${cliCount})` },
-            { key: 'claude-code' as const, label: `Claude Code (${claudeCount})` },
+            { key: 'cli' as const, label: `CLI (${cliCount})`, color: 'var(--cyan)' },
+            { key: 'claude-code' as const, label: `Claude Code (${claudeCount})`, color: 'var(--purple)' },
           ]).map(f => (
             <button
               key={f.key}
@@ -116,8 +105,8 @@ export default function SkillsView({ skills }: { skills: Skill[] }) {
               className="text-xs font-mono px-3 py-1.5 rounded-lg transition-all"
               style={{
                 color: filter === f.key ? 'var(--bg)' : 'var(--text-secondary)',
-                background: filter === f.key ? 'var(--cyan)' : 'var(--surface)',
-                border: `1px solid ${filter === f.key ? 'var(--cyan)' : 'var(--border)'}`,
+                background: filter === f.key ? f.color : 'var(--surface)',
+                border: `1px solid ${filter === f.key ? f.color : 'var(--border)'}`,
               }}
             >
               {f.label}
@@ -297,8 +286,11 @@ export default function SkillsView({ skills }: { skills: Skill[] }) {
               <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#ff5f57', display: 'inline-block' }} />
               <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#febc2e', display: 'inline-block' }} />
               <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#28c840', display: 'inline-block' }} />
-              {/* Mode tabs */}
-              {(availableModes.length > 0 ? availableModes : ['terminal', 'script'] as OutputMode[]).map((m, i) => (
+              {/* Mode tabs - driven by filter */}
+              {(filter === 'claude-code'
+                ? ['claude-code'] as OutputMode[]
+                : ['terminal', 'script'] as OutputMode[]
+              ).map((m, i) => (
                 <button
                   key={m}
                   onClick={() => setMode(m)}
@@ -387,14 +379,7 @@ export default function SkillsView({ skills }: { skills: Skill[] }) {
                 wordBreak: 'break-all',
               }}
             >
-              {selectedSkills.length > 0 && availableModes.length === 0 ? (
-                <span style={{ color: 'rgba(255, 180, 50, 0.9)' }}>
-                  {'⚠ Selected skills don\'t share a common\n  install method.\n\n'}
-                  <span style={{ color: 'rgba(255, 180, 50, 0.5)' }}>
-                    {'> Try filtering by CLI or Claude Code\n> to select compatible skills.\n>\n> _'}
-                  </span>
-                </span>
-              ) : rawScript ? (
+              {rawScript ? (
                 effectiveMode === 'script' ? (
                   <>
                     <span style={{ color: 'rgba(0, 255, 136, 0.4)' }}>#!/bin/bash</span>
