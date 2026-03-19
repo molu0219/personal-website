@@ -30,14 +30,19 @@ export default function SkillsView({ skills }: { skills: Skill[] }) {
     else setSelected(new Set(skills.map(s => s.id)))
   }
 
-  const script = skills
+  const commands = skills
     .filter(s => selected.has(s.id))
     .map(s => s.install_command)
-    .join('\n')
+
+  const script = commands.join('\n')
+
+  const fullScript = script
+    ? `#!/bin/bash\n# Install ${commands.length} selected AI skill${commands.length > 1 ? 's' : ''}\n\n${script}`
+    : ''
 
   const copyScript = async () => {
-    if (!script) return
-    await navigator.clipboard.writeText(script)
+    if (!fullScript) return
+    await navigator.clipboard.writeText(fullScript)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -116,6 +121,7 @@ export default function SkillsView({ skills }: { skills: Skill[] }) {
                 <div
                   className="text-sm truncate hidden md:block"
                   style={{ color: 'var(--text-secondary)' }}
+                  title={skill.description}
                 >
                   {skill.description}
                 </div>
@@ -276,7 +282,7 @@ export default function SkillsView({ skills }: { skills: Skill[] }) {
                 <>
                   <span style={{ color: 'rgba(0, 255, 136, 0.4)' }}>#!/bin/bash</span>
                   {'\n'}
-                  <span style={{ color: 'rgba(0, 255, 136, 0.4)' }}># Install selected AI skills</span>
+                  <span style={{ color: 'rgba(0, 255, 136, 0.4)' }}># Install {commands.length} selected AI skill{commands.length > 1 ? 's' : ''}</span>
                   {'\n\n'}
                   {script}
                 </>
