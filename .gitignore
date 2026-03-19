@@ -43,3 +43,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# project docs (kept locally, not pushed)
+CLAUDE.md
+PRD.md
+TODO.md
+DECISION.md
+social-post/
