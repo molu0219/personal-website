@@ -213,7 +213,7 @@ function ProjectCard({ project, index, views }: { project: Project; index: numbe
           <div className="flex flex-wrap items-center gap-1.5">
             {views != null && views > 0 && (
               <span className="text-xs font-mono mr-2" style={{ color: 'var(--text-muted)' }}>
-                {views} views
+                {views.toLocaleString()} views
               </span>
             )}
             {project.tags?.slice(0, 4).map(tag => (

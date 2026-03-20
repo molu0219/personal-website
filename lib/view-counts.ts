@@ -4,17 +4,16 @@ export async function getViewCounts(paths: string[]): Promise<Record<string, num
   if (paths.length === 0) return {}
 
   const supabase = createServiceClient()
-  const { data } = await supabase
-    .from('page_views')
-    .select('path')
-    .in('path', paths)
-
-  const counts: Record<string, number> = {}
-  for (const path of paths) counts[path] = 0
-  for (const row of data ?? []) {
-    counts[row.path] = (counts[row.path] ?? 0) + 1
-  }
-  return counts
+  const results = await Promise.all(
+    paths.map(async (path) => {
+      const { count } = await supabase
+        .from('page_views')
+        .select('*', { count: 'exact', head: true })
+        .eq('path', path)
+      return [path, count ?? 0] as const
+    })
+  )
+  return Object.fromEntries(results)
 }
 
 export async function getViewCount(path: string): Promise<number> {

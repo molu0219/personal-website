@@ -260,7 +260,7 @@ function PostCard({ post, index, views }: { post: Post; index: number; views?: n
               )}
               {views != null && views > 0 && (
                 <span className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
-                  {views} views
+                  {views.toLocaleString()} views
                 </span>
               )}
             </div>

@@ -84,14 +84,13 @@ export default function ProjectLayout({
                 {project.description}
               </p>
             )}
-            {views != null && views > 0 && (
-              <p className="text-sm mb-8 pb-8" style={{ color: 'var(--text-muted)', borderBottom: '1px solid var(--border)' }}>
-                {views.toLocaleString()} views
-              </p>
-            )}
-            {(!views || views === 0) && project.description && (
-              <div className="mb-8 pb-8" style={{ borderBottom: '1px solid var(--border)' }} />
-            )}
+            <div className="mb-8 pb-8" style={{ borderBottom: '1px solid var(--border)' }}>
+              {views != null && views > 0 && (
+                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                  {views.toLocaleString()} views
+                </p>
+              )}
+            </div>
 
             <div className="prose-theme">{children}</div>
           </article>
