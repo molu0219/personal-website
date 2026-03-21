@@ -6,7 +6,8 @@ import Footer from '@/components/layout/Footer'
 import NeonCursor from '@/components/art/NeonCursor'
 import ThemeProvider from '@/components/ThemeProvider'
 import PageViewTracker from '@/components/PageViewTracker'
-import CrtAdLoader from '@/components/ad/CrtAdLoader'
+// CrtAdLoader disabled until AdSense approval — placeholder ad slot triggers policy violation
+// import CrtAdLoader from '@/components/ad/CrtAdLoader'
 import ImageLightbox from '@/components/ui/ImageLightbox'
 
 export const metadata: Metadata = {
@@ -34,7 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Navbar />
           <main>{children}</main>
           <Footer />
-          <CrtAdLoader />
+          {/* <CrtAdLoader /> */}
           <ImageLightbox />
         </ThemeProvider>
       </body>
