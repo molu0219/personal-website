@@ -6,6 +6,7 @@ import ProjectGrid from '@/components/sections/ProjectGrid'
 export const metadata: Metadata = {
   title: 'Projects — Joey Chen',
   description: 'Blockchain, AI, and Web3 projects by Joey Chen.',
+  alternates: { canonical: '/projects' },
 }
 
 export default async function ProjectsPage() {

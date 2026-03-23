@@ -6,6 +6,7 @@ import SkillsView from '@/components/skills/SkillsView'
 export const metadata: Metadata = {
   title: 'Skills Hub — Joey Chen',
   description: 'Curated collection of AI agent skills. Select and generate install scripts.',
+  alternates: { canonical: '/skills' },
 }
 
 export default async function SkillsPage() {

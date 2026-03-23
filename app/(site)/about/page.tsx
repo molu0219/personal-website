@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 export const metadata: Metadata = {
   title: 'About — Joey Chen',
   description: 'About Joey Chen — blockchain developer, builder, and creator.',
+  alternates: { canonical: '/about' },
 }
 import GlassCard from '@/components/ui/GlassCard'
 import NeonBadge from '@/components/ui/NeonBadge'

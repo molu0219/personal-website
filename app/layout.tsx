@@ -11,8 +11,12 @@ import PageViewTracker from '@/components/PageViewTracker'
 import ImageLightbox from '@/components/ui/ImageLightbox'
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://0xjoeytw.xyz'),
   title: 'Joey Chen — Developer & Builder',
   description: 'Personal website of Joey Chen — blockchain developer, builder, and creator.',
+  alternates: {
+    canonical: '/',
+  },
   other: {
     'google-adsense-account': 'ca-pub-9548192708890896',
   },

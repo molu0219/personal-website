@@ -6,6 +6,7 @@ import BlogList from '@/components/sections/BlogList'
 export const metadata: Metadata = {
   title: 'Blog — Joey Chen',
   description: 'Thoughts on blockchain, code, and creativity.',
+  alternates: { canonical: '/blog' },
 }
 
 export default async function BlogPage() {

@@ -14,7 +14,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   try {
     const supabase = await createClient()
     const { data } = await supabase.from('posts').select('title, excerpt').eq('slug', slug).eq('published', true).single()
-    if (data) return { title: `${data.title} — Joey Chen`, description: data.excerpt || undefined }
+    if (data) return {
+      title: `${data.title} — Joey Chen`,
+      description: data.excerpt || undefined,
+      alternates: { canonical: `/blog/${slug}` },
+    }
   } catch {}
   return { title: 'Blog — Joey Chen' }
 }
