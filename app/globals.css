@@ -95,6 +95,34 @@ body {
   animation: marquee-scroll 8s linear infinite;
 }
 
+/* Volume slider */
+.volume-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--cyan, #00d4ff);
+  box-shadow: 0 0 6px rgba(0,212,255,0.5);
+  cursor: pointer;
+}
+.volume-slider::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--cyan, #00d4ff);
+  border: none;
+  box-shadow: 0 0 6px rgba(0,212,255,0.5);
+  cursor: pointer;
+}
+
 /* Glass panel utility */
 .glass {
   background: var(--surface);
