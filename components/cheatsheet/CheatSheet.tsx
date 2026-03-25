@@ -130,14 +130,14 @@ const CARDS: Card[] = [
       { title: 'Session & Startup', rows: [
         { key: '-c, --continue', val: 'Load most recent conversation' },
         { key: '-r, --resume ID', val: 'Resume specific session' },
+        { key: '--fork-session', val: 'New session ID when resuming' },
         { key: '-n, --name', val: 'Set session display name' },
         { key: '-p, --print', val: 'One-shot print mode (non-interactive)' },
         { key: '--bare', val: 'Minimal mode, skip auto-discovery' },
         { key: '-w, --worktree', val: 'Start in isolated git worktree' },
-        { key: '--init', val: 'Run init hooks + start interactive' },
-        { key: '--remote', val: 'Create web session on claude.ai' },
-        { key: '--teleport', val: 'Resume web session in local terminal' },
+        { key: '--tmux', val: 'Create tmux session for worktree' },
         { key: '--from-pr 123', val: 'Resume sessions linked to PR' },
+        { key: '--session-id UUID', val: 'Use specific session ID' },
       ]},
       { title: 'Model & Effort', rows: [
         { key: '--model MODEL', val: 'Set model (or use sonnet/opus)' },
@@ -153,13 +153,13 @@ const CARDS: Card[] = [
       { title: 'System Prompt', rows: [
         { key: '--system-prompt', val: 'Replace default system prompt' },
         { key: '--append-system-prompt', val: 'Append to default prompt' },
-        { key: '--system-prompt-file', val: 'Load prompt from file' },
       ]},
-      { title: 'Output', rows: [
+      { title: 'Output & Limits', rows: [
         { key: '--output-format', val: 'text / json / stream-json' },
+        { key: '--input-format', val: 'text / stream-json (with --print)' },
         { key: '--json-schema', val: 'Get validated JSON output' },
-        { key: '--max-turns N', val: 'Limit agentic turns' },
-        { key: '--max-budget-usd N', val: 'Max dollar amount' },
+        { key: '--max-budget-usd N', val: 'Max dollar amount (with --print)' },
+        { key: '--tools', val: 'Restrict available built-in tools' },
         { key: '-v, --version', val: 'Print version' },
       ]},
       { title: 'MCP & Plugins', rows: [
@@ -168,9 +168,11 @@ const CARDS: Card[] = [
         { key: '--chrome / --no-chrome', val: 'Enable / disable Chrome integration' },
         { key: '--plugin-dir DIR', val: 'Load plugins from directory' },
         { key: '--agent NAME', val: 'Specify agent for session' },
+        { key: '--agents JSON', val: 'Define custom subagents via JSON' },
         { key: '--add-dir PATH', val: 'Add working directories' },
         { key: '--settings FILE', val: 'Load additional settings' },
-        { key: '--debug', val: 'Enable debug mode' },
+        { key: '-d, --debug', val: 'Enable debug mode (optional filter)' },
+        { key: '--verbose', val: 'Enable verbose logging' },
       ]},
       { title: 'Auth Commands', rows: [
         { key: 'claude auth login', val: 'Sign in' },
