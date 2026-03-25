@@ -85,6 +85,22 @@ export default function CdPlayer() {
     const dpr = window.devicePixelRatio || 1
     canvas.width = 48 * dpr
     canvas.height = 20 * dpr
+
+    // Draw idle bars
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    const w = 48
+    const h = 20
+    const barW = w / BAR_COUNT
+    for (let i = 0; i < BAR_COUNT; i++) {
+      const idle = 0.1 + Math.sin(i * 0.6) * 0.08
+      const barH = Math.max(1.5, idle * h)
+      const ratio = i / BAR_COUNT
+      const r = Math.round(ratio * 191)
+      const g = Math.round(212 - ratio * 212)
+      ctx.fillStyle = `rgba(${r},${g},255,0.25)`
+      ctx.fillRect((i * barW + 0.5) * dpr, (h - barH) * dpr, (barW - 1) * dpr, barH * dpr)
+    }
   }, [])
 
   const toggle = useCallback(async () => {
