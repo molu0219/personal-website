@@ -146,7 +146,17 @@ export default function CdPlayer() {
   }, [])
 
   return (
-    <div className="flex flex-col gap-0.5" onMouseEnter={showVol} onMouseLeave={hideVol}>
+    <div
+      className="flex flex-col gap-0.5 rounded-lg px-2 py-1.5"
+      style={{
+        background: 'color-mix(in srgb, var(--surface) 80%, transparent)',
+        border: '1px solid var(--border)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+      }}
+      onMouseEnter={showVol}
+      onMouseLeave={hideVol}
+    >
       {/* Row 1: Play + Visualizer bars */}
       <div className="flex items-center gap-1.5">
         <button
