@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import ThemeToggle from '@/components/ui/ThemeToggle'
+import CdPlayer from '@/components/ui/CdPlayer'
 
 const links = [
   { href: '/', label: 'Home' },
@@ -42,9 +43,14 @@ export default function Navbar() {
           boxShadow: scrolled ? 'var(--shadow-md)' : 'none',
         }}
       >
-        <Link href="/" className="text-lg font-bold" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-          <span className="gradient-text">JC</span>
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link href="/" className="text-lg font-bold" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+            <span className="gradient-text">JC</span>
+          </Link>
+          <div className="hidden md:flex">
+            <CdPlayer />
+          </div>
+        </div>
 
         {/* Desktop links */}
         <div className="hidden md:flex items-center gap-1">
