@@ -146,70 +146,62 @@ export default function CdPlayer() {
   }, [])
 
   return (
-    <div className="flex items-center gap-1.5" onMouseEnter={showVol} onMouseLeave={hideVol}>
-      {/* Play/Pause button */}
-      <button
-        onClick={toggle}
-        className="outline-none focus:outline-none flex items-center justify-center rounded-md transition-colors"
-        style={{
-          width: '22px', height: '22px',
-          background: 'rgba(255,255,255,0.06)',
-          border: 'none', cursor: 'pointer',
-          color: playing ? 'var(--cyan, #00d4ff)' : 'var(--text-muted)',
-        }}
-        title={playing ? 'Pause' : 'Play'}
-      >
-        {playing ? (
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
-            <rect x="6" y="4" width="4" height="16" />
-            <rect x="14" y="4" width="4" height="16" />
-          </svg>
-        ) : (
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M8 5v14l11-7z" />
-          </svg>
-        )}
-      </button>
-
-      {/* Visualizer bars */}
-      <canvas
-        ref={canvasRef}
-        className="rounded-sm"
-        style={{
-          width: '48px', height: '20px',
-          opacity: playing ? 1 : 0.3,
-          transition: 'opacity 0.3s',
-        }}
-      />
-
-      {/* Volume icon (clickable mute) */}
-      <button
-        onClick={toggleMute}
-        className="outline-none focus:outline-none flex items-center justify-center"
-        style={{ background: 'none', border: 'none', cursor: 'pointer', width: '16px', height: '16px' }}
-        title={muted ? 'Unmute' : 'Mute'}
-      >
-        <svg
-          width="12" height="12" viewBox="0 0 24 24" fill="none"
-          stroke={muted ? 'rgba(255,82,82,0.7)' : 'var(--text-muted)'}
-          strokeWidth="2.5"
+    <div className="flex flex-col gap-0.5" onMouseEnter={showVol} onMouseLeave={hideVol}>
+      {/* Row 1: Play + Visualizer bars */}
+      <div className="flex items-center gap-1.5">
+        <button
+          onClick={toggle}
+          className="outline-none focus:outline-none flex items-center justify-center rounded-md transition-colors"
+          style={{
+            width: '20px', height: '20px',
+            background: 'rgba(255,255,255,0.06)',
+            border: 'none', cursor: 'pointer',
+            color: playing ? 'var(--cyan, #00d4ff)' : 'var(--text-muted)',
+          }}
+          title={playing ? 'Pause' : 'Play'}
         >
-          <path d="M11 5L6 9H2v6h4l5 4V5z" />
-          {!muted && volume > 0.3 && <path d="M15.54 8.46a5 5 0 010 7.07" />}
-          {!muted && volume > 0.6 && <path d="M19.07 4.93a10 10 0 010 14.14" />}
-          {muted && <><line x1="23" y1="9" x2="17" y2="15" /><line x1="17" y1="9" x2="23" y2="15" /></>}
-        </svg>
-      </button>
+          {playing ? (
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="4" width="4" height="16" />
+              <rect x="14" y="4" width="4" height="16" />
+            </svg>
+          ) : (
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          )}
+        </button>
 
-      {/* Volume slider (appears on hover) */}
-      <div
-        className="overflow-hidden transition-all"
-        style={{
-          width: showVolume ? '60px' : '0px',
-          opacity: showVolume ? 1 : 0,
-          transition: 'width 0.2s ease, opacity 0.2s ease',
-        }}
-      >
+        <canvas
+          ref={canvasRef}
+          className="rounded-sm"
+          style={{
+            width: '48px', height: '20px',
+            opacity: playing ? 1 : 0.3,
+            transition: 'opacity 0.3s',
+          }}
+        />
+      </div>
+
+      {/* Row 2: Volume icon + slider */}
+      <div className="flex items-center gap-1">
+        <button
+          onClick={toggleMute}
+          className="outline-none focus:outline-none flex items-center justify-center flex-shrink-0"
+          style={{ background: 'none', border: 'none', cursor: 'pointer', width: '14px', height: '14px' }}
+          title={muted ? 'Unmute' : 'Mute'}
+        >
+          <svg
+            width="10" height="10" viewBox="0 0 24 24" fill="none"
+            stroke={muted ? 'rgba(255,82,82,0.7)' : 'var(--text-muted)'}
+            strokeWidth="2.5"
+          >
+            <path d="M11 5L6 9H2v6h4l5 4V5z" />
+            {!muted && volume > 0.3 && <path d="M15.54 8.46a5 5 0 010 7.07" />}
+            {!muted && volume > 0.6 && <path d="M19.07 4.93a10 10 0 010 14.14" />}
+            {muted && <><line x1="23" y1="9" x2="17" y2="15" /><line x1="17" y1="9" x2="23" y2="15" /></>}
+          </svg>
+        </button>
         <input
           type="range" min="0" max="1" step="0.01"
           value={volume} onChange={handleVolume}
