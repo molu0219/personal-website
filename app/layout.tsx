@@ -9,6 +9,7 @@ import PageViewTracker from '@/components/PageViewTracker'
 // CrtAdLoader disabled until AdSense approval — placeholder ad slot triggers policy violation
 // import CrtAdLoader from '@/components/ad/CrtAdLoader'
 import ImageLightbox from '@/components/ui/ImageLightbox'
+import CdPlayer from '@/components/ui/CdPlayer'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://0xjoeytw.xyz'),
@@ -41,6 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Footer />
           {/* <CrtAdLoader /> */}
           <ImageLightbox />
+          <CdPlayer />
         </ThemeProvider>
       </body>
     </html>

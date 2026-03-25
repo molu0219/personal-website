@@ -81,6 +81,20 @@ body {
   background: color-mix(in srgb, var(--cyan) 70%, transparent);
 }
 
+/* CD Player animations */
+@keyframes spin-cd {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.animate-marquee {
+  display: inline-block;
+  animation: marquee-scroll 8s linear infinite;
+}
+
 /* Glass panel utility */
 .glass {
   background: var(--surface);
