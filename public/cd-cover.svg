@@ -1,0 +1,8 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'>
+<defs><radialGradient id='g'><stop offset='0%' stop-color='#1a1a2e'/><stop offset='70%' stop-color='#0f0f23'/><stop offset='100%' stop-color='#050510'/></radialGradient></defs>
+<circle cx='100' cy='100' r='100' fill='url(#g)'/>
+<circle cx='100' cy='100' r='60' fill='none' stroke='rgba(0,212,255,0.15)' stroke-width='0.5'/>
+<circle cx='100' cy='100' r='40' fill='none' stroke='rgba(0,212,255,0.1)' stroke-width='0.5'/>
+<text x='100' y='95' text-anchor='middle' fill='rgba(255,255,255,0.4)' font-size='11' font-family='sans-serif'>CD</text>
+<text x='100' y='112' text-anchor='middle' fill='rgba(0,212,255,0.5)' font-size='9' font-family='sans-serif'>Cover</text>
+</svg>
