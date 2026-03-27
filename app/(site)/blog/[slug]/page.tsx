@@ -13,10 +13,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   try {
     const supabase = await createClient()
-    const { data } = await supabase.from('posts').select('title, excerpt, cover_url').eq('slug', slug).eq('published', true).single()
+    const { data } = await supabase.from('posts').select('title, excerpt, excerpt_en, cover_url').eq('slug', slug).eq('published', true).single()
     if (data) {
       const title = `${data.title} — Joey Chen`
-      const description = data.excerpt || undefined
+      const description = data.excerpt_en || data.excerpt || undefined
       return {
         title,
         description,
@@ -62,7 +62,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     '@type': 'BlogPosting',
     '@id': `https://0xjoeytw.xyz/blog/${slug}#article`,
     headline: post.title,
-    description: post.excerpt || undefined,
+    description: post.excerpt_en || post.excerpt || undefined,
     url: `https://0xjoeytw.xyz/blog/${slug}`,
     datePublished: post.published_at || post.created_at,
     dateModified: post.updated_at || post.published_at || post.created_at,

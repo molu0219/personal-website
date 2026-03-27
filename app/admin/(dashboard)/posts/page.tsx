@@ -15,6 +15,7 @@ interface Post {
   slug: string
   title: string
   excerpt: string
+  excerpt_en: string
   content: string
   tags: string[]
   published: boolean
@@ -76,6 +77,7 @@ export default function AdminPosts() {
           <GlassInput label="Title" value={editing.title ?? ''} onChange={e => setEditing({ ...editing, title: e.target.value })} className="w-full" />
           <GlassInput label="Slug" value={editing.slug ?? ''} onChange={e => setEditing({ ...editing, slug: e.target.value })} className="w-full" />
           <GlassInput label="Excerpt" value={editing.excerpt ?? ''} onChange={e => setEditing({ ...editing, excerpt: e.target.value })} className="w-full" />
+          <GlassInput label="Excerpt (English)" value={editing.excerpt_en ?? ''} onChange={e => setEditing({ ...editing, excerpt_en: e.target.value })} className="w-full" placeholder="English abstract for AI search engines (meta description & JSON-LD)" />
           <TagInput label="Tags (comma-separated)" value={editing.tags ?? []} onChange={tags => setEditing({ ...editing, tags })} className="w-full" />
           <ImageUpload
             label="Cover Image"

@@ -55,7 +55,7 @@ const jsonLdPerson = {
   name: 'Joey Chen',
   url: 'https://0xjoeytw.xyz',
   description: 'Blockchain developer, builder, and creator. Building at the intersection of blockchain, AI, and generative art.',
-  jobTitle: 'Blockchain Developer',
+  jobTitle: 'Product Manager & AI Builder',
   sameAs: [
     'https://github.com/molu0219',
     'https://twitter.com/0xjoeytw',

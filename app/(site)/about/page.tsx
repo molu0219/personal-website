@@ -3,8 +3,22 @@ import { createClient } from '@/lib/supabase/server'
 
 export const metadata: Metadata = {
   title: 'About — Joey Chen',
-  description: 'About Joey Chen — blockchain developer, builder, and creator.',
+  description: 'About Joey Chen — Product Manager & AI Builder. Focused on Claude Code workflows, AI-assisted development, and Web3.',
   alternates: { canonical: '/about' },
+  openGraph: {
+    title: 'About — Joey Chen',
+    description: 'About Joey Chen — Product Manager & AI Builder. Focused on Claude Code workflows, AI-assisted development, and Web3.',
+    url: 'https://0xjoeytw.xyz/about',
+    type: 'profile',
+    siteName: 'Joey Chen',
+    locale: 'zh_TW',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'About — Joey Chen',
+    description: 'About Joey Chen — Product Manager & AI Builder. Focused on Claude Code workflows, AI-assisted development, and Web3.',
+    creator: '@0xjoeytw',
+  },
 }
 import GlassCard from '@/components/ui/GlassCard'
 import NeonBadge from '@/components/ui/NeonBadge'
@@ -38,8 +52,8 @@ export default async function AboutPage() {
   } catch {}
 
   const name = about?.name ?? 'Joey Chen'
-  const title = about?.title ?? 'Blockchain Developer & Builder'
-  const bio = about?.bio ?? 'I build decentralized applications and explore the intersection of blockchain, AI, and generative art.'
+  const title = about?.title ?? 'Product Manager & AI Builder'
+  const bio = about?.bio ?? '我是 Joey Chen，一個對去中心化技術和 AI 開發充滿熱情的 PM。目前專注於用 Claude Code 打造高效的 AI 輔助開發工作流，並將實踐經驗寫成系列文章分享。\n\n這個網站是我的數位花園，記錄技術探索、專案作品、以及從實戰中學到的東西。所有內容都是真實開發經驗的結晶，不是理論空談。'
   const skills: string[] = about?.skills ?? ['Solidity', 'TypeScript', 'React', 'Next.js', 'Rust', 'Python', 'SQL', 'Web3.js', 'Supabase', 'Cloudflare']
   const social = about?.social_links ?? {}
 
@@ -147,16 +161,21 @@ export default async function AboutPage() {
               About
             </h2>
           </div>
-          <p
-            className="text-base sm:text-lg leading-loose max-w-3xl"
-            style={{
-              color: 'var(--text-secondary)',
-              fontFamily: 'Inter, sans-serif',
-              lineHeight: '1.95',
-            }}
-          >
-            {bio}
-          </p>
+          <div className="space-y-4 max-w-3xl">
+            {bio.split('\n\n').map((paragraph: string, i: number) => (
+              <p
+                key={i}
+                className="text-base sm:text-lg leading-loose"
+                style={{
+                  color: 'var(--text-secondary)',
+                  fontFamily: 'Inter, sans-serif',
+                  lineHeight: '1.95',
+                }}
+              >
+                {paragraph}
+              </p>
+            ))}
+          </div>
         </GlassCard>
 
         {/* Skills */}
