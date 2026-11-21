@@ -1,16 +1,8 @@
 import Link from 'next/link'
 import HeroSection from '@/components/sections/HeroSection'
 import NeonBadge from '@/components/ui/NeonBadge'
+import PostRow, { type PostSummary } from '@/components/blog/PostRow'
 import { createClient } from '@/lib/supabase/server'
-
-interface PostRow {
-  id: string
-  slug: string
-  title: string
-  excerpt: string | null
-  tags: string[] | null
-  published_at: string | null
-}
 
 interface ProjectRow {
   id: string
@@ -27,10 +19,6 @@ interface AboutRow {
   hero_description: string | null
   status_text: string | null
   status_active: boolean | null
-}
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' })
 }
 
 function SectionHeader({ index, title, href }: { index: string; title: string; href: string }) {
@@ -55,7 +43,7 @@ function SectionHeader({ index, title, href }: { index: string; title: string; h
 
 export default async function HomePage() {
   let projects: ProjectRow[] = []
-  let posts: PostRow[] = []
+  let posts: PostSummary[] = []
   let about: AboutRow | null = null
 
   try {
@@ -99,34 +87,7 @@ export default async function HomePage() {
           <div className="max-w-6xl mx-auto">
             <SectionHeader index="01" title="Writing" href="/blog" />
             <ul>
-              {posts.map(post => (
-                <li key={post.id} className="border-b" style={{ borderColor: 'var(--border)' }}>
-                  <Link
-                    href={`/blog/${post.slug}`}
-                    className="group grid gap-1 py-5 md:grid-cols-[140px_1fr_auto] md:items-baseline md:gap-6"
-                  >
-                    <span className="text-xs" style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
-                      {post.published_at ? formatDate(post.published_at) : '—'}
-                    </span>
-                    <span>
-                      <span
-                        className="block font-medium transition-colors group-hover:text-[var(--accent)]"
-                        style={{ color: 'var(--text-primary)' }}
-                      >
-                        {post.title}
-                      </span>
-                      {post.excerpt && (
-                        <span className="mt-1 block text-sm line-clamp-1" style={{ color: 'var(--text-secondary)' }}>
-                          {post.excerpt}
-                        </span>
-                      )}
-                    </span>
-                    <span className="hidden md:flex gap-1.5">
-                      {post.tags?.slice(0, 2).map(tag => <NeonBadge key={tag}>{tag}</NeonBadge>)}
-                    </span>
-                  </Link>
-                </li>
-              ))}
+              {posts.map(post => <PostRow key={post.id} post={post} />)}
             </ul>
           </div>
         </section>
