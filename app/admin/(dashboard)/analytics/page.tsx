@@ -196,7 +196,7 @@ function StatCard({ label, value, change, color, sub }: {
       <div className="text-xs mb-2 font-semibold" style={{ color: 'var(--text-muted)', letterSpacing: '0.08em' }}>
         {label}
       </div>
-      <div className="text-3xl font-bold" style={{ color, fontFamily: 'Space Grotesk, sans-serif' }}>
+      <div className="text-3xl font-bold" style={{ color, fontFamily: 'var(--font-display)' }}>
         {value.toLocaleString()}
       </div>
       <div className="flex items-center gap-2 mt-1.5">
@@ -224,7 +224,7 @@ export default async function AnalyticsPage() {
   if (!stats) {
     return (
       <div>
-        <h1 className="text-3xl font-bold mb-8" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-primary)' }}>Analytics</h1>
+        <h1 className="text-3xl font-bold mb-8" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>Analytics</h1>
         <GlassCard className="p-6">
           <p style={{ color: 'var(--text-muted)' }}>Unable to load analytics. Please ensure the Supabase <code>page_views</code> table exists.</p>
         </GlassCard>
@@ -241,7 +241,7 @@ export default async function AnalyticsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-primary)' }}>
+        <h1 className="text-3xl font-bold" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
           Analytics
         </h1>
         <span className="text-xs px-3 py-1.5 rounded-full" style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-muted)' }}>
@@ -288,7 +288,7 @@ export default async function AnalyticsPage() {
               <div className="text-xs font-semibold mb-1" style={{ color: 'var(--text-muted)', letterSpacing: '0.08em' }}>
                 UNIQUE VISITORS (30D)
               </div>
-              <div className="text-2xl font-bold" style={{ color: 'var(--cyan)', fontFamily: 'Space Grotesk, sans-serif' }}>
+              <div className="text-2xl font-bold" style={{ color: 'var(--cyan)', fontFamily: 'var(--font-display)' }}>
                 {summary.uniqueVisitors.toLocaleString()}
               </div>
             </div>

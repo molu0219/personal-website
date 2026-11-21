@@ -18,7 +18,7 @@ export default async function AdminDashboard() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-8" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-primary)' }}>
+      <h1 className="text-3xl font-bold mb-8" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
         Dashboard
       </h1>
 
@@ -30,7 +30,7 @@ export default async function AdminDashboard() {
           { label: 'Published Posts', value: stats.publishedPosts, color: 'var(--purple)' },
         ].map(stat => (
           <GlassCard key={stat.label} className="p-6 text-center">
-            <div className="text-3xl font-bold mb-1" style={{ color: stat.color, fontFamily: 'Space Grotesk, sans-serif' }}>
+            <div className="text-3xl font-bold mb-1" style={{ color: stat.color, fontFamily: 'var(--font-display)' }}>
               {stat.value}
             </div>
             <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>{stat.label}</div>

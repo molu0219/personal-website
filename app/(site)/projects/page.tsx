@@ -36,7 +36,7 @@ export default async function ProjectsPage() {
         <h1
           className="font-bold uppercase mb-6"
           style={{
-            fontFamily: 'Space Grotesk, sans-serif',
+            fontFamily: 'var(--font-display)',
             fontSize: 'clamp(2.5rem, 8vw, 5rem)',
             color: 'var(--text-primary)',
             letterSpacing: '0.18em',

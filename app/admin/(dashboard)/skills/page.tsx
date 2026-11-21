@@ -131,7 +131,7 @@ export default function AdminSkills() {
   if (editing !== null) {
     return (
       <div className="max-w-2xl">
-        <h1 className="text-2xl font-bold mb-8" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-primary)' }}>
+        <h1 className="text-2xl font-bold mb-8" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
           {editing.id ? 'Edit Skill' : 'New Skill'}
         </h1>
         <GlassCard className="p-6 space-y-4">
@@ -202,7 +202,7 @@ export default function AdminSkills() {
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-primary)' }}>Skills</h1>
+        <h1 className="text-2xl font-bold" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>Skills</h1>
         <div className="flex items-center gap-2">
           <NeonButton variant="ghost" onClick={refreshStars} disabled={refreshing}>
             {refreshing ? 'Refreshing…' : 'Refresh Stars'}

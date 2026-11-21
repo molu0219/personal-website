@@ -95,7 +95,7 @@ export default async function AboutPage() {
                   className="w-full h-full flex items-center justify-center text-4xl font-bold"
                   style={{
                     background: 'linear-gradient(135deg, color-mix(in srgb, var(--cyan) 18%, var(--surface)), color-mix(in srgb, var(--purple) 18%, var(--surface)))',
-                    fontFamily: 'Space Grotesk, sans-serif',
+                    fontFamily: 'var(--font-display)',
                     color: 'var(--cyan)',
                   }}
                 >
@@ -118,14 +118,14 @@ export default async function AboutPage() {
           <div className="flex-1 text-center sm:text-left">
             <p
               className="text-xs uppercase tracking-widest mb-2 font-medium"
-              style={{ color: 'var(--cyan)', fontFamily: 'Space Grotesk, sans-serif', letterSpacing: '0.2em' }}
+              style={{ color: 'var(--cyan)', fontFamily: 'var(--font-display)', letterSpacing: '0.2em' }}
             >
               {title}
             </p>
             <h1
               className="text-4xl sm:text-5xl font-bold leading-none mb-5"
               style={{
-                fontFamily: 'Space Grotesk, sans-serif',
+                fontFamily: 'var(--font-display)',
                 color: 'var(--text-primary)',
               }}
             >
@@ -156,7 +156,7 @@ export default async function AboutPage() {
             <div className="w-1 h-6 rounded-full" style={{ background: 'linear-gradient(180deg, var(--cyan), var(--purple))' }} />
             <h2
               className="text-sm uppercase tracking-widest font-semibold"
-              style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-muted)', letterSpacing: '0.15em' }}
+              style={{ fontFamily: 'var(--font-display)', color: 'var(--text-muted)', letterSpacing: '0.15em' }}
             >
               About
             </h2>
@@ -168,7 +168,7 @@ export default async function AboutPage() {
                 className="text-base sm:text-lg leading-loose"
                 style={{
                   color: 'var(--text-secondary)',
-                  fontFamily: 'Inter, sans-serif',
+                  fontFamily: 'var(--font-body)',
                   lineHeight: '1.95',
                 }}
               >
@@ -184,7 +184,7 @@ export default async function AboutPage() {
             <div className="w-1 h-6 rounded-full" style={{ background: 'linear-gradient(180deg, var(--purple), var(--pink))' }} />
             <h2
               className="text-sm uppercase tracking-widest font-semibold"
-              style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-muted)', letterSpacing: '0.15em' }}
+              style={{ fontFamily: 'var(--font-display)', color: 'var(--text-muted)', letterSpacing: '0.15em' }}
             >
               Skills & Technologies
             </h2>
@@ -196,7 +196,7 @@ export default async function AboutPage() {
                 <div key={label}>
                   <p
                     className="text-xs font-medium mb-3 uppercase tracking-wider"
-                    style={{ color: 'var(--text-muted)', fontFamily: 'Space Grotesk, sans-serif' }}
+                    style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-display)' }}
                   >
                     {label}
                   </p>

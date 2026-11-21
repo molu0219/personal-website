@@ -48,11 +48,11 @@ export default function AdminAbout() {
 
   return (
     <div className="max-w-2xl">
-      <h1 className="text-2xl font-bold mb-8" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-primary)' }}>
+      <h1 className="text-2xl font-bold mb-8" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
         About Info
       </h1>
       <GlassCard className="p-6 space-y-4">
-        <p className="text-xs uppercase tracking-widest font-semibold pt-2" style={{ color: 'var(--cyan)', fontFamily: 'Space Grotesk, sans-serif' }}>Home / Hero</p>
+        <p className="text-xs uppercase tracking-widest font-semibold pt-2" style={{ color: 'var(--cyan)', fontFamily: 'var(--font-display)' }}>Home / Hero</p>
         <GlassInput label="Name" value={data.name ?? ''} onChange={e => setData({ ...data, name: e.target.value })} className="w-full" />
         <GlassInput label="Tagline (hero subtitle)" value={data.title ?? ''} onChange={e => setData({ ...data, title: e.target.value })} className="w-full" />
         <div>
@@ -77,7 +77,7 @@ export default function AdminAbout() {
           </label>
         </div>
 
-        <p className="text-xs uppercase tracking-widest font-semibold pt-4" style={{ color: 'var(--purple)', fontFamily: 'Space Grotesk, sans-serif' }}>Author Signature / About Page</p>
+        <p className="text-xs uppercase tracking-widest font-semibold pt-4" style={{ color: 'var(--purple)', fontFamily: 'var(--font-display)' }}>Author Signature / About Page</p>
         <ImageUpload
           label="Avatar"
           value={data.avatar_url ?? ''}

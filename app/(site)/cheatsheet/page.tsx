@@ -19,7 +19,7 @@ export default function CheatSheetPage() {
         </p>
         <h1
           className="text-4xl md:text-5xl font-bold mb-4"
-          style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-primary)' }}
+          style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}
         >
           Cheat <span className="gradient-text">Sheet</span>
         </h1>

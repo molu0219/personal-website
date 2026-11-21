@@ -42,7 +42,7 @@ export default async function SkillsPage() {
         </div>
         <h1
           className="text-4xl md:text-5xl font-bold mb-4"
-          style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-primary)' }}
+          style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}
         >
           AI <span className="gradient-text">Skills Hub</span>
         </h1>

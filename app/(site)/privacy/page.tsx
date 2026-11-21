@@ -13,14 +13,14 @@ export default function PrivacyPage() {
       <div className="max-w-3xl mx-auto px-6 pt-36">
         <h1
           className="text-3xl font-bold mb-8"
-          style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-primary)' }}
+          style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}
         >
           Privacy Policy
         </h1>
 
         <div
           className="space-y-6 text-base leading-relaxed"
-          style={{ color: 'var(--text-secondary)', fontFamily: 'Inter, sans-serif' }}
+          style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}
         >
           <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
             Last updated: March 27, 2026
@@ -31,7 +31,7 @@ export default function PrivacyPage() {
             explains how data is collected and used when you visit.
           </p>
 
-          <h2 className="text-xl font-semibold pt-2" style={{ color: 'var(--text-primary)', fontFamily: 'Space Grotesk, sans-serif' }}>
+          <h2 className="text-xl font-semibold pt-2" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
             Data Collection
           </h2>
           <ul className="list-disc pl-6 space-y-2">
@@ -48,7 +48,7 @@ export default function PrivacyPage() {
             </li>
           </ul>
 
-          <h2 className="text-xl font-semibold pt-2" style={{ color: 'var(--text-primary)', fontFamily: 'Space Grotesk, sans-serif' }}>
+          <h2 className="text-xl font-semibold pt-2" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
             Data Storage
           </h2>
           <p>
@@ -56,7 +56,7 @@ export default function PrivacyPage() {
             No personally identifiable information is stored.
           </p>
 
-          <h2 className="text-xl font-semibold pt-2" style={{ color: 'var(--text-primary)', fontFamily: 'Space Grotesk, sans-serif' }}>
+          <h2 className="text-xl font-semibold pt-2" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
             Third-Party Services
           </h2>
           <ul className="list-disc pl-6 space-y-2">
@@ -65,7 +65,7 @@ export default function PrivacyPage() {
             <li><strong>Google AdSense:</strong> Advertising service (pending activation).</li>
           </ul>
 
-          <h2 className="text-xl font-semibold pt-2" style={{ color: 'var(--text-primary)', fontFamily: 'Space Grotesk, sans-serif' }}>
+          <h2 className="text-xl font-semibold pt-2" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
             Your Rights
           </h2>
           <p>
@@ -73,7 +73,7 @@ export default function PrivacyPage() {
             via <a href="https://twitter.com/0xjoeytw" className="underline" style={{ color: 'var(--cyan)' }}>Twitter (@0xjoeytw)</a> or <a href="https://github.com/molu0219" className="underline" style={{ color: 'var(--cyan)' }}>GitHub (molu0219)</a>.
           </p>
 
-          <h2 className="text-xl font-semibold pt-2" style={{ color: 'var(--text-primary)', fontFamily: 'Space Grotesk, sans-serif' }}>
+          <h2 className="text-xl font-semibold pt-2" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
             Changes
           </h2>
           <p>
