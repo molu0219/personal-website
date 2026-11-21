@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import NeonBadge from '@/components/ui/NeonBadge'
 import TableOfContents from '@/components/blog/TableOfContents'
-import ContentMap from '@/components/art/ContentMap'
+import ContentArt from '@/components/art/ContentArt'
 
 interface Project {
   slug: string
@@ -107,7 +107,7 @@ export default function ProjectLayout({
           </dl>
 
           {project.content && (
-            <ContentMap path={`~/projects/${project.slug}/README.md`} content={project.content} cols={84} maxRows={34} linkHeadings className="mt-10" />
+            <ContentArt content={project.content} seed={project.slug} tags={project.tags} cols={176} rows={52} glyphClass="text-[3.2px] leading-[4px] md:text-[7px] md:leading-[8px]" className="mt-10" />
           )}
 
           <div className="prose-theme mt-10 max-w-[68ch]">{children}</div>

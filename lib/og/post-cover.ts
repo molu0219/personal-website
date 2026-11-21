@@ -31,9 +31,9 @@ export async function renderPostCover(slug: string) {
 
   if (!post) return null
   const meta = [formatPostDate(post.published_at), ...(post.tags ?? []).slice(0, 2)].join('  ·  ')
-  return renderCover({ section: '~/blog', title: post.title, meta, path: `~/blog/${slug}.md`, content: post.content ?? '' })
+  return renderCover({ section: '~/blog', title: post.title, meta, path: `~/blog/${slug}.md`, content: post.content ?? '', seed: slug, tags: post.tags })
 }
 
 /** Generic cover for when the post cannot be loaded. */
 export const renderFallbackCover = (slug: string) =>
-  renderCover({ section: '~/blog', title: 'Joey Chen', meta: '0xjoeytw.xyz', path: `~/blog/${slug}.md`, content: '' })
+  renderCover({ section: '~/blog', title: 'Joey Chen', meta: '0xjoeytw.xyz', path: `~/blog/${slug}.md`, content: '', seed: slug })

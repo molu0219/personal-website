@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { getViewCounts } from '@/lib/view-counts'
 import BlogList from '@/components/sections/BlogList'
-import ContentMap from '@/components/art/ContentMap'
+import ContentArt from '@/components/art/ContentArt'
 import AsciiBars from '@/components/art/AsciiBars'
 import { withPostMeta } from '@/components/blog/post-meta'
 import PageHeader from '@/components/ui/PageHeader'
@@ -44,7 +44,7 @@ export default async function BlogPage() {
         viewCounts={viewCounts}
         featuredArt={
           posts[0] && (
-            <ContentMap path={`~/blog/${posts[0].slug}.md`} content={latestContent} cols={64} maxRows={22} />
+            <ContentArt content={latestContent} seed={posts[0].slug} tags={posts[0].tags} cols={124} rows={44} glyphClass="text-[4px] leading-[5px] md:text-[7px] md:leading-[8px]" />
           )
         }
       />

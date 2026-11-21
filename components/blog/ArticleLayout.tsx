@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import NeonBadge from '@/components/ui/NeonBadge'
 import TableOfContents from './TableOfContents'
-import ContentMap from '@/components/art/ContentMap'
+import ContentArt from '@/components/art/ContentArt'
 
 interface Post {
   slug: string
@@ -82,7 +82,7 @@ export default function ArticleLayout({
               </p>
             )}
 
-            <ContentMap path={`~/blog/${post.slug}.md`} content={post.content} cols={84} maxRows={34} linkHeadings className="mt-10" />
+            <ContentArt content={post.content} seed={post.slug} tags={post.tags} cols={176} rows={52} glyphClass="text-[3.2px] leading-[4px] md:text-[7px] md:leading-[8px]" className="mt-10" />
 
             <div className="prose-theme mt-10">{children}</div>
           </article>

@@ -1,5 +1,6 @@
 import { ImageResponse } from 'next/og'
-import { fingerprint, parseBlocks, type FpCell } from '@/lib/ascii/fingerprint'
+import type { FpCell } from '@/lib/ascii/fingerprint'
+import { landscape, landscapeLegend } from '@/lib/ascii/landscape'
 import { loadGoogleFont, type OgFont } from '@/lib/og/fonts'
 
 export const COVER_SIZE = { width: 1200, height: 630 }
@@ -27,10 +28,10 @@ const MAT_DARK: [string, string][] = [
   ['#3a2e16', '#f0c66e'],
 ]
 
-const MAP_FONT_PX = 12
-const MAP_LINE_PX = 15
-const MAP_COLS = 46
-const MAP_ROWS = 30
+const MAP_FONT_PX = 9
+const MAP_LINE_PX = 10
+const MAP_COLS = 72
+const MAP_ROWS = 44
 const PANEL_W = 430
 
 export interface CoverInput {
@@ -41,8 +42,11 @@ export interface CoverInput {
   meta: string
   /** File path shown in the map panel header, e.g. "~/blog/slug.md". */
   path: string
-  /** Markdown of the post/project: drawn as its ASCII fingerprint. */
+  /** Markdown of the post/project: drawn as its generated ASCII landscape. */
   content: string
+  /** Stable seed (slug) and tags: they pick ridge shapes and palette. */
+  seed: string
+  tags?: string[] | null
 }
 
 const hex = (h: string) => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16))
@@ -64,7 +68,7 @@ function titleSize(title: string): number {
 }
 
 async function loadFonts(input: CoverInput, mapText: string): Promise<OgFont[]> {
-  const chrome = `${input.section}${input.meta}${input.path}joey@chen0123456789 ·sectionscodetableslists…`
+  const chrome = `${input.section}${input.meta}${input.path}joey@chen0123456789 ·skyline=sectionsduskdaynight…`
   const results = await Promise.allSettled([
     loadGoogleFont('Noto Sans TC', 500, input.title),
     loadGoogleFont('Geist Mono', 400, `${chrome}${mapText}`),
@@ -99,14 +103,11 @@ function mapLines(rows: FpCell[][]) {
 }
 
 export async function renderCover(input: CoverInput): Promise<ImageResponse> {
-  const rows = fingerprint(input.content, { cols: MAP_COLS, maxRows: MAP_ROWS }).map(r => r.cells)
+  const rows = landscape({ content: input.content, seed: input.seed, tags: input.tags }, MAP_COLS, MAP_ROWS)
   const mapText = Array.from(new Set(rows.flatMap(r => r.map(c => c.ch)))).join('')
-  const blocks = parseBlocks(input.content)
-  const count = (k: string) => blocks.filter(b => b.kind === k).length
-  const stats = [`${count('heading')} sections`, count('code') ? `${count('code')} code` : ''].filter(Boolean).join(' · ')
+  const stats = landscapeLegend(input.content, input.tags)
   const fonts = await loadFonts(input, mapText)
   const mono = 'Geist Mono, Noto Sans TC'
-  const path = input.path.length > 34 ? input.path.slice(0, 33) + '…' : input.path
 
   return new ImageResponse(
     (
@@ -156,14 +157,13 @@ export async function renderCover(input: CoverInput): Promise<ImageResponse> {
               color: C.muted,
             }}
           >
-            <span>{path}</span>
             <span>{stats}</span>
           </div>
           <div
             style={{
               display: 'flex',
               flexDirection: 'column',
-              padding: '14px 16px',
+              padding: '12px 14px',
               fontFamily: mono,
               fontSize: MAP_FONT_PX,
               lineHeight: 1,

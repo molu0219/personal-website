@@ -28,7 +28,7 @@ export default function ProjectCard({
         className="aspect-[16/10] overflow-hidden rounded-lg border"
         style={{ borderColor: 'var(--border)', background: 'var(--surface-2)' }}
       >
-        <div className="relative h-full overflow-hidden px-4 pt-4">
+        <div className="relative h-full overflow-hidden">
           {art}
           <span
             className="absolute bottom-3 left-3 text-xs"

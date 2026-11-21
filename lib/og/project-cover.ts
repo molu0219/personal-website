@@ -33,8 +33,10 @@ export async function renderProjectCover(slug: string) {
     meta,
     path: `~/projects/${slug}/README.md`,
     content: project.content ?? '',
+    seed: slug,
+    tags: project.tags,
   })
 }
 
 export const renderFallbackProjectCover = (slug: string) =>
-  renderCover({ section: '~/projects', title: 'Joey Chen', meta: '0xjoeytw.xyz', path: `~/projects/${slug}`, content: '' })
+  renderCover({ section: '~/projects', title: 'Joey Chen', meta: '0xjoeytw.xyz', path: `~/projects/${slug}`, content: '', seed: slug })
