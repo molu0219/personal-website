@@ -128,7 +128,7 @@ function ProjectCard({ project, index, views }: { project: Project; index: numbe
               />
               <span
                 className="relative font-bold uppercase text-xs tracking-widest"
-                style={{ color: `color-mix(in srgb, var(--${color}) 50%, transparent)`, fontFamily: 'Space Grotesk, sans-serif', letterSpacing: '0.3em' }}
+                style={{ color: `color-mix(in srgb, var(--${color}) 50%, transparent)`, fontFamily: 'var(--font-display)', letterSpacing: '0.3em' }}
               >
                 {category}
               </span>
@@ -194,7 +194,7 @@ function ProjectCard({ project, index, views }: { project: Project; index: numbe
           <h3
             className="font-bold leading-snug mb-2"
             style={{
-              fontFamily: 'Space Grotesk, sans-serif',
+              fontFamily: 'var(--font-display)',
               fontSize: '1rem',
               color: 'var(--text-primary)',
               letterSpacing: '0.02em',
@@ -298,7 +298,7 @@ export default function ProjectGrid({ projects, viewCounts = {} }: { projects: P
               background: 'var(--surface)',
               border: '1px solid var(--border)',
               color: 'var(--text-primary)',
-              fontFamily: 'Inter, sans-serif',
+              fontFamily: 'var(--font-body)',
               transition: 'border-color 0.2s',
             }}
             onFocus={e => { e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--cyan) 50%, transparent)' }}
@@ -313,7 +313,7 @@ export default function ProjectGrid({ projects, viewCounts = {} }: { projects: P
               onClick={() => setSort(s)}
               className="px-4 py-2 text-xs font-medium transition-colors duration-150 capitalize"
               style={{
-                fontFamily: 'Space Grotesk, sans-serif',
+                fontFamily: 'var(--font-display)',
                 background: sort === s ? 'color-mix(in srgb, var(--cyan) 12%, transparent)' : 'transparent',
                 color: sort === s ? 'var(--cyan)' : 'var(--text-muted)',
                 borderRight: i < arr.length - 1 ? '1px solid var(--border)' : 'none',
@@ -335,7 +335,7 @@ export default function ProjectGrid({ projects, viewCounts = {} }: { projects: P
               onClick={() => setActiveTag(tag)}
               className="px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-200"
               style={{
-                fontFamily: 'Space Grotesk, sans-serif',
+                fontFamily: 'var(--font-display)',
                 letterSpacing: '0.08em',
                 background: isActive ? 'color-mix(in srgb, var(--cyan) 15%, transparent)' : 'transparent',
                 border: `1px solid ${isActive ? 'color-mix(in srgb, var(--cyan) 50%, transparent)' : 'var(--border)'}`,
@@ -343,7 +343,7 @@ export default function ProjectGrid({ projects, viewCounts = {} }: { projects: P
               }}
             >
               {tag}
-              <span className="ml-1.5 opacity-60" style={{ fontFamily: 'Inter, sans-serif' }}>
+              <span className="ml-1.5 opacity-60" style={{ fontFamily: 'var(--font-body)' }}>
                 {tag === 'All'
                   ? projects.length
                   : projects.filter(p => p.tags?.includes(tag)).length}

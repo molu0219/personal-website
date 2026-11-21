@@ -1,20 +1,21 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import ThemeToggle from '@/components/ui/ThemeToggle'
-import CdPlayer from '@/components/ui/CdPlayer'
 
 const links = [
-  { href: '/', label: 'Home' },
   { href: '/about', label: 'About' },
   { href: '/projects', label: 'Projects' },
   { href: '/blog', label: 'Blog' },
-  { href: '/skills', label: 'Skills Hub' },
+  { href: '/skills', label: 'Skills' },
   { href: '/cheatsheet', label: 'Cheat Sheet' },
 ]
+
+function isActive(pathname: string, href: string): boolean {
+  return pathname === href || pathname.startsWith(`${href}/`)
+}
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
@@ -22,112 +23,100 @@ export default function Navbar() {
   const pathname = usePathname()
 
   useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 20)
-    window.addEventListener('scroll', handler)
+    const handler = () => setScrolled(window.scrollY > 8)
+    handler()
+    window.addEventListener('scroll', handler, { passive: true })
     return () => window.removeEventListener('scroll', handler)
   }, [])
 
+  // Close the mobile menu on navigation.
+  useEffect(() => {
+    setMenuOpen(false) // eslint-disable-line react-hooks/set-state-in-effect
+  }, [pathname])
+
   return (
-    <motion.nav
-      className="fixed top-0 left-0 right-0 z-50 px-6 py-4"
-      initial={{ y: -80, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.6, ease: 'easeOut' }}
+    <nav
+      className="fixed top-0 left-0 right-0 z-50 border-b transition-[background-color,border-color] duration-200"
+      style={{
+        background: scrolled || menuOpen ? 'color-mix(in srgb, var(--bg) 85%, transparent)' : 'transparent',
+        borderColor: scrolled || menuOpen ? 'var(--border)' : 'transparent',
+        backdropFilter: scrolled || menuOpen ? 'saturate(180%) blur(12px)' : 'none',
+        WebkitBackdropFilter: scrolled || menuOpen ? 'saturate(180%) blur(12px)' : 'none',
+      }}
     >
-      <div
-        className="max-w-6xl mx-auto flex items-center justify-between rounded-2xl px-6 py-3 transition-all duration-300"
-        style={{
-          background: scrolled ? 'var(--surface)' : 'color-mix(in srgb, var(--surface) 60%, transparent)',
-          border: '1px solid var(--border)',
-          backdropFilter: 'blur(20px)',
-          boxShadow: scrolled ? 'var(--shadow-md)' : 'none',
-        }}
-      >
-        <div className="flex items-center gap-3">
-          <Link href="/" className="text-lg font-bold" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-            <span className="gradient-text">JC</span>
-          </Link>
-          <div className="hidden md:flex">
-            <CdPlayer />
-          </div>
-        </div>
+      <div className="max-w-6xl mx-auto flex h-14 items-center justify-between px-6">
+        <Link
+          href="/"
+          className="text-sm font-medium tracking-tight"
+          style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}
+        >
+          joey<span style={{ color: 'var(--accent)' }}>@</span>chen
+        </Link>
 
-        {/* Desktop links */}
         <div className="hidden md:flex items-center gap-1">
-          {links.map(link => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="nav-link-hover relative px-4 py-2 rounded-lg text-sm transition-colors"
-              style={{
-                color: pathname === link.href ? 'var(--cyan)' : 'var(--text-secondary)',
-                fontFamily: 'Inter, sans-serif',
-              }}
-            >
-              {link.label}
-              {pathname === link.href && (
-                <motion.div
-                  layoutId="nav-indicator"
-                  className="absolute inset-0 rounded-lg"
-                  style={{
-                    background: 'color-mix(in srgb, var(--cyan) 8%, transparent)',
-                    border: '1px solid color-mix(in srgb, var(--cyan) 25%, transparent)',
-                  }}
-                  transition={{ type: 'spring', bounce: 0.2, duration: 0.5 }}
-                />
-              )}
-            </Link>
-          ))}
+          {links.map(link => {
+            const active = isActive(pathname, link.href)
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={active ? 'page' : undefined}
+                className="px-3 py-1.5 rounded-md text-sm transition-colors hover:text-[var(--text-primary)]"
+                style={{ color: active ? 'var(--text-primary)' : 'var(--text-secondary)' }}
+              >
+                {link.label}
+              </Link>
+            )
+          })}
+          <span className="mx-2 h-4 w-px" style={{ background: 'var(--border)' }} />
+          <ThemeToggle />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex md:hidden items-center gap-1">
           <ThemeToggle />
-
-          {/* Mobile menu button */}
           <button
-            className="md:hidden p-2 rounded-lg"
+            className="p-2 -mr-2"
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-            style={{ color: 'var(--text-secondary)', cursor: 'none' }}
-            onClick={() => setMenuOpen(!menuOpen)}
+            aria-expanded={menuOpen}
+            style={{ color: 'var(--text-primary)' }}
+            onClick={() => setMenuOpen(o => !o)}
           >
-            <div className="w-5 space-y-1.5">
-              <span className="block h-px w-full transition-all" style={{ background: menuOpen ? 'var(--cyan)' : 'currentColor' }} />
-              <span className="block h-px w-3/4 transition-all" style={{ background: menuOpen ? 'var(--cyan)' : 'currentColor' }} />
-              <span className="block h-px w-full transition-all" style={{ background: menuOpen ? 'var(--cyan)' : 'currentColor' }} />
+            <div className="relative w-5 h-3">
+              <span
+                className="absolute left-0 h-px w-full bg-current transition-transform duration-200"
+                style={{ top: menuOpen ? 6 : 0, transform: menuOpen ? 'rotate(45deg)' : 'none' }}
+              />
+              <span
+                className="absolute left-0 h-px w-full bg-current transition-transform duration-200"
+                style={{ top: menuOpen ? 6 : 12, transform: menuOpen ? 'rotate(-45deg)' : 'none' }}
+              />
             </div>
           </button>
         </div>
       </div>
 
-      {/* Mobile menu */}
-      <AnimatePresence>
-        {menuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="md:hidden mt-2 mx-auto max-w-6xl rounded-2xl overflow-hidden"
-            style={{
-              background: 'var(--surface)',
-              border: '1px solid var(--border)',
-              backdropFilter: 'blur(20px)',
-              boxShadow: 'var(--shadow-md)',
-            }}
-          >
+      <div
+        className="md:hidden grid transition-[grid-template-rows] duration-300 ease-out"
+        style={{ gridTemplateRows: menuOpen ? '1fr' : '0fr' }}
+      >
+        <div className="overflow-hidden">
+          <div className="px-6 pb-4">
             {links.map(link => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="block px-6 py-4 text-sm transition-colors"
-                style={{ color: pathname === link.href ? 'var(--cyan)' : 'var(--text-secondary)' }}
-                onClick={() => setMenuOpen(false)}
+                className="block py-3 text-base border-b"
+                style={{
+                  borderColor: 'var(--border)',
+                  color: isActive(pathname, link.href) ? 'var(--text-primary)' : 'var(--text-secondary)',
+                }}
               >
                 {link.label}
               </Link>
             ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.nav>
+          </div>
+        </div>
+      </div>
+    </nav>
   )
 }

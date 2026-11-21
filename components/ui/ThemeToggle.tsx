@@ -6,27 +6,21 @@ import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export default function ThemeToggle() {
-  const { theme, setTheme } = useTheme()
+  const { resolvedTheme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => setMounted(true), [])
 
   if (!mounted) return <div className="w-9 h-9" />
 
-  const isDark = theme === 'dark'
+  const isDark = resolvedTheme === 'dark'
 
   return (
     <motion.button
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
-      className="relative w-9 h-9 rounded-lg flex items-center justify-center"
-      style={{
-        background: 'var(--surface)',
-        border: '1px solid var(--border)',
-        color: 'var(--text-secondary)',
-        cursor: 'none',
-      }}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
+      className="relative w-9 h-9 rounded-md flex items-center justify-center transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)]"
+      style={{ color: 'var(--text-secondary)' }}
+      whileTap={{ scale: 0.92 }}
       aria-label="Toggle theme"
     >
       <AnimatePresence mode="wait" initial={false}>

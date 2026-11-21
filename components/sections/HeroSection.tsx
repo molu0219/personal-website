@@ -1,7 +1,4 @@
-'use client'
-
-import { motion } from 'framer-motion'
-import { useEffect, useState } from 'react'
+import AsciiKnot from '@/components/art/AsciiKnot'
 import NeonButton from '@/components/ui/NeonButton'
 
 interface Props {
@@ -12,54 +9,6 @@ interface Props {
   statusActive?: boolean
 }
 
-function TypewriterName({ text }: { text: string }) {
-  const [displayed, setDisplayed] = useState('')
-  const [typing, setTyping] = useState(true)
-
-  useEffect(() => {
-    let timeout: ReturnType<typeof setTimeout>
-
-    const typeOut = () => {
-      let i = 0
-      setTyping(true)
-      setDisplayed('')
-
-      const type = () => {
-        i++
-        setDisplayed(text.slice(0, i))
-        if (i < text.length) {
-          timeout = setTimeout(type, 80)
-        } else {
-          setTyping(false)
-          // wait until 5s total has elapsed then restart
-          const typeTime = text.length * 80
-          const pause = 5000 - typeTime
-          timeout = setTimeout(typeOut, Math.max(pause, 500))
-        }
-      }
-      type()
-    }
-
-    typeOut()
-    return () => clearTimeout(timeout)
-  }, [text])
-
-  return (
-    <span className="gradient-text-animated">
-      {displayed}
-      <span
-        className="inline-block w-[3px] h-[0.85em] ml-1 align-middle"
-        style={{
-          background: 'var(--cyan)',
-          borderRadius: 2,
-          opacity: typing ? 1 : 0,
-          transition: 'opacity 0.3s',
-        }}
-      />
-    </span>
-  )
-}
-
 export default function HeroSection({
   name = 'Joey Chen',
   tagline = 'Blockchain Developer · Builder · Creator',
@@ -68,56 +17,49 @@ export default function HeroSection({
   statusActive = true,
 }: Props) {
   return (
-    <section className="relative min-h-screen flex items-center justify-center px-6">
-      <div className="relative z-10 text-center max-w-3xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
-        >
+    <section className="relative px-6 pt-32 pb-16 md:pt-40 md:pb-24">
+      <div className="max-w-6xl mx-auto grid gap-10 md:grid-cols-[1.1fr_1fr] md:items-center">
+        <div className="order-2 md:order-1">
           {statusActive && statusText && (
-            <div
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-8"
-              style={{
-                background: 'color-mix(in srgb, var(--cyan) 10%, transparent)',
-                border: '1px solid color-mix(in srgb, var(--cyan) 25%, transparent)',
-              }}
+            <p
+              className="inline-flex items-center gap-2 mb-8 text-xs"
+              style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)' }}
             >
-              <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--cyan)' }} />
-              <span className="text-xs" style={{ color: 'var(--cyan)' }}>{statusText}</span>
-            </div>
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inset-0 rounded-full animate-ping opacity-60" style={{ background: 'var(--accent)' }} />
+                <span className="relative h-1.5 w-1.5 rounded-full" style={{ background: 'var(--accent)' }} />
+              </span>
+              {statusText}
+            </p>
           )}
 
           <h1
-            className="text-5xl md:text-7xl font-bold mb-6 leading-tight"
-            style={{ fontFamily: 'Space Grotesk, sans-serif' }}
+            className="text-5xl md:text-7xl font-semibold leading-[1.02] tracking-[-0.035em] mb-6"
+            style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}
           >
-            <span style={{ color: 'var(--text-primary)' }}>Hey, I&apos;m </span>
-            <TypewriterName text={name} />
+            {name}
+            <span style={{ color: 'var(--accent)' }}>.</span>
           </h1>
 
-          <p className="text-lg md:text-xl mb-4" style={{ color: 'var(--text-secondary)', fontFamily: 'Inter, sans-serif' }}>
+          <p
+            className="text-sm mb-5 uppercase tracking-[0.12em]"
+            style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)' }}
+          >
             {tagline}
           </p>
 
-          <p className="text-base md:text-lg mb-10 max-w-xl mx-auto leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+          <p className="text-base md:text-lg leading-relaxed max-w-lg mb-10" style={{ color: 'var(--text-secondary)' }}>
             {description}
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <NeonButton href="/projects" variant="cyan">View Projects</NeonButton>
-            <NeonButton href="/blog" variant="purple">Read Blog</NeonButton>
-            <NeonButton href="/about" variant="ghost">About Me</NeonButton>
+          <div className="flex flex-wrap items-center gap-3">
+            <NeonButton href="/projects" variant="cyan">View projects</NeonButton>
+            <NeonButton href="/blog" variant="purple">Read the blog</NeonButton>
+            <NeonButton href="/about" variant="ghost">About →</NeonButton>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div
-          className="absolute bottom-12 left-1/2 -translate-x-1/2"
-          animate={{ y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 2 }}
-        >
-          <div className="w-px h-12 mx-auto" style={{ background: 'linear-gradient(to bottom, var(--cyan), transparent)' }} />
-        </motion.div>
+        <AsciiKnot className="order-1 md:order-2 h-[280px] sm:h-[360px] md:h-[480px]" />
       </div>
     </section>
   )

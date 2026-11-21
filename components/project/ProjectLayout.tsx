@@ -68,7 +68,7 @@ export default function ProjectLayout({
 
             <h1
               className="text-4xl md:text-5xl font-bold mb-4"
-              style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-primary)' }}
+              style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}
             >
               {project.title}
             </h1>
@@ -146,7 +146,7 @@ export default function ProjectLayout({
                         target="_blank"
                         rel="noreferrer"
                         className="flex items-center gap-2 text-sm transition-opacity hover:opacity-70"
-                        style={{ color: 'var(--cyan)', cursor: 'none' }}
+                        style={{ color: 'var(--cyan)', cursor: 'pointer' }}
                       >
                         <ExternalLink size={14} />
                         Live Demo
@@ -158,7 +158,7 @@ export default function ProjectLayout({
                         target="_blank"
                         rel="noreferrer"
                         className="flex items-center gap-2 text-sm transition-opacity hover:opacity-70"
-                        style={{ color: 'var(--text-secondary)', cursor: 'none' }}
+                        style={{ color: 'var(--text-secondary)', cursor: 'pointer' }}
                       >
                         <Github size={14} />
                         GitHub

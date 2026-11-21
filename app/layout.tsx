@@ -1,14 +1,16 @@
 import type { Metadata } from 'next'
-import Script from 'next/script'
 import './globals.css'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
-import NeonCursor from '@/components/art/NeonCursor'
+import { Geist, Geist_Mono } from 'next/font/google'
 import ThemeProvider from '@/components/ThemeProvider'
 import PageViewTracker from '@/components/PageViewTracker'
 // CrtAdLoader disabled until AdSense approval — placeholder ad slot triggers policy violation
 // import CrtAdLoader from '@/components/ad/CrtAdLoader'
 import ImageLightbox from '@/components/ui/ImageLightbox'
+
+const geistSans = Geist({ subsets: ['latin'], variable: '--font-geist-sans', display: 'swap' })
+const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono', display: 'swap' })
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://0xjoeytw.xyz'),
@@ -65,7 +67,7 @@ const jsonLdPerson = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="zh-TW" suppressHydrationWarning>
+    <html lang="zh-TW" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
       <head>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdWebSite) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdPerson) }} />
@@ -78,7 +80,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <ThemeProvider>
           <PageViewTracker />
-          <NeonCursor />
           <Navbar />
           <main>{children}</main>
           <Footer />

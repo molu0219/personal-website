@@ -75,7 +75,7 @@ export default function ArticleLayout({
 
             <h1
               className="text-4xl md:text-5xl font-bold mb-5 leading-tight"
-              style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-primary)' }}
+              style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}
             >
               {post.title}
             </h1>

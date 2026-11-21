@@ -73,7 +73,7 @@ function SearchBar({
               background: 'var(--surface)',
               border: '1px solid var(--border)',
               color: 'var(--text-primary)',
-              fontFamily: 'Inter, sans-serif',
+              fontFamily: 'var(--font-body)',
             }}
             onFocus={e => { e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--cyan) 50%, transparent)' }}
             onBlur={e => { e.currentTarget.style.borderColor = 'var(--border)' }}
@@ -88,7 +88,7 @@ function SearchBar({
               onClick={() => onSort(s)}
               className="px-4 py-2 text-xs font-medium transition-colors duration-150 capitalize"
               style={{
-                fontFamily: 'Space Grotesk, sans-serif',
+                fontFamily: 'var(--font-display)',
                 background: sort === s ? 'color-mix(in srgb, var(--cyan) 12%, transparent)' : 'transparent',
                 color: sort === s ? 'var(--cyan)' : 'var(--text-muted)',
                 borderRight: s === 'newest' ? '1px solid var(--border)' : 'none',
@@ -111,7 +111,7 @@ function SearchBar({
                 onClick={() => onTag(tag)}
                 className="px-3 py-1 rounded-full text-xs font-medium transition-all duration-150"
                 style={{
-                  fontFamily: 'Space Grotesk, sans-serif',
+                  fontFamily: 'var(--font-display)',
                   background: active ? 'color-mix(in srgb, var(--purple) 15%, transparent)' : 'transparent',
                   border: `1px solid ${active ? 'color-mix(in srgb, var(--purple) 50%, transparent)' : 'var(--border)'}`,
                   color: active ? 'var(--purple)' : 'var(--text-muted)',
@@ -176,7 +176,7 @@ function HeroCard({ post }: { post: Post }) {
             <h2
               className="font-bold leading-tight mb-3"
               style={{
-                fontFamily: 'Space Grotesk, sans-serif',
+                fontFamily: 'var(--font-display)',
                 fontSize: 'clamp(1.4rem, 3vw, 2rem)',
                 color: '#fff',
                 textShadow: '0 2px 20px rgba(0,0,0,0.5)',
@@ -266,7 +266,7 @@ function PostCard({ post, index, views }: { post: Post; index: number; views?: n
             </div>
             <h3
               className="font-bold leading-snug mb-2"
-              style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '1.05rem', color: 'var(--text-primary)' }}
+              style={{ fontFamily: 'var(--font-display)', fontSize: '1.05rem', color: 'var(--text-primary)' }}
             >
               {post.title}
             </h3>

@@ -89,7 +89,7 @@ export default function ImageUpload({ value, onChange, label = 'Cover Image' }: 
         <button
           type="button"
           className="text-xs mt-1 font-mono underline"
-          style={{ color: 'var(--text-muted)', cursor: 'none' }}
+          style={{ color: 'var(--text-muted)', cursor: 'pointer' }}
           onClick={() => onChange('')}
         >
           Remove image

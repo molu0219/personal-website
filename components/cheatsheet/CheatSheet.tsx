@@ -434,7 +434,7 @@ export default function CheatSheet() {
               onClick={() => setOs(o)}
               className="px-5 py-2 text-xs font-semibold transition-all"
               style={{
-                fontFamily: 'Space Grotesk, sans-serif',
+                fontFamily: 'var(--font-display)',
                 background: os === o ? 'var(--cyan)' : 'transparent',
                 color: os === o ? '#000' : 'var(--text-muted)',
                 boxShadow: os === o ? '0 0 12px rgba(0,212,255,0.4)' : 'none',
@@ -473,7 +473,7 @@ export default function CheatSheet() {
             <div
               className="px-3 py-2 text-xs font-bold uppercase tracking-widest"
               style={{
-                fontFamily: 'Space Grotesk, sans-serif',
+                fontFamily: 'var(--font-display)',
                 background: card.color,
                 color: '#000',
                 boxShadow: `0 2px 12px ${card.color}40`,
@@ -489,7 +489,7 @@ export default function CheatSheet() {
                   <div
                     className="text-[0.65rem] font-bold uppercase tracking-wider mt-3 mb-1 pb-1 first:mt-0"
                     style={{
-                      fontFamily: 'Space Grotesk, sans-serif',
+                      fontFamily: 'var(--font-display)',
                       color: 'var(--text-primary)',
                       borderBottom: '1px solid var(--border)',
                     }}

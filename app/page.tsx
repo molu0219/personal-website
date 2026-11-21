@@ -1,46 +1,76 @@
-import AuroraCanvas from '@/components/art/AuroraCanvas'
-import HeroSection from '@/components/sections/HeroSection'
-import { createClient } from '@/lib/supabase/server'
-import NeonButton from '@/components/ui/NeonButton'
-import NeonBadge from '@/components/ui/NeonBadge'
-import ScrollCarousel from '@/components/ui/ScrollCarousel'
 import Link from 'next/link'
+import HeroSection from '@/components/sections/HeroSection'
+import NeonBadge from '@/components/ui/NeonBadge'
+import { createClient } from '@/lib/supabase/server'
 
-const TAG_COLORS: Record<string, string> = {
-  'Solidity':   '20,80,180',
-  'DeFi':       '0,160,100',
-  'NFT':        '120,0,200',
-  'AI':         '200,40,100',
-  'ZK Proofs':  '80,0,200',
-  'TypeScript': '0,100,200',
-  'Ethereum':   '80,60,200',
-  'Solana':     '100,200,80',
-  'Security':   '200,0,60',
+interface PostRow {
+  id: string
+  slug: string
+  title: string
+  excerpt: string | null
+  tags: string[] | null
+  published_at: string | null
 }
 
-function tagGradient(tags: string[]) {
-  const rgb = TAG_COLORS[tags?.[0]] ?? '0,100,160'
-  return `linear-gradient(135deg, rgba(${rgb},0.3) 0%, rgba(${rgb},0.05) 100%)`
+interface ProjectRow {
+  id: string
+  slug: string
+  title: string
+  description: string | null
+  tags: string[] | null
+  cover_url: string | null
+}
+
+interface AboutRow {
+  name: string | null
+  title: string | null
+  hero_description: string | null
+  status_text: string | null
+  status_active: boolean | null
+}
+
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' })
+}
+
+function SectionHeader({ index, title, href }: { index: string; title: string; href: string }) {
+  return (
+    <div className="flex items-baseline justify-between border-b pb-4 mb-2" style={{ borderColor: 'var(--border)' }}>
+      <h2 className="flex items-baseline gap-3 text-xl font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>
+        <span className="text-xs font-normal" style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
+          {index}
+        </span>
+        {title}
+      </h2>
+      <Link
+        href={href}
+        className="text-sm transition-colors hover:text-[var(--text-primary)]"
+        style={{ color: 'var(--text-secondary)' }}
+      >
+        View all →
+      </Link>
+    </div>
+  )
 }
 
 export default async function HomePage() {
-  let projects: any[] = []
-  let posts: any[] = []
-  let about: any = null
+  let projects: ProjectRow[] = []
+  let posts: PostRow[] = []
+  let about: AboutRow | null = null
 
   try {
     const supabase = await createClient()
     const [{ data: p }, { data: b }, { data: a }] = await Promise.all([
       supabase
         .from('projects')
-        .select('id,slug,title,description,tags,cover_url,featured')
+        .select('id,slug,title,description,tags,cover_url')
         .eq('published', true)
         .eq('featured', true)
         .order('created_at', { ascending: false })
-        .limit(5),
+        .limit(4),
       supabase
         .from('posts')
-        .select('id,slug,title,excerpt,tags,cover_url,published_at')
+        .select('id,slug,title,excerpt,tags,published_at')
         .eq('published', true)
         .order('published_at', { ascending: false })
         .limit(5),
@@ -49,148 +79,104 @@ export default async function HomePage() {
     projects = p ?? []
     posts = b ?? []
     about = a
-  } catch {}
+  } catch (err) {
+    // Render the static hero even if Supabase is unreachable.
+    console.error('[home] failed to load content', err)
+  }
 
   return (
     <>
-      <AuroraCanvas />
       <HeroSection
-        name={about?.name}
-        tagline={about?.title}
-        description={about?.hero_description}
-        statusText={about?.status_text}
+        name={about?.name ?? undefined}
+        tagline={about?.title ?? undefined}
+        description={about?.hero_description ?? undefined}
+        statusText={about?.status_text ?? undefined}
         statusActive={about?.status_active ?? true}
       />
 
-      {/* Recent Posts */}
       {posts.length > 0 && (
-        <section className="relative z-10 pt-20 pb-10">
-          <div className="flex items-center justify-between mb-8 px-6 max-w-6xl mx-auto">
-            <h2
-              className="text-3xl font-bold"
-              style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-primary)' }}
-            >
-              Recent <span className="gradient-text">Posts</span>
-            </h2>
-            <NeonButton href="/blog" variant="ghost">View All →</NeonButton>
-          </div>
-          <div className="pl-6 max-w-6xl mx-auto">
-            <ScrollCarousel>
+        <section className="px-6 py-16">
+          <div className="max-w-6xl mx-auto">
+            <SectionHeader index="01" title="Writing" href="/blog" />
+            <ul>
               {posts.map(post => (
-                <Link
-                  key={post.id}
-                  href={`/blog/${post.slug}`}
-                  className="flex-shrink-0"
-                  style={{ width: 280, scrollSnapAlign: 'start' }}
-                >
-                  <div className="card-hover-purple h-full rounded-xl overflow-hidden group">
-                    {/* Cover */}
-                    <div className="overflow-hidden" style={{ height: 160 }}>
-                      {post.cover_url ? (
-                        <img
-                          src={post.cover_url}
-                          alt={post.title}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                      ) : (
-                        <div
-                          className="w-full h-full"
-                          style={{ background: tagGradient(post.tags) }}
-                        />
-                      )}
-                    </div>
-                    {/* Content */}
-                    <div className="p-4">
-                      {post.published_at && (
-                        <p className="text-xs mb-2 font-mono" style={{ color: 'var(--text-muted)' }}>
-                          {new Date(post.published_at).toLocaleDateString('en-US', {
-                            month: 'short', day: 'numeric', year: 'numeric',
-                          })}
-                        </p>
-                      )}
-                      <h3
-                        className="font-semibold text-sm leading-snug mb-2 line-clamp-2"
-                        style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-primary)' }}
+                <li key={post.id} className="border-b" style={{ borderColor: 'var(--border)' }}>
+                  <Link
+                    href={`/blog/${post.slug}`}
+                    className="group grid gap-1 py-5 md:grid-cols-[140px_1fr_auto] md:items-baseline md:gap-6"
+                  >
+                    <span className="text-xs" style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
+                      {post.published_at ? formatDate(post.published_at) : '—'}
+                    </span>
+                    <span>
+                      <span
+                        className="block font-medium transition-colors group-hover:text-[var(--accent)]"
+                        style={{ color: 'var(--text-primary)' }}
                       >
                         {post.title}
-                      </h3>
+                      </span>
                       {post.excerpt && (
-                        <p className="text-xs line-clamp-2 mb-3" style={{ color: 'var(--text-secondary)' }}>
+                        <span className="mt-1 block text-sm line-clamp-1" style={{ color: 'var(--text-secondary)' }}>
                           {post.excerpt}
-                        </p>
+                        </span>
                       )}
-                      <div className="flex flex-wrap gap-1.5">
-                        {post.tags?.slice(0, 2).map((tag: string) => (
-                          <NeonBadge key={tag} color="purple">{tag}</NeonBadge>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </Link>
+                    </span>
+                    <span className="hidden md:flex gap-1.5">
+                      {post.tags?.slice(0, 2).map(tag => <NeonBadge key={tag}>{tag}</NeonBadge>)}
+                    </span>
+                  </Link>
+                </li>
               ))}
-            </ScrollCarousel>
+            </ul>
           </div>
         </section>
       )}
 
-      {/* Featured Projects */}
       {projects.length > 0 && (
-        <section className="relative z-10 pt-10 pb-20">
-          <div className="flex items-center justify-between mb-8 px-6 max-w-6xl mx-auto">
-            <h2
-              className="text-3xl font-bold"
-              style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-primary)' }}
-            >
-              Featured <span className="gradient-text">Projects</span>
-            </h2>
-            <NeonButton href="/projects" variant="ghost">View All →</NeonButton>
-          </div>
-          <div className="pl-6 max-w-6xl mx-auto">
-            <ScrollCarousel>
+        <section className="px-6 py-16">
+          <div className="max-w-6xl mx-auto">
+            <SectionHeader index="02" title="Selected work" href="/projects" />
+            <div className="grid gap-6 pt-6 sm:grid-cols-2">
               {projects.map(project => (
-                <Link
-                  key={project.id}
-                  href={`/projects/${project.slug}`}
-                  className="flex-shrink-0"
-                  style={{ width: 300, scrollSnapAlign: 'start' }}
-                >
-                  <div className="card-hover-cyan h-full rounded-xl overflow-hidden group">
-                    {/* Cover */}
-                    <div className="overflow-hidden" style={{ height: 180 }}>
-                      {project.cover_url ? (
-                        <img
-                          src={project.cover_url}
-                          alt={project.title}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                      ) : (
-                        <div
-                          className="w-full h-full"
-                          style={{ background: tagGradient(project.tags) }}
-                        />
-                      )}
-                    </div>
-                    {/* Content */}
-                    <div className="p-4">
-                      <h3
-                        className="font-semibold text-sm mb-2 line-clamp-2"
-                        style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-primary)' }}
+                <Link key={project.id} href={`/projects/${project.slug}`} className="group block">
+                  <div
+                    className="aspect-[16/10] overflow-hidden rounded-lg border"
+                    style={{ borderColor: 'var(--border)', background: 'var(--surface-2)' }}
+                  >
+                    {project.cover_url ? (
+                      <img
+                        src={project.cover_url}
+                        alt={project.title}
+                        loading="lazy"
+                        decoding="async"
+                        className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02]"
+                      />
+                    ) : (
+                      <div
+                        className="flex h-full items-center justify-center text-xs"
+                        style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}
                       >
-                        {project.title}
-                      </h3>
-                      <p className="text-xs line-clamp-2 mb-3" style={{ color: 'var(--text-secondary)' }}>
-                        {project.description}
-                      </p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {project.tags?.slice(0, 3).map((tag: string) => (
-                          <NeonBadge key={tag} color="cyan">{tag}</NeonBadge>
-                        ))}
+                        {project.slug}
                       </div>
-                    </div>
+                    )}
+                  </div>
+                  <h3
+                    className="mt-4 font-medium transition-colors group-hover:text-[var(--accent)]"
+                    style={{ color: 'var(--text-primary)' }}
+                  >
+                    {project.title}
+                  </h3>
+                  {project.description && (
+                    <p className="mt-1 text-sm line-clamp-2" style={{ color: 'var(--text-secondary)' }}>
+                      {project.description}
+                    </p>
+                  )}
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {project.tags?.slice(0, 3).map(tag => <NeonBadge key={tag}>{tag}</NeonBadge>)}
                   </div>
                 </Link>
               ))}
-            </ScrollCarousel>
+            </div>
           </div>
         </section>
       )}

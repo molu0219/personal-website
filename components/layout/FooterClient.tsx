@@ -52,7 +52,7 @@ export default function FooterClient({ socials }: Props) {
                     color: 'var(--text-muted)',
                     background: 'var(--surface)',
                     border: '1px solid var(--border)',
-                    cursor: 'none',
+                    cursor: 'pointer',
                   }}
                   whileHover={{ scale: 1.15, color: 'var(--cyan)' }}
                   whileTap={{ scale: 0.95 }}

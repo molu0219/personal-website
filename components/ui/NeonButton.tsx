@@ -1,6 +1,4 @@
-'use client'
-
-import { motion } from 'framer-motion'
+import Link from 'next/link'
 
 type Variant = 'cyan' | 'purple' | 'pink' | 'ghost'
 
@@ -14,12 +12,19 @@ interface NeonButtonProps {
   disabled?: boolean
 }
 
-const variantVars: Record<Variant, string> = {
-  cyan: '--cyan',
-  purple: '--purple',
-  pink: '--pink',
-  ghost: '',
+// Legacy variant names kept for call-site compatibility:
+// cyan → primary (solid), purple → secondary (outline), pink → danger, ghost → quiet.
+const VARIANT_CLASS: Record<Variant, string> = {
+  cyan: 'bg-[var(--text-primary)] text-[var(--bg)] border-transparent hover:opacity-85',
+  purple: 'bg-transparent text-[var(--text-primary)] border-[var(--border-strong)] hover:bg-[var(--surface-2)]',
+  pink: 'bg-transparent text-[var(--accent)] border-[color-mix(in_srgb,var(--accent)_45%,transparent)] hover:bg-[color-mix(in_srgb,var(--accent)_8%,transparent)]',
+  ghost: 'bg-transparent text-[var(--text-secondary)] border-transparent hover:text-[var(--text-primary)] hover:bg-[var(--surface-2)]',
 }
+
+const BASE =
+  'inline-flex items-center justify-center gap-2 h-10 px-5 rounded-md border text-sm font-medium ' +
+  'transition-[background-color,color,opacity,transform] duration-150 ease-out active:scale-[0.98] ' +
+  'disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 select-none'
 
 export default function NeonButton({
   children,
@@ -30,46 +35,24 @@ export default function NeonButton({
   type = 'button',
   disabled,
 }: NeonButtonProps) {
-  const isGhost = variant === 'ghost'
-  const colorVar = isGhost ? 'var(--text-secondary)' : `var(${variantVars[variant]})`
-
-  const inner = (
-    <motion.button
-      type={type}
-      disabled={disabled}
-      onClick={onClick}
-      className={`relative px-6 py-2.5 rounded-lg font-medium text-sm tracking-wide ${className}`}
-      style={{
-        color: colorVar,
-        border: `1px solid ${isGhost ? 'var(--border)' : `color-mix(in srgb, ${colorVar} 50%, transparent)`}`,
-        background: 'var(--surface)',
-        backdropFilter: 'blur(10px)',
-        cursor: disabled ? 'not-allowed' : 'none',
-        opacity: disabled ? 0.5 : 1,
-        transition: 'box-shadow 0.2s, border-color 0.2s, background 0.2s',
-      }}
-      whileHover={
-        disabled
-          ? {}
-          : {
-              boxShadow: isGhost
-                ? 'var(--shadow-md)'
-                : `0 0 20px color-mix(in srgb, ${colorVar} 30%, transparent), 0 0 40px color-mix(in srgb, ${colorVar} 15%, transparent)`,
-              borderColor: colorVar,
-            }
-      }
-      whileTap={disabled ? {} : { scale: 0.97 }}
-    >
-      {children}
-    </motion.button>
-  )
+  const cls = `${BASE} ${VARIANT_CLASS[variant]} ${className}`
 
   if (href) {
-    return (
-      <a href={href} target={href.startsWith('http') ? '_blank' : undefined} rel="noreferrer">
-        {inner}
+    const isExternal = /^https?:\/\//.test(href)
+    return isExternal ? (
+      <a href={href} target="_blank" rel="noopener noreferrer" className={cls}>
+        {children}
       </a>
+    ) : (
+      <Link href={href} className={cls}>
+        {children}
+      </Link>
     )
   }
-  return inner
+
+  return (
+    <button type={type} disabled={disabled} onClick={onClick} className={cls}>
+      {children}
+    </button>
+  )
 }
