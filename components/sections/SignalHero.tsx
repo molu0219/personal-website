@@ -49,6 +49,7 @@ export default function SignalHero({ name, tagline, description, signals, stats 
     } catch {}
     if (seenBoot || reduceMotion) field.skipBoot()
 
+    section.style.cursor = 'none' // the spider is the cursor in the field
     let lastHud = ''
     const syncHud = () => {
       const s = field.hovered ?? field.focus
@@ -56,7 +57,8 @@ export default function SignalHero({ name, tagline, description, signals, stats 
       if (key === lastHud) return
       lastHud = key
       setHud(s ? { title: s.title, href: s.href, hovered: !!field.hovered } : null)
-      section.style.cursor = field.hovered ? 'pointer' : ''
+      // The spider is the cursor inside the field.
+      section.style.cursor = field.hovered ? 'pointer' : 'none'
     }
 
     const layout = () => {
@@ -114,8 +116,8 @@ export default function SignalHero({ name, tagline, description, signals, stats 
 
     layout()
     if (reduceMotion) {
-      // One still frame with the first signal already decoded.
-      field.step(5)
+      // One still frame: let the spider settle on the first signal.
+      for (let i = 0; i < 120; i++) field.step(1 / 30)
       field.render()
       syncHud()
     }
@@ -144,7 +146,7 @@ export default function SignalHero({ name, tagline, description, signals, stats 
 
       <div ref={containerRef} className="absolute inset-x-6 bottom-0 top-0 max-w-6xl mx-auto pointer-events-none">
         <h1 className="sr-only">{name}</h1>
-        <div ref={copyRef} className="pointer-events-auto absolute left-0 bottom-24 max-w-md">
+        <div ref={copyRef} className="pointer-events-auto cursor-auto absolute left-0 bottom-24 max-w-md">
           <p className="mb-3 text-sm" style={{ fontFamily: 'var(--font-mono)', color: 'var(--accent)' }}>
             {tagline}
           </p>
@@ -165,13 +167,13 @@ export default function SignalHero({ name, tagline, description, signals, stats 
             <span style={{ color: 'var(--accent)' }}>●</span> {stats.posts} posts · {stats.projects} projects
             {stats.lastWrite && <> · last write {stats.lastWrite}</>}
           </span>
-          <span aria-live="polite" className="min-w-0 truncate pointer-events-auto">
+          <span aria-live="polite" className="min-w-0 truncate pointer-events-auto cursor-auto">
             {hud ? (
               <a href={hud.href} style={{ color: hud.hovered ? 'var(--accent)' : 'var(--text-secondary)' }}>
                 decoding → {hud.title} {hud.hovered && '↵'}
               </a>
             ) : (
-              'move the cursor to decode · click anywhere'
+              'move the crawler over the noise · click a decoded path'
             )}
           </span>
         </div>

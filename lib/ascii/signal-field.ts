@@ -2,8 +2,9 @@ import { AsciiGrid } from '@/lib/ascii/grid'
 import { textMask, type TextMask } from '@/lib/ascii/mask'
 import { MAT, edgeGlyph, rampChar } from '@/lib/ascii/palette'
 import { hash1, hash2, hashString, rng, vnoise } from '@/lib/ascii/noise'
+import { Spider } from '@/lib/ascii/spider'
 
-/** Something real hidden in the noise: a post or project path that the lens decodes. */
+/** Something real hidden in the noise: a post or project path the spider crawls and decodes. */
 export interface Signal {
   /** ASCII path drawn in the grid, e.g. "~/blog/harness-ai-agent". */
   label: string
@@ -34,7 +35,10 @@ const HEX = '0123456789abcdef'
 const GLITCH = '#$%?!*+=/\\|01{}[]~^'
 const NAME_EDGE = 0.35
 const NAME_RAMP = ':-=+*#%@'
-const LENS_PX = 90
+const LENS_PX = 90 // radius used for the name's light falloff
+const BODY_REVEAL_PX = 70 // body this close to a signal decodes it
+const FOOT_REVEAL_PX = 26 // a planted foot this close decodes it
+const CLEAR_PX = 44 // noise cleared around the spider so it stays readable
 const NAV_PX = 56 // fixed navbar height: keep it clear of noise
 const BOOT_END = 2.2
 const AUTOPILOT_IDLE = 2.5 // s without pointer input before the lens drives itself
@@ -58,6 +62,7 @@ export class SignalField {
   lens = { c: -100, r: -100 }
   private lensTarget = { c: -100, r: -100 }
   private pointer: { c: number; r: number } | null = null
+  private spider: Spider | null = null
   private lastInput = -Infinity
   private pilotIndex = 0
   private pilotSince = 0
@@ -187,19 +192,23 @@ export class SignalField {
       }
       this.lensTarget = this.centre(this.placed[this.pilotIndex])
     }
-    const k = Math.min(1, dt * (idle ? 2.2 : 10))
-    this.lens.c += (this.lensTarget.c - this.lens.c) * k
-    this.lens.r += (this.lensTarget.r - this.lens.r) * k
-
     const { cw, ch } = this.grid
+    // The spider crawls toward the target; the "lens" is just where its body is.
+    if (!this.spider) this.spider = new Spider(this.lens.c * cw, this.lens.r * ch)
+    const sp = this.spider
+    sp.step(dt, this.lensTarget.c * cw, this.lensTarget.r * ch)
+    this.lens = { c: sp.x / cw, r: sp.y / ch }
+
+    const feet = sp.feet()
+    // Distance in px from a point to a signal's text span.
+    const toSpan = (p: Placed, x: number, y: number) =>
+      Math.hypot(Math.max(0, Math.abs(x / cw - (p.col + p.label.length / 2)) - p.label.length / 2) * cw, y - p.row * ch - ch / 2)
     let best: Placed | null = null
     let bestD = Infinity
     for (const p of this.placed) {
-      const ctr = this.centre(p)
-      const dx = Math.max(0, Math.abs(this.lens.c - ctr.c) - p.label.length / 2) * cw
-      const dy = (this.lens.r - ctr.r) * ch
-      const d = Math.hypot(dx, dy)
-      const inside = d < LENS_PX * 1.1
+      const d = toSpan(p, sp.x, sp.y)
+      const touched = feet.some(f => toSpan(p, f.x, f.y) < FOOT_REVEAL_PX)
+      const inside = d < BODY_REVEAL_PX || touched
       p.reveal = Math.min(1, Math.max(0, p.reveal + (inside ? dt * 2.4 : -dt * 1.2)))
       if (inside && d < bestD) {
         best = p
@@ -273,29 +282,12 @@ export class SignalField {
         if (n < 0.4) continue
         const epoch = Math.floor(t * 0.7 + hash2(c, r) * 9)
         const hex = HEX[Math.floor(hash2(c * 7 + epoch, r * 13) * 16)]
-        const d = Math.hypot((c - lx) * cw, (r - ly) * ch)
-        const inLens = d < LENS_PX
-        if (inLens) {
-          // Inside the lens the noise clears, leaving a faint grain.
-          if (hash2(c, r + epoch) < 0.85) continue
-          g.set(c, r, '.', MAT.noise, 0.35)
-          continue
-        }
+        if (Math.hypot((c - lx) * cw, (r - ly) * ch) < CLEAR_PX) continue
         g.set(c, r, hex, MAT.noise, (n - 0.4) * 1.1)
       }
     }
 
-    // ── lens rim ─────────────────────────────────────────────
-    const steps = 44
-    for (let i = 0; i < steps; i++) {
-      if (i % 3 === 2) continue
-      const a = (i / steps) * Math.PI * 2 + t * 0.4
-      const c = Math.round(lx + (Math.cos(a) * LENS_PX) / cw)
-      const r = Math.round(ly + (Math.sin(a) * LENS_PX) / ch)
-      if (!inRect(c, r, this.calm) && !inRect(c, r, nb)) g.set(c, r, i % 9 === 0 ? '+' : '.', MAT.accent, 0.75)
-    }
-
-    // ── signals decoded by the lens ──────────────────────────
+    // ── signals decoded by the crawler ───────────────────────
     for (const p of this.placed) {
       if (p.reveal <= 0) continue
       const hot = p === this.hovered
@@ -325,10 +317,8 @@ export class SignalField {
         }
     }
 
-    // ── crosshair ────────────────────────────────────────────
-    if (this.pointer && !inRect(this.pointer.c, this.pointer.r, this.calm)) {
-      g.set(this.pointer.c, this.pointer.r, this.hovered ? '*' : '+', MAT.accent, 1)
-    }
+    // ── the crawler (the cursor) ─────────────────────────────
+    this.spider?.draw(g)
 
     if (booting) this.renderBoot()
     g.compose()
