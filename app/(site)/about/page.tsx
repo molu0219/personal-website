@@ -20,9 +20,7 @@ export const metadata: Metadata = {
     creator: '@0xjoeytw',
   },
 }
-import GlassCard from '@/components/ui/GlassCard'
 import NeonBadge from '@/components/ui/NeonBadge'
-import NeonButton from '@/components/ui/NeonButton'
 import { Github, Globe, Youtube, Instagram, Send } from 'lucide-react'
 
 function XIcon({ size = 16 }: { size?: number }) {
@@ -42,185 +40,125 @@ const SOCIAL_ICONS: Record<string, React.ElementType> = {
   telegram: Send,
 }
 
+interface AboutData {
+  name?: string | null
+  title?: string | null
+  bio?: string | null
+  skills?: string[] | null
+  social_links?: Record<string, string> | null
+  avatar_url?: string | null
+}
+
+function Row({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <section className="grid gap-4 py-10 border-b md:grid-cols-[200px_1fr] md:gap-10" style={{ borderColor: 'var(--border)' }}>
+      <h2 className="text-xs pt-1" style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
+        {label}
+      </h2>
+      <div>{children}</div>
+    </section>
+  )
+}
+
 export default async function AboutPage() {
-  let about: any = null
+  let about: AboutData | null = null
 
   try {
     const supabase = await createClient()
     const { data } = await supabase.from('about').select('*').single()
     about = data
-  } catch {}
+  } catch (err) {
+    console.error('[about] failed to load about', err)
+  }
 
   const name = about?.name ?? 'Joey Chen'
   const title = about?.title ?? 'Product Manager & AI Builder'
   const bio = about?.bio ?? '我是 Joey Chen，一個對去中心化技術和 AI 開發充滿熱情的 PM。目前專注於用 Claude Code 打造高效的 AI 輔助開發工作流，並將實踐經驗寫成系列文章分享。\n\n這個網站是我的數位花園，記錄技術探索、專案作品、以及從實戰中學到的東西。所有內容都是真實開發經驗的結晶，不是理論空談。'
   const skills: string[] = about?.skills ?? ['Solidity', 'TypeScript', 'React', 'Next.js', 'Rust', 'Python', 'SQL', 'Web3.js', 'Supabase', 'Cloudflare']
-  const social = about?.social_links ?? {}
-
+  const social: Record<string, string> = about?.social_links ?? {}
   const skillCategories = groupSkills(skills)
 
   return (
-    <div className="relative z-10 min-h-screen pb-24">
-      {/* ── Hero Banner ── */}
-      <div
-        className="relative overflow-hidden"
-        style={{
-          background: 'linear-gradient(180deg, color-mix(in srgb, var(--cyan) 6%, var(--bg)) 0%, var(--bg) 100%)',
-          borderBottom: '1px solid var(--border)',
-        }}
-      >
-        {/* grid decoration */}
-        <div
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage: 'linear-gradient(var(--cyan) 1px, transparent 1px), linear-gradient(90deg, var(--cyan) 1px, transparent 1px)',
-            backgroundSize: '48px 48px',
-          }}
-        />
-
-        <div className="relative max-w-5xl mx-auto px-6 pt-36 pb-20 flex flex-col sm:flex-row items-center sm:items-end gap-10">
-          {/* Avatar */}
-          <div className="relative shrink-0">
-            <div
-              className="w-36 h-36 rounded-2xl overflow-hidden"
-              style={{
-                border: '1px solid color-mix(in srgb, var(--cyan) 40%, transparent)',
-                boxShadow: '0 0 0 1px color-mix(in srgb, var(--cyan) 15%, transparent), 0 0 40px color-mix(in srgb, var(--cyan) 18%, transparent), 0 0 80px color-mix(in srgb, var(--purple) 12%, transparent)',
-              }}
-            >
-              {about?.avatar_url ? (
-                <img src={about.avatar_url} alt={name} className="w-full h-full object-cover" />
-              ) : (
-                <div
-                  className="w-full h-full flex items-center justify-center text-4xl font-bold"
-                  style={{
-                    background: 'linear-gradient(135deg, color-mix(in srgb, var(--cyan) 18%, var(--surface)), color-mix(in srgb, var(--purple) 18%, var(--surface)))',
-                    fontFamily: 'var(--font-display)',
-                    color: 'var(--cyan)',
-                  }}
-                >
-                  {name.charAt(0)}
-                </div>
-              )}
-            </div>
-            {/* glow ring */}
-            <div
-              className="absolute -inset-2 rounded-2xl -z-10"
-              style={{
-                background: 'linear-gradient(135deg, var(--cyan), var(--purple))',
-                opacity: 0.2,
-                filter: 'blur(10px)',
-              }}
-            />
-          </div>
-
-          {/* Identity */}
-          <div className="flex-1 text-center sm:text-left">
-            <p
-              className="text-xs uppercase tracking-widest mb-2 font-medium"
-              style={{ color: 'var(--cyan)', fontFamily: 'var(--font-display)', letterSpacing: '0.2em' }}
-            >
-              {title}
-            </p>
-            <h1
-              className="text-4xl sm:text-5xl font-bold leading-none mb-5"
-              style={{
-                fontFamily: 'var(--font-display)',
-                color: 'var(--text-primary)',
-              }}
-            >
-              {name}
-            </h1>
-
-            {Object.keys(social).length > 0 && (
-              <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
-                {Object.entries(social).map(([key, url]) => {
-                  const Icon = SOCIAL_ICONS[key.toLowerCase()] ?? Globe
-                  return (
-                    <NeonButton key={key} href={url as string} variant="ghost" aria-label={key}>
-                      <Icon size={16} />
-                    </NeonButton>
-                  )
-                })}
-              </div>
-            )}
-          </div>
+    <div className="max-w-6xl mx-auto px-6 pb-24">
+      <header className="pt-32 pb-12 md:pt-40 md:pb-16 border-b flex flex-col-reverse gap-8 sm:flex-row sm:items-end sm:justify-between" style={{ borderColor: 'var(--border)' }}>
+        <div>
+          <p className="text-xs mb-4" style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
+            ~/about
+          </p>
+          <h1
+            className="text-4xl md:text-6xl font-semibold tracking-[-0.035em] leading-[1.05]"
+            style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}
+          >
+            {name}
+            <span style={{ color: 'var(--accent)' }}>.</span>
+          </h1>
+          <p className="mt-4 text-sm uppercase tracking-[0.12em]" style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)' }}>
+            {title}
+          </p>
         </div>
-      </div>
+        {about?.avatar_url && (
+          <img
+            src={about.avatar_url}
+            alt={name}
+            className="h-24 w-24 md:h-32 md:w-32 rounded-lg object-cover border grayscale hover:grayscale-0 transition-[filter] duration-500"
+            style={{ borderColor: 'var(--border)' }}
+          />
+        )}
+      </header>
 
-      {/* ── Body ── */}
-      <div className="max-w-5xl mx-auto px-6 mt-14 space-y-8">
-        {/* Bio */}
-        <GlassCard className="p-8 sm:p-10">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-1 h-6 rounded-full" style={{ background: 'linear-gradient(180deg, var(--cyan), var(--purple))' }} />
-            <h2
-              className="text-sm uppercase tracking-widest font-semibold"
-              style={{ fontFamily: 'var(--font-display)', color: 'var(--text-muted)', letterSpacing: '0.15em' }}
-            >
-              About
-            </h2>
-          </div>
-          <div className="space-y-4 max-w-3xl">
-            {bio.split('\n\n').map((paragraph: string, i: number) => (
-              <p
-                key={i}
-                className="text-base sm:text-lg leading-loose"
-                style={{
-                  color: 'var(--text-secondary)',
-                  fontFamily: 'var(--font-body)',
-                  lineHeight: '1.95',
-                }}
-              >
-                {paragraph}
-              </p>
+      <Row label="About">
+        <div className="max-w-[62ch] space-y-5">
+          {bio.split('\n\n').map((paragraph, i) => (
+            <p key={i} className="text-base md:text-lg leading-[1.9]" style={{ color: 'var(--text-primary)' }}>
+              {paragraph}
+            </p>
+          ))}
+        </div>
+      </Row>
+
+      <Row label="Skills">
+        {skillCategories.length > 1 ? (
+          <dl className="space-y-6">
+            {skillCategories.map(({ label, items }) => (
+              <div key={label} className="grid gap-2 sm:grid-cols-[140px_1fr] sm:gap-6">
+                <dt className="text-sm" style={{ color: 'var(--text-secondary)' }}>{label}</dt>
+                <dd className="flex flex-wrap gap-1.5">
+                  {items.map(skill => <NeonBadge key={skill}>{skill}</NeonBadge>)}
+                </dd>
+              </div>
             ))}
+          </dl>
+        ) : (
+          <div className="flex flex-wrap gap-1.5">
+            {skills.map(skill => <NeonBadge key={skill}>{skill}</NeonBadge>)}
           </div>
-        </GlassCard>
+        )}
+      </Row>
 
-        {/* Skills */}
-        <GlassCard className="p-8 sm:p-10">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-1 h-6 rounded-full" style={{ background: 'linear-gradient(180deg, var(--purple), var(--pink))' }} />
-            <h2
-              className="text-sm uppercase tracking-widest font-semibold"
-              style={{ fontFamily: 'var(--font-display)', color: 'var(--text-muted)', letterSpacing: '0.15em' }}
-            >
-              Skills & Technologies
-            </h2>
-          </div>
-
-          {skillCategories.length > 1 ? (
-            <div className="space-y-6">
-              {skillCategories.map(({ label, items, color }, ci) => (
-                <div key={label}>
-                  <p
-                    className="text-xs font-medium mb-3 uppercase tracking-wider"
-                    style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-display)' }}
+      {Object.keys(social).length > 0 && (
+        <Row label="Elsewhere">
+          <ul className="grid gap-x-10 gap-y-3 sm:grid-cols-2 max-w-xl">
+            {Object.entries(social).map(([key, url]) => {
+              const Icon = SOCIAL_ICONS[key.toLowerCase()] ?? Globe
+              return (
+                <li key={key}>
+                  <a
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer me"
+                    className="group flex items-center gap-3 text-sm transition-colors hover:text-[var(--accent)]"
+                    style={{ color: 'var(--text-primary)' }}
                   >
-                    {label}
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {items.map((skill, i) => (
-                      <NeonBadge key={skill} color={color}>
-                        {skill}
-                      </NeonBadge>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {skills.map((skill, i) => (
-                <NeonBadge key={skill} color={i % 3 === 0 ? 'cyan' : i % 3 === 1 ? 'purple' : 'pink'}>
-                  {skill}
-                </NeonBadge>
-              ))}
-            </div>
-          )}
-        </GlassCard>
-      </div>
+                    <Icon size={15} />
+                    <span className="capitalize">{key}</span>
+                    <span className="ml-auto opacity-0 -translate-x-1 transition-all group-hover:opacity-100 group-hover:translate-x-0">↗</span>
+                  </a>
+                </li>
+              )
+            })}
+          </ul>
+        </Row>
+      )}
     </div>
   )
 }
