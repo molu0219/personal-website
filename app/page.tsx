@@ -1,17 +1,8 @@
 import Link from 'next/link'
 import HeroSection from '@/components/sections/HeroSection'
-import NeonBadge from '@/components/ui/NeonBadge'
+import ProjectCard, { type ProjectSummary } from '@/components/project/ProjectCard'
 import PostRow, { type PostSummary } from '@/components/blog/PostRow'
 import { createClient } from '@/lib/supabase/server'
-
-interface ProjectRow {
-  id: string
-  slug: string
-  title: string
-  description: string | null
-  tags: string[] | null
-  cover_url: string | null
-}
 
 interface AboutRow {
   name: string | null
@@ -42,7 +33,7 @@ function SectionHeader({ index, title, href }: { index: string; title: string; h
 }
 
 export default async function HomePage() {
-  let projects: ProjectRow[] = []
+  let projects: ProjectSummary[] = []
   let posts: PostSummary[] = []
   let about: AboutRow | null = null
 
@@ -98,45 +89,7 @@ export default async function HomePage() {
           <div className="max-w-6xl mx-auto">
             <SectionHeader index="02" title="Selected work" href="/projects" />
             <div className="grid gap-6 pt-6 sm:grid-cols-2">
-              {projects.map(project => (
-                <Link key={project.id} href={`/projects/${project.slug}`} className="group block">
-                  <div
-                    className="aspect-[16/10] overflow-hidden rounded-lg border"
-                    style={{ borderColor: 'var(--border)', background: 'var(--surface-2)' }}
-                  >
-                    {project.cover_url ? (
-                      <img
-                        src={project.cover_url}
-                        alt={project.title}
-                        loading="lazy"
-                        decoding="async"
-                        className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02]"
-                      />
-                    ) : (
-                      <div
-                        className="flex h-full items-center justify-center text-xs"
-                        style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}
-                      >
-                        {project.slug}
-                      </div>
-                    )}
-                  </div>
-                  <h3
-                    className="mt-4 font-medium transition-colors group-hover:text-[var(--accent)]"
-                    style={{ color: 'var(--text-primary)' }}
-                  >
-                    {project.title}
-                  </h3>
-                  {project.description && (
-                    <p className="mt-1 text-sm line-clamp-2" style={{ color: 'var(--text-secondary)' }}>
-                      {project.description}
-                    </p>
-                  )}
-                  <div className="mt-3 flex flex-wrap gap-1.5">
-                    {project.tags?.slice(0, 3).map(tag => <NeonBadge key={tag}>{tag}</NeonBadge>)}
-                  </div>
-                </Link>
-              ))}
+              {projects.map(project => <ProjectCard key={project.id} project={project} />)}
             </div>
           </div>
         </section>

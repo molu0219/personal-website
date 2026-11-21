@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { getViewCounts } from '@/lib/view-counts'
 import ProjectGrid from '@/components/sections/ProjectGrid'
+import PageHeader from '@/components/ui/PageHeader'
+import type { ProjectSummary } from '@/components/project/ProjectCard'
 
 export const metadata: Metadata = {
   title: 'Projects — Joey Chen',
@@ -10,54 +12,26 @@ export const metadata: Metadata = {
 }
 
 export default async function ProjectsPage() {
-  let projects: any[] = []
+  let projects: ProjectSummary[] = []
 
   try {
     const supabase = await createClient()
     const { data } = await supabase
       .from('projects')
-      .select('*')
+      .select('id,slug,title,description,tags,cover_url,featured,created_at')
       .eq('published', true)
       .order('created_at', { ascending: false })
     projects = data ?? []
-  } catch {}
+  } catch (err) {
+    console.error('[projects] failed to load projects', err)
+  }
 
-  const viewCounts = await getViewCounts(projects.map((p: any) => `/projects/${p.slug}`))
+  const viewCounts = await getViewCounts(projects.map(p => `/projects/${p.slug}`))
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
-      <div className="px-8 pt-32 pb-12 max-w-6xl mx-auto">
-        <p
-          className="font-mono uppercase text-xs mb-4"
-          style={{ color: 'var(--text-muted)', letterSpacing: '0.25em' }}
-        >
-          Portfolio
-        </p>
-        <h1
-          className="font-bold uppercase mb-6"
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(2.5rem, 8vw, 5rem)',
-            color: 'var(--text-primary)',
-            letterSpacing: '0.18em',
-            lineHeight: 1,
-          }}
-        >
-          Projects
-        </h1>
-        <p
-          className="font-mono text-xs uppercase"
-          style={{ color: 'var(--text-muted)', letterSpacing: '0.2em' }}
-        >
-          Blockchain · AI · Web3 · Open Source
-        </p>
-      </div>
-
-      <div style={{ borderTop: '1px solid var(--border)' }} />
-
-      <div className="px-8 py-16 max-w-6xl mx-auto">
-        <ProjectGrid projects={projects} viewCounts={viewCounts} />
-      </div>
+    <div className="px-6 pb-24 max-w-6xl mx-auto">
+      <PageHeader eyebrow="~/projects" title="Projects" description="Blockchain, AI, Web3 and open-source work." />
+      <ProjectGrid projects={projects} viewCounts={viewCounts} />
     </div>
   )
 }
