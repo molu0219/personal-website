@@ -1,21 +1,24 @@
-'use client'
-
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
 import NeonBadge from '@/components/ui/NeonBadge'
 import TableOfContents from './TableOfContents'
 
 interface Post {
   title: string
-  excerpt?: string
+  excerpt?: string | null
   content: string
-  published_at?: string
-  tags?: string[]
-  cover_url?: string
+  published_at?: string | null
+  tags?: string[] | null
+  cover_url?: string | null
 }
 
-function readingTime(content: string): number {
-  return Math.ceil(content.trim().split(/\s+/).length / 200)
+const CJK_CHARS_PER_MIN = 400
+const WORDS_PER_MIN = 220
+
+/** Mixed zh/en estimate: CJK counted per character, the rest per word. */
+export function readingTime(content: string): number {
+  const cjk = content.match(/[㐀-鿿豈-﫿]/g)?.length ?? 0
+  const words = content.replace(/[㐀-鿿豈-﫿]/g, ' ').trim().split(/\s+/).filter(Boolean).length
+  return Math.max(1, Math.round(cjk / CJK_CHARS_PER_MIN + words / WORDS_PER_MIN))
 }
 
 export default function ArticleLayout({
@@ -27,90 +30,76 @@ export default function ArticleLayout({
   children: React.ReactNode
   views?: number
 }) {
-  const minutes = readingTime(post.content)
+  const meta = [
+    post.published_at
+      ? new Date(post.published_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' })
+      : null,
+    `${readingTime(post.content)} min read`,
+    views != null && views > 0 ? `${views.toLocaleString()} views` : null,
+  ].filter(Boolean)
 
   return (
-    <div className="relative z-10 min-h-screen pt-24 pb-20">
-      <div className="max-w-6xl mx-auto px-6">
-        <Link
-          href="/blog"
-          className="inline-flex items-center gap-1.5 text-sm mb-10 transition-colors hover:opacity-80"
-          style={{ color: 'var(--text-secondary)' }}
-        >
-          <ArrowLeft size={14} />
-          Back to Blog
-        </Link>
+    <>
+      {/* Scroll-driven progress bar: pure CSS, no scroll listener. */}
+      <div className="reading-progress" aria-hidden="true" />
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-12 items-start">
-          {/* Main article */}
-          <article>
-            {/* Meta row */}
-            <div className="flex flex-wrap items-center gap-3 mb-5">
-              {post.tags?.map(tag => (
-                <NeonBadge key={tag} color="purple">{tag}</NeonBadge>
-              ))}
-            </div>
-            <div
-              className="flex flex-wrap gap-3 text-sm mb-6"
-              style={{ color: 'var(--text-muted)' }}
+      <div className="max-w-6xl mx-auto px-6 pt-28 md:pt-36 pb-24">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_220px] gap-16">
+          <article className="min-w-0 max-w-[68ch]">
+            <Link
+              href="/blog"
+              className="inline-block mb-10 text-xs transition-colors hover:text-[var(--text-primary)]"
+              style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}
             >
-              {post.published_at && (
-                <span>
-                  {new Date(post.published_at).toLocaleDateString('en-US', {
-                    month: 'long',
-                    day: 'numeric',
-                    year: 'numeric',
-                  })}
-                </span>
-              )}
-              <span>·</span>
-              <span>{minutes} min read</span>
-              {views != null && views > 0 && (
-                <>
-                  <span>·</span>
-                  <span>{views.toLocaleString()} views</span>
-                </>
-              )}
-            </div>
+              ← ~/blog
+            </Link>
 
             <h1
-              className="text-4xl md:text-5xl font-bold mb-5 leading-tight"
+              className="text-3xl md:text-5xl font-semibold leading-[1.15] tracking-[-0.03em]"
               style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}
             >
               {post.title}
             </h1>
 
+            <p className="mt-6 text-xs" style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
+              {meta.join('  ·  ')}
+            </p>
+
+            {post.tags && post.tags.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-1.5">
+                {post.tags.map(tag => <NeonBadge key={tag}>{tag}</NeonBadge>)}
+              </div>
+            )}
+
             {post.excerpt && (
               <p
-                className="text-lg mb-8 pb-8"
-                style={{
-                  color: 'var(--text-secondary)',
-                  borderBottom: '1px solid var(--border)',
-                  lineHeight: '1.7',
-                }}
+                className="mt-8 pb-8 text-lg leading-relaxed border-b"
+                style={{ color: 'var(--text-secondary)', borderColor: 'var(--border)' }}
               >
                 {post.excerpt}
               </p>
             )}
 
             {post.cover_url && (
-              <div
-                className="mb-10 rounded-2xl overflow-hidden"
-                style={{ border: '1px solid var(--border)' }}
-              >
-                <img src={post.cover_url} alt={post.title} className="w-full" />
-              </div>
+              <img
+                src={post.cover_url}
+                alt=""
+                decoding="async"
+                className="mt-10 w-full rounded-lg border"
+                style={{ borderColor: 'var(--border)' }}
+              />
             )}
 
-            <div className="prose-theme">{children}</div>
+            <div className="prose-theme mt-10">{children}</div>
           </article>
 
-          {/* Sticky sidebar */}
-          <aside className="hidden lg:block sticky top-24 self-start max-h-[calc(100vh-8rem)] overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: 'var(--border) transparent' }}>
-            <TableOfContents content={post.content} />
+          <aside className="hidden lg:block">
+            <div className="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto">
+              <TableOfContents content={post.content} />
+            </div>
           </aside>
         </div>
       </div>
-    </div>
+    </>
   )
 }
