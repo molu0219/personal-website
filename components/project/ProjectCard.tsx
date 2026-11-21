@@ -25,7 +25,7 @@ export default function ProjectCard({ project, views }: { project: ProjectSummar
             alt={project.title}
             loading="lazy"
             decoding="async"
-            className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02]"
+            className="h-full w-full object-cover"
           />
         ) : (
           <div

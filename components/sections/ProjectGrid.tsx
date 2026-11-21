@@ -65,7 +65,7 @@ export default function ProjectGrid({
         sortOptions={SORT_OPTIONS}
         sort={sort}
         onSort={setSort}
-        tags={Array.from(tagCounts.keys())}
+        tags={Array.from(tagCounts.keys()).sort((a, b) => tagCounts.get(b)! - tagCounts.get(a)! || a.localeCompare(b))}
         activeTag={activeTag}
         onTag={setActiveTag}
         tagCount={tag => (tag === ALL_TAG ? projects.length : tagCounts.get(tag) ?? 0)}

@@ -25,16 +25,13 @@ export default function HeroSection({
               className="inline-flex items-center gap-2 mb-8 text-xs"
               style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)' }}
             >
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inset-0 rounded-full animate-ping opacity-60" style={{ background: 'var(--accent)' }} />
-                <span className="relative h-1.5 w-1.5 rounded-full" style={{ background: 'var(--accent)' }} />
-              </span>
+              <span className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--accent)' }} />
               {statusText}
             </p>
           )}
 
           <h1
-            className="text-5xl md:text-7xl font-semibold leading-[1.02] tracking-[-0.035em] mb-6"
+            className="text-5xl md:text-7xl font-medium leading-[1.02] tracking-[-0.03em] mb-6"
             style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}
           >
             {name}
@@ -42,7 +39,7 @@ export default function HeroSection({
           </h1>
 
           <p
-            className="text-sm mb-5 uppercase tracking-[0.12em]"
+            className="text-sm mb-5"
             style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)' }}
           >
             {tagline}
@@ -55,7 +52,6 @@ export default function HeroSection({
           <div className="flex flex-wrap items-center gap-3">
             <NeonButton href="/projects" variant="cyan">View projects</NeonButton>
             <NeonButton href="/blog" variant="purple">Read the blog</NeonButton>
-            <NeonButton href="/about" variant="ghost">About →</NeonButton>
           </div>
         </div>
 

@@ -22,11 +22,16 @@ export default function BlogList({
   const [sort, setSort] = useState<SortKey>('newest')
   const [activeTag, setActiveTag] = useState(ALL_TAG)
 
-  const allTags = useMemo(() => {
-    const set = new Set<string>()
-    posts.forEach(p => p.tags?.forEach(t => set.add(t)))
-    return Array.from(set).sort()
+  // Most-used tags first, so the collapsed filter row shows the ones that matter.
+  const tagCounts = useMemo(() => {
+    const counts = new Map<string, number>()
+    posts.forEach(p => p.tags?.forEach(t => counts.set(t, (counts.get(t) ?? 0) + 1)))
+    return counts
   }, [posts])
+  const allTags = useMemo(
+    () => Array.from(tagCounts.keys()).sort((a, b) => tagCounts.get(b)! - tagCounts.get(a)! || a.localeCompare(b)),
+    [tagCounts],
+  )
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -55,6 +60,7 @@ export default function BlogList({
         tags={allTags}
         activeTag={activeTag}
         onTag={setActiveTag}
+        tagCount={tag => (tag === ALL_TAG ? posts.length : tagCounts.get(tag) ?? 0)}
       />
 
       {filtered.length === 0 ? (

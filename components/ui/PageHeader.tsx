@@ -13,7 +13,7 @@ export default function PageHeader({ eyebrow, title, description, children }: Pa
         {eyebrow}
       </p>
       <h1
-        className="text-4xl md:text-6xl font-semibold tracking-[-0.035em] leading-[1.05]"
+        className="text-4xl md:text-6xl font-medium tracking-[-0.03em] leading-[1.05]"
         style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}
       >
         {title}

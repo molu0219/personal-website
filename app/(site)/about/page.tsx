@@ -94,7 +94,7 @@ export default async function AboutPage() {
             {name}
             <span style={{ color: 'var(--accent)' }}>.</span>
           </h1>
-          <p className="mt-4 text-sm uppercase tracking-[0.12em]" style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)' }}>
+          <p className="mt-4 text-sm" style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)' }}>
             {title}
           </p>
         </div>
@@ -153,7 +153,7 @@ export default async function AboutPage() {
                   >
                     <Icon size={15} />
                     <span className="capitalize">{key}</span>
-                    <span className="ml-auto opacity-0 -translate-x-1 transition-all group-hover:opacity-100 group-hover:translate-x-0">↗</span>
+                    <span className="ml-auto opacity-0 -translate-x-1 transition-[opacity,transform] group-hover:opacity-100 group-hover:translate-x-0">↗</span>
                   </a>
                 </li>
               )
