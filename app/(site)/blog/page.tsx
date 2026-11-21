@@ -6,6 +6,9 @@ import BlogList from '@/components/sections/BlogList'
 import ContentArt from '@/components/art/ContentArt'
 import AsciiBars from '@/components/art/AsciiBars'
 import { withPostMeta } from '@/components/blog/post-meta'
+import { postThumbs } from '@/components/blog/PostThumb'
+import FeaturedEntry from '@/components/ui/FeaturedEntry'
+import { formatPostDate } from '@/components/blog/PostRow'
 import PageHeader from '@/components/ui/PageHeader'
 import type { PostSummary } from '@/components/blog/PostRow'
 
@@ -18,6 +21,7 @@ export const metadata: Metadata = {
 export default async function BlogPage() {
   let posts: PostSummary[] = []
   let latestContent = ''
+  let thumbs: Record<string, React.ReactNode> = {}
 
   try {
     const supabase = await createClient()
@@ -26,8 +30,9 @@ export default async function BlogPage() {
       .select('id,slug,title,excerpt,tags,published_at,content')
       .eq('published', true)
       .order('published_at', { ascending: false })
-    // Only the newest post's markdown is needed (for its fingerprint); keep it off the client payload.
+    // Markdown is only used server-side (art); keep it off the client payload.
     latestContent = data?.[0]?.content ?? ''
+    thumbs = postThumbs(data ?? [])
     posts = withPostMeta(data ?? [])
   } catch (err) {
     unstable_rethrow(err)
@@ -35,19 +40,33 @@ export default async function BlogPage() {
   }
 
   const viewCounts = await getViewCounts(posts.map(p => `/blog/${p.slug}`))
+  const latest = posts[0]
 
   return (
     <div className="px-6 pb-24 max-w-6xl mx-auto">
       <PageHeader aside={<AsciiBars command="$ git log --posts | cut -c1-7 | uniq -c" rows={postsPerMonth(posts)} />} eyebrow="~/blog" title="Writing" description="Notes on building with AI agents, Claude Code workflows, and on-chain work." />
-      <BlogList
-        posts={posts}
-        viewCounts={viewCounts}
-        featuredArt={
-          posts[0] && (
-            <ContentArt content={latestContent} seed={posts[0].slug} tags={posts[0].tags} cols={124} rows={44} glyphClass="text-[4px] leading-[5px] md:text-[7px] md:leading-[8px]" />
-          )
-        }
-      />
+      {latest && (
+        <FeaturedEntry
+          href={`/blog/${latest.slug}`}
+          label="latest"
+          meta={formatPostDate(latest.published_at)}
+          title={latest.title}
+          excerpt={latest.excerpt}
+          cta="Read post"
+          art={
+            <ContentArt
+              content={latestContent}
+              seed={latest.slug}
+              tags={latest.tags}
+              cols={124}
+              rows={44}
+              glyphClass="text-[4px] leading-[5px] md:text-[7px] md:leading-[8px]"
+            />
+          }
+        />
+      )}
+      {/* The latest post stays pinned above; the filterable timeline holds the rest. */}
+      <BlogList posts={posts.slice(1)} viewCounts={viewCounts} thumbs={thumbs} />
     </div>
   )
 }

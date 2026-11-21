@@ -4,7 +4,6 @@ import { useState, useMemo } from 'react'
 import type { PostSummary } from '@/components/blog/PostRow'
 import PostTimeline from '@/components/blog/PostTimeline'
 import FilterBar, { ALL_TAG } from '@/components/ui/FilterBar'
-import FeaturedPost from '@/components/blog/FeaturedPost'
 
 type SortKey = 'newest' | 'oldest'
 
@@ -16,12 +15,12 @@ const SORT_OPTIONS = [
 export default function BlogList({
   posts,
   viewCounts = {},
-  featuredArt,
+  thumbs = {},
 }: {
   posts: PostSummary[]
   viewCounts?: Record<string, number>
-  /** Server-rendered fingerprint of the newest post. */
-  featuredArt?: React.ReactNode
+  /** Server-rendered landscape thumbnails keyed by slug. */
+  thumbs?: Record<string, React.ReactNode>
 }) {
   const [query, setQuery] = useState('')
   const [sort, setSort] = useState<SortKey>('newest')
@@ -53,14 +52,8 @@ export default function BlogList({
     return [...matches].sort((a, b) => (sort === 'newest' ? time(b) - time(a) : time(a) - time(b)))
   }, [posts, query, sort, activeTag])
 
-  // The newest post gets the featured slot only in the default, unfiltered view.
-  const isDefaultView = !query.trim() && activeTag === ALL_TAG && sort === 'newest'
-  const featured = isDefaultView && filtered.length > 1 ? filtered[0] : null
-  const rows = featured ? filtered.slice(1) : filtered
-
   return (
     <div>
-      {featured && <FeaturedPost post={featured} art={featuredArt} />}
       <FilterBar
         query={query}
         onQuery={setQuery}
@@ -79,7 +72,7 @@ export default function BlogList({
           No posts match.
         </p>
       ) : (
-        <PostTimeline posts={rows} views={viewCounts} />
+        <PostTimeline posts={filtered} views={viewCounts} thumbs={thumbs} />
       )}
     </div>
   )

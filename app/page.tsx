@@ -7,6 +7,7 @@ import { splitProjectArt } from '@/components/project/ProjectCardArt'
 import type { PostSummary } from '@/components/blog/PostRow'
 import PostTimeline from '@/components/blog/PostTimeline'
 import { withPostMeta } from '@/components/blog/post-meta'
+import { postThumbs } from '@/components/blog/PostThumb'
 import { createClient } from '@/lib/supabase/server'
 
 interface AboutRow {
@@ -40,6 +41,7 @@ function SectionHeader({ index, title, href }: { index: string; title: string; h
 export default async function HomePage() {
   let allProjects: (ProjectSummary & { featured?: boolean | null; content?: string | null })[] = []
   let allPosts: PostSummary[] = []
+  let thumbs: Record<string, React.ReactNode> = {}
   let about: AboutRow | null = null
 
   try {
@@ -58,6 +60,7 @@ export default async function HomePage() {
       supabase.from('about').select('name,title,hero_description,status_text,status_active').single(),
     ])
     allProjects = p ?? []
+    thumbs = postThumbs((b ?? []).slice(0, 5))
     allPosts = withPostMeta(b ?? [])
     about = a
   } catch (err) {
@@ -97,7 +100,7 @@ export default async function HomePage() {
         <section className="px-6 py-16">
           <div className="max-w-6xl mx-auto">
             <SectionHeader index="01" title="Writing" href="/blog" />
-            <PostTimeline posts={posts} />
+            <PostTimeline posts={posts} thumbs={thumbs} />
           </div>
         </section>
       )}

@@ -25,18 +25,10 @@ export default function ProjectCard({
   return (
     <Link href={`/projects/${project.slug}`} className="group block">
       <div
-        className="aspect-[16/10] overflow-hidden rounded-lg border"
-        style={{ borderColor: 'var(--border)', background: 'var(--surface-2)' }}
+        className="ascii-dark aspect-[16/10] overflow-hidden rounded-lg border transition-[border-color] duration-150 group-hover:border-[var(--accent)]"
+        style={{ borderColor: '#232323', background: '#0a0a0a' }}
       >
-        <div className="relative h-full overflow-hidden">
-          {art}
-          <span
-            className="absolute bottom-3 left-3 text-xs"
-            style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}
-          >
-            ./{project.slug}
-          </span>
-        </div>
+        <div className="h-full overflow-hidden">{art}</div>
       </div>
       <div className="mt-4 flex items-baseline justify-between gap-3">
         <h3 className="font-medium transition-colors group-hover:text-[var(--accent)]" style={{ color: 'var(--text-primary)' }}>

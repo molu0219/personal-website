@@ -1,46 +1,22 @@
 import Link from 'next/link'
 import type { PostSummary } from '@/components/blog/PostRow'
 
-const BAR = 10 // glyphs; one per minute, capped
 const mono = { fontFamily: 'var(--font-mono)' } as const
-
-function Bar({ minutes }: { minutes: number }) {
-  const n = Math.min(BAR, Math.max(1, minutes))
-  return (
-    <span aria-label={`${minutes} min read`} className="whitespace-pre">
-      <span className="text-[var(--text-secondary)] transition-colors duration-150 group-hover:text-[var(--accent)]">
-        {'#'.repeat(n)}
-      </span>
-      <span style={{ color: 'var(--border-strong)' }}>{'.'.repeat(BAR - n)}</span>
-    </span>
-  )
-}
-
-/** Structure spine with each block type in its own tone. */
-function Spine({ value }: { value: string }) {
-  const tone: Record<string, string> = {
-    '#': 'var(--accent)',
-    '+': 'var(--text-secondary)',
-    '%': 'var(--a6-hi)',
-    '=': 'var(--a7-hi)',
-    '*': 'var(--text-secondary)',
-  }
-  return (
-    <span className="whitespace-pre opacity-60 transition-opacity duration-150 group-hover:opacity-100" aria-hidden>
-      {Array.from(value).map((g, i) => (
-        <span key={i} style={{ color: tone[g] ?? 'var(--text-muted)' }}>
-          {g}
-        </span>
-      ))}
-    </span>
-  )
-}
 
 /**
  * Posts as a reading timeline: a rail with year markers; each post shows its date,
- * a glyph bar for reading time, the title, and a spine of its structure.
+ * its generated landscape thumbnail, the title and reading time.
  */
-export default function PostTimeline({ posts, views = {} }: { posts: PostSummary[]; views?: Record<string, number> }) {
+export default function PostTimeline({
+  posts,
+  views = {},
+  thumbs = {},
+}: {
+  posts: PostSummary[]
+  views?: Record<string, number>
+  /** Server-rendered landscape thumbnails keyed by slug. */
+  thumbs?: Record<string, React.ReactNode>
+}) {
   const yearOf = (p: PostSummary) => p.published_at?.slice(0, 4) ?? ''
   return (
     <ol className="relative">
@@ -57,16 +33,19 @@ export default function PostTimeline({ posts, views = {} }: { posts: PostSummary
             )}
             <Link
               href={`/blog/${post.slug}`}
-              className="group relative grid gap-x-6 gap-y-1 border-l py-4 pl-6 transition-colors hover:border-[var(--accent)] md:grid-cols-[92px_1fr_auto]"
+              className="group relative grid gap-x-6 gap-y-1 border-l py-4 pl-6 transition-colors hover:border-[var(--accent)] md:grid-cols-[64px_116px_1fr_auto] md:items-center"
               style={{ borderColor: 'var(--border)' }}
             >
               <span
                 aria-hidden
-                className="absolute -left-px top-[1.55rem] h-px w-4 transition-[width,background-color] duration-150 group-hover:w-5 group-hover:bg-[var(--accent)]"
+                className="absolute -left-px top-1/2 h-px w-4 transition-[width,background-color] duration-150 group-hover:w-5 group-hover:bg-[var(--accent)]"
                 style={{ background: 'var(--border-strong)' }}
               />
               <span className="text-xs leading-6" style={{ ...mono, color: 'var(--text-muted)' }}>
                 {post.published_at?.slice(5, 10).replace('-', '.') ?? '--.--'}
+              </span>
+              <span className="hidden md:block transition-opacity duration-150 opacity-80 group-hover:opacity-100">
+                {thumbs[post.slug]}
               </span>
               <span className="min-w-0">
                 <span
@@ -75,17 +54,13 @@ export default function PostTimeline({ posts, views = {} }: { posts: PostSummary
                 >
                   {post.title}
                 </span>
-                <span className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px]" style={mono}>
-                  {post.minutes != null && (
-                    <span className="flex items-center gap-2" style={{ color: 'var(--text-muted)' }}>
-                      <Bar minutes={post.minutes} />
-                      {post.minutes} min
-                    </span>
-                  )}
-                  {post.spine && <Spine value={post.spine} />}
-                </span>
+                {post.minutes != null && (
+                  <span className="mt-1 block text-[11px]" style={{ ...mono, color: 'var(--text-muted)' }}>
+                    {post.minutes} min read
+                  </span>
+                )}
               </span>
-              <span className="hidden md:flex items-start gap-3 pt-0.5 text-xs" style={{ ...mono, color: 'var(--text-muted)' }}>
+              <span className="hidden md:flex items-center gap-3 text-xs" style={{ ...mono, color: 'var(--text-muted)' }}>
                 {post.tags?.slice(0, 2).map(t => <span key={t}>#{t}</span>)}
                 {v ? <span className="tabular-nums">{v} views</span> : null}
               </span>

@@ -315,7 +315,9 @@ body {
   --a6-lo: #c8e0eb; --a6-hi: #14648a;
   --a7-lo: #ecdcb6; --a7-hi: #8c6200;
 }
-.dark {
+/* Art frames are always dark, in both themes (like the OG cards). */
+.dark,
+.ascii-dark {
   --a0-lo: #2a2a27; --a0-hi: #7a7a71;
   --a1-lo: #33332f; --a1-hi: #f2f2ee;
   --a2-lo: #4a200a; --a2-hi: #ff7a2e;

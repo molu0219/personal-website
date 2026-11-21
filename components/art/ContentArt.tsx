@@ -26,8 +26,8 @@ export default function ContentArt({
 }: Props) {
   return (
     <figure
-      className={`m-0 overflow-hidden rounded-xl border ${className}`}
-      style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
+      className={`ascii-dark m-0 overflow-hidden rounded-xl border ${className}`}
+      style={{ borderColor: '#232323', background: '#0a0a0a' }}
     >
       <div className="flex justify-center overflow-hidden">
         <AsciiArt grid={landscape({ content, seed, tags }, cols, rows)} className={glyphClass} />
@@ -35,7 +35,7 @@ export default function ContentArt({
       {legend && (
         <figcaption
           className="border-t px-4 py-2 text-[11px]"
-          style={{ borderColor: 'var(--border)', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}
+          style={{ borderColor: '#232323', fontFamily: 'var(--font-mono)', color: '#6b6b65' }}
         >
           {landscapeLegend(content, tags)}
         </figcaption>

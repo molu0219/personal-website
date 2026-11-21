@@ -10,8 +10,6 @@ export interface PostSummary {
   published_at?: string | null
   /** Estimated reading minutes (server-computed from the markdown). */
   minutes?: number | null
-  /** One-line structure summary, see lib/ascii/fingerprint `spine`. */
-  spine?: string | null
 }
 
 export function formatPostDate(iso?: string | null): string {
