@@ -1,6 +1,7 @@
 import { unstable_rethrow } from 'next/navigation'
 import Link from 'next/link'
-import HeroSection from '@/components/sections/HeroSection'
+import SignalHero from '@/components/sections/SignalHero'
+import type { Signal } from '@/lib/ascii/signal-field'
 import ProjectCard, { type ProjectSummary } from '@/components/project/ProjectCard'
 import PostRow, { type PostSummary } from '@/components/blog/PostRow'
 import { createClient } from '@/lib/supabase/server'
@@ -34,8 +35,8 @@ function SectionHeader({ index, title, href }: { index: string; title: string; h
 }
 
 export default async function HomePage() {
-  let projects: ProjectSummary[] = []
-  let posts: PostSummary[] = []
+  let allProjects: (ProjectSummary & { featured?: boolean | null })[] = []
+  let allPosts: PostSummary[] = []
   let about: AboutRow | null = null
 
   try {
@@ -43,21 +44,18 @@ export default async function HomePage() {
     const [{ data: p }, { data: b }, { data: a }] = await Promise.all([
       supabase
         .from('projects')
-        .select('id,slug,title,description,tags')
+        .select('id,slug,title,description,tags,featured')
         .eq('published', true)
-        .eq('featured', true)
-        .order('created_at', { ascending: false })
-        .limit(4),
+        .order('created_at', { ascending: false }),
       supabase
         .from('posts')
         .select('id,slug,title,excerpt,tags,published_at')
         .eq('published', true)
-        .order('published_at', { ascending: false })
-        .limit(5),
+        .order('published_at', { ascending: false }),
       supabase.from('about').select('name,title,hero_description,status_text,status_active').single(),
     ])
-    projects = p ?? []
-    posts = b ?? []
+    allProjects = p ?? []
+    allPosts = b ?? []
     about = a
   } catch (err) {
     unstable_rethrow(err)
@@ -65,14 +63,29 @@ export default async function HomePage() {
     console.error('[home] failed to load content', err)
   }
 
+  const posts = allPosts.slice(0, 5)
+  const projects = allProjects.filter(p => p.featured).slice(0, 4)
+  // Everything real the hero lens can decode: post and project paths.
+  const signals: Signal[] = [
+    ...allPosts.map(p => ({ label: `~/blog/${p.slug}`, title: p.title, href: `/blog/${p.slug}` })),
+    ...allProjects.map(p => ({ label: `~/projects/${p.slug}`, title: p.title, href: `/projects/${p.slug}` })),
+  ]
+
   return (
     <>
-      <HeroSection
-        name={about?.name ?? undefined}
-        tagline={about?.title ?? undefined}
-        description={about?.hero_description ?? undefined}
-        statusText={about?.status_text ?? undefined}
-        statusActive={about?.status_active ?? true}
+      <SignalHero
+        name={about?.name ?? 'Joey Chen'}
+        tagline={about?.title ?? 'Blockchain developer · AI agent workflows'}
+        description={
+          about?.hero_description ??
+          'I build AI agent workflows and on-chain tools, and write about how they work.'
+        }
+        signals={signals}
+        stats={{
+          posts: allPosts.length,
+          projects: allProjects.length,
+          lastWrite: allPosts[0]?.published_at?.slice(0, 10) ?? null,
+        }}
       />
 
       {posts.length > 0 && (

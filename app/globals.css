@@ -301,3 +301,76 @@ body {
 .ascii-reveal {
   animation: ascii-scan 900ms var(--ease-out) both;
 }
+
+/* ── ASCII palette (F010) ────────────────────────────────────────────────
+   Glyphs are coloured per material (0=noise, 1=ink, 2=accent, 3=signal, 4=hud, 5=ok, 6=code, 7=quote) in 6 shades, lo → hi.
+   Generated values; keep lib/ascii/palette.ts MAT ids in sync. */
+:root {
+  --a0-lo: #e6e6e1; --a0-hi: #a8a8a0;
+  --a1-lo: #d2d2cc; --a1-hi: #0c0c0b;
+  --a2-lo: #f5cdb5; --a2-hi: #d9480f;
+  --a3-lo: #efb48c; --a3-hi: #a8380a;
+  --a4-lo: #d4d4ce; --a4-hi: #4a4a44;
+  --a5-lo: #c9e6d3; --a5-hi: #17803f;
+  --a6-lo: #c8e0eb; --a6-hi: #14648a;
+  --a7-lo: #ecdcb6; --a7-hi: #8c6200;
+}
+.dark {
+  --a0-lo: #1c1c1a; --a0-hi: #55554e;
+  --a1-lo: #33332f; --a1-hi: #f2f2ee;
+  --a2-lo: #4a200a; --a2-hi: #ff7a2e;
+  --a3-lo: #6a3010; --a3-hi: #ffc08f;
+  --a4-lo: #34342f; --a4-hi: #b4b4ac;
+  --a5-lo: #183224; --a5-hi: #74e39a;
+  --a6-lo: #16303c; --a6-hi: #82cdee;
+  --a7-lo: #3a2e16; --a7-hi: #f0c66e;
+}
+.ascii i { font-style: normal; }
+.a0s0{color:color-mix(in oklab,var(--a0-hi) 0%,var(--a0-lo))}
+.a0s1{color:color-mix(in oklab,var(--a0-hi) 25%,var(--a0-lo))}
+.a0s2{color:color-mix(in oklab,var(--a0-hi) 46%,var(--a0-lo))}
+.a0s3{color:color-mix(in oklab,var(--a0-hi) 65%,var(--a0-lo))}
+.a0s4{color:color-mix(in oklab,var(--a0-hi) 83%,var(--a0-lo))}
+.a0s5{color:color-mix(in oklab,var(--a0-hi) 100%,var(--a0-lo))}
+.a1s0{color:color-mix(in oklab,var(--a1-hi) 0%,var(--a1-lo))}
+.a1s1{color:color-mix(in oklab,var(--a1-hi) 25%,var(--a1-lo))}
+.a1s2{color:color-mix(in oklab,var(--a1-hi) 46%,var(--a1-lo))}
+.a1s3{color:color-mix(in oklab,var(--a1-hi) 65%,var(--a1-lo))}
+.a1s4{color:color-mix(in oklab,var(--a1-hi) 83%,var(--a1-lo))}
+.a1s5{color:color-mix(in oklab,var(--a1-hi) 100%,var(--a1-lo))}
+.a2s0{color:color-mix(in oklab,var(--a2-hi) 0%,var(--a2-lo))}
+.a2s1{color:color-mix(in oklab,var(--a2-hi) 25%,var(--a2-lo))}
+.a2s2{color:color-mix(in oklab,var(--a2-hi) 46%,var(--a2-lo))}
+.a2s3{color:color-mix(in oklab,var(--a2-hi) 65%,var(--a2-lo))}
+.a2s4{color:color-mix(in oklab,var(--a2-hi) 83%,var(--a2-lo))}
+.a2s5{color:color-mix(in oklab,var(--a2-hi) 100%,var(--a2-lo))}
+.a3s0{color:color-mix(in oklab,var(--a3-hi) 0%,var(--a3-lo))}
+.a3s1{color:color-mix(in oklab,var(--a3-hi) 25%,var(--a3-lo))}
+.a3s2{color:color-mix(in oklab,var(--a3-hi) 46%,var(--a3-lo))}
+.a3s3{color:color-mix(in oklab,var(--a3-hi) 65%,var(--a3-lo))}
+.a3s4{color:color-mix(in oklab,var(--a3-hi) 83%,var(--a3-lo))}
+.a3s5{color:color-mix(in oklab,var(--a3-hi) 100%,var(--a3-lo))}
+.a4s0{color:color-mix(in oklab,var(--a4-hi) 0%,var(--a4-lo))}
+.a4s1{color:color-mix(in oklab,var(--a4-hi) 25%,var(--a4-lo))}
+.a4s2{color:color-mix(in oklab,var(--a4-hi) 46%,var(--a4-lo))}
+.a4s3{color:color-mix(in oklab,var(--a4-hi) 65%,var(--a4-lo))}
+.a4s4{color:color-mix(in oklab,var(--a4-hi) 83%,var(--a4-lo))}
+.a4s5{color:color-mix(in oklab,var(--a4-hi) 100%,var(--a4-lo))}
+.a5s0{color:color-mix(in oklab,var(--a5-hi) 0%,var(--a5-lo))}
+.a5s1{color:color-mix(in oklab,var(--a5-hi) 25%,var(--a5-lo))}
+.a5s2{color:color-mix(in oklab,var(--a5-hi) 46%,var(--a5-lo))}
+.a5s3{color:color-mix(in oklab,var(--a5-hi) 65%,var(--a5-lo))}
+.a5s4{color:color-mix(in oklab,var(--a5-hi) 83%,var(--a5-lo))}
+.a5s5{color:color-mix(in oklab,var(--a5-hi) 100%,var(--a5-lo))}
+.a6s0{color:color-mix(in oklab,var(--a6-hi) 0%,var(--a6-lo))}
+.a6s1{color:color-mix(in oklab,var(--a6-hi) 25%,var(--a6-lo))}
+.a6s2{color:color-mix(in oklab,var(--a6-hi) 46%,var(--a6-lo))}
+.a6s3{color:color-mix(in oklab,var(--a6-hi) 65%,var(--a6-lo))}
+.a6s4{color:color-mix(in oklab,var(--a6-hi) 83%,var(--a6-lo))}
+.a6s5{color:color-mix(in oklab,var(--a6-hi) 100%,var(--a6-lo))}
+.a7s0{color:color-mix(in oklab,var(--a7-hi) 0%,var(--a7-lo))}
+.a7s1{color:color-mix(in oklab,var(--a7-hi) 25%,var(--a7-lo))}
+.a7s2{color:color-mix(in oklab,var(--a7-hi) 46%,var(--a7-lo))}
+.a7s3{color:color-mix(in oklab,var(--a7-hi) 65%,var(--a7-lo))}
+.a7s4{color:color-mix(in oklab,var(--a7-hi) 83%,var(--a7-lo))}
+.a7s5{color:color-mix(in oklab,var(--a7-hi) 100%,var(--a7-lo))}
