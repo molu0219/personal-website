@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   try {
     const supabase = await createClient()
-    const { data } = await supabase.from('posts').select('title, excerpt, excerpt_en, cover_url').eq('slug', slug).eq('published', true).single()
+    const { data } = await supabase.from('posts').select('title, excerpt, excerpt_en').eq('slug', slug).eq('published', true).single()
     if (data) {
       const title = `${data.title} — Joey Chen`
       const description = data.excerpt_en || data.excerpt || undefined
@@ -28,14 +28,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
           type: 'article',
           siteName: 'Joey Chen',
           locale: 'zh_TW',
-          ...(data.cover_url ? { images: [{ url: data.cover_url }] } : {}),
         },
         twitter: {
-          card: data.cover_url ? 'summary_large_image' : 'summary',
+          // Images come from the generated opengraph-image / twitter-image routes.
+          card: 'summary_large_image',
           title,
           description,
           creator: '@0xjoeytw',
-          ...(data.cover_url ? { images: [data.cover_url] } : {}),
         },
       }
     }
@@ -77,7 +76,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       '@id': 'https://0xjoeytw.xyz/#person',
       name: 'Joey Chen',
     },
-    ...(post.cover_url ? { image: post.cover_url } : {}),
+    image: `https://0xjoeytw.xyz/blog/${slug}/opengraph-image`,
     mainEntityOfPage: { '@type': 'WebPage', '@id': `https://0xjoeytw.xyz/blog/${slug}` },
     ...(post.tags?.length ? { keywords: post.tags.join(', ') } : {}),
     inLanguage: 'zh-TW',
