@@ -11,6 +11,8 @@ export interface KnotShape {
   q: number
 }
 export const TREFOIL: KnotShape = { p: 2, q: 3 }
+/** Projects section shape (page header, cards, covers). */
+export const PROJECT_KNOT: KnotShape = { p: 2, q: 5 }
 const SEG_U = 520 // samples along the knot
 const SEG_V = 36 // samples around the tube
 const TUBE_R = 0.42

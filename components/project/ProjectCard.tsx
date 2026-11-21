@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import NeonBadge from '@/components/ui/NeonBadge'
 import AsciiStill from '@/components/art/AsciiStill'
+import { PROJECT_KNOT } from '@/lib/ascii-knot'
 
 export interface ProjectSummary {
   id: string
@@ -20,25 +21,15 @@ export default function ProjectCard({ project, views }: { project: ProjectSummar
         className="aspect-[16/10] overflow-hidden rounded-lg border"
         style={{ borderColor: 'var(--border)', background: 'var(--surface-2)' }}
       >
-        {project.cover_url ? (
-          <img
-            src={project.cover_url}
-            alt={project.title}
-            loading="lazy"
-            decoding="async"
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <div className="relative flex h-full items-center justify-center">
-            <AsciiStill seed={project.slug} cols={110} rows={40} className="text-[6px] leading-[6px]" />
-            <span
-              className="absolute bottom-3 left-3 text-xs"
-              style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}
-            >
-              ./{project.slug}
-            </span>
-          </div>
-        )}
+        <div className="relative flex h-full items-center justify-center">
+          <AsciiStill seed={project.slug} shape={PROJECT_KNOT} cols={110} rows={40} className="text-[6px] leading-[6px]" />
+          <span
+            className="absolute bottom-3 left-3 text-xs"
+            style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}
+          >
+            ./{project.slug}
+          </span>
+        </div>
       </div>
       <div className="mt-4 flex items-baseline justify-between gap-3">
         <h3 className="font-medium transition-colors group-hover:text-[var(--accent)]" style={{ color: 'var(--text-primary)' }}>

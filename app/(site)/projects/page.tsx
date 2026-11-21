@@ -5,6 +5,7 @@ import { getViewCounts } from '@/lib/view-counts'
 import ProjectGrid from '@/components/sections/ProjectGrid'
 import PageHeader from '@/components/ui/PageHeader'
 import type { ProjectSummary } from '@/components/project/ProjectCard'
+import { PROJECT_KNOT } from '@/lib/ascii-knot'
 
 export const metadata: Metadata = {
   title: 'Projects — Joey Chen',
@@ -19,7 +20,7 @@ export default async function ProjectsPage() {
     const supabase = await createClient()
     const { data } = await supabase
       .from('projects')
-      .select('id,slug,title,description,tags,cover_url,featured,created_at')
+      .select('id,slug,title,description,tags,featured,created_at')
       .eq('published', true)
       .order('created_at', { ascending: false })
     projects = data ?? []
@@ -32,7 +33,7 @@ export default async function ProjectsPage() {
 
   return (
     <div className="px-6 pb-24 max-w-6xl mx-auto">
-      <PageHeader knot={{ p: 2, q: 5 }} eyebrow="~/projects" title="Projects" description="Blockchain, AI, Web3 and open-source work." />
+      <PageHeader knot={PROJECT_KNOT} eyebrow="~/projects" title="Projects" description="Blockchain, AI, Web3 and open-source work." />
       <ProjectGrid projects={projects} viewCounts={viewCounts} />
     </div>
   )

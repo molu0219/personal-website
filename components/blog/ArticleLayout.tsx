@@ -1,8 +1,10 @@
 import Link from 'next/link'
 import NeonBadge from '@/components/ui/NeonBadge'
 import TableOfContents from './TableOfContents'
+import AsciiBanner from '@/components/art/AsciiBanner'
 
 interface Post {
+  slug: string
   title: string
   excerpt?: string | null
   content: string
@@ -80,15 +82,7 @@ export default function ArticleLayout({
               </p>
             )}
 
-            {post.cover_url && (
-              <img
-                src={post.cover_url}
-                alt=""
-                decoding="async"
-                className="mt-10 w-full rounded-lg border"
-                style={{ borderColor: 'var(--border)' }}
-              />
-            )}
+            <AsciiBanner seed={post.slug} className="mt-10" />
 
             <div className="prose-theme mt-10">{children}</div>
           </article>

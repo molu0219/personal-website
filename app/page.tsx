@@ -43,7 +43,7 @@ export default async function HomePage() {
     const [{ data: p }, { data: b }, { data: a }] = await Promise.all([
       supabase
         .from('projects')
-        .select('id,slug,title,description,tags,cover_url')
+        .select('id,slug,title,description,tags')
         .eq('published', true)
         .eq('featured', true)
         .order('created_at', { ascending: false })

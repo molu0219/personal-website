@@ -1,8 +1,11 @@
 import Link from 'next/link'
 import NeonBadge from '@/components/ui/NeonBadge'
 import TableOfContents from '@/components/blog/TableOfContents'
+import AsciiBanner from '@/components/art/AsciiBanner'
+import { PROJECT_KNOT } from '@/lib/ascii-knot'
 
 interface Project {
+  slug: string
   title: string
   description?: string | null
   content: string
@@ -104,15 +107,7 @@ export default function ProjectLayout({
             )}
           </dl>
 
-          {project.cover_url && (
-            <img
-              src={project.cover_url}
-              alt=""
-              decoding="async"
-              className="mt-10 w-full rounded-lg border"
-              style={{ borderColor: 'var(--border)' }}
-            />
-          )}
+          <AsciiBanner seed={project.slug} shape={PROJECT_KNOT} className="mt-10" />
 
           <div className="prose-theme mt-10 max-w-[68ch]">{children}</div>
         </article>

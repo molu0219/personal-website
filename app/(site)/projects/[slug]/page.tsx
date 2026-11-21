@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   try {
     const supabase = await createClient()
-    const { data } = await supabase.from('projects').select('title, description, cover_url').eq('slug', slug).eq('published', true).single()
+    const { data } = await supabase.from('projects').select('title, description').eq('slug', slug).eq('published', true).single()
     if (data) {
       const title = `${data.title} — Joey Chen`
       const description = data.description || undefined
@@ -28,14 +28,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
           type: 'article',
           siteName: 'Joey Chen',
           locale: 'zh_TW',
-          ...(data.cover_url ? { images: [{ url: data.cover_url }] } : {}),
         },
         twitter: {
-          card: data.cover_url ? 'summary_large_image' : 'summary',
+          // Images come from the generated opengraph-image / twitter-image routes.
+          card: 'summary_large_image',
           title,
           description,
           creator: '@0xjoeytw',
-          ...(data.cover_url ? { images: [data.cover_url] } : {}),
         },
       }
     }

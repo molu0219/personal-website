@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og'
-import { getGeometry, hashSeed, renderKnotText } from '@/lib/ascii-knot'
+import { getGeometry, hashSeed, renderKnotText, type KnotShape } from '@/lib/ascii-knot'
 import { loadGoogleFont, type OgFont } from '@/lib/og/fonts'
 
 export const COVER_SIZE = { width: 1200, height: 630 }
@@ -33,9 +33,11 @@ export interface CoverInput {
   seed: string
   /** 'art' drops the title for in-page thumbnails that already show it as text. */
   variant?: 'full' | 'art'
+  /** Knot winding numbers; each section has its own (blog trefoil, projects (2,5)). */
+  shape?: KnotShape
 }
 
-function knotFor(seed: string): string[] {
+function knotFor(seed: string, shape?: KnotShape): string[] {
   const h = hashSeed(seed)
   const angle = (shift: number) => (((h >>> shift) & 0xff) / 255) * Math.PI * 2
   return renderKnotText({
@@ -46,7 +48,7 @@ function knotFor(seed: string): string[] {
     rotX: 0.75 + (angle(0) / (Math.PI * 2)) * 0.5,
     rotY: (angle(8) / (Math.PI * 2) - 0.5) * 0.9,
     rotZ: angle(16),
-  }, getGeometry()).split('\n')
+  }, getGeometry(shape)).split('\n')
 }
 
 function titleSize(title: string): number {
@@ -102,7 +104,7 @@ async function renderArt(input: CoverInput): Promise<ImageResponse> {
             color: C.secondary,
           }}
         >
-          {knotLines(knotFor(input.seed))}
+          {knotLines(knotFor(input.seed, input.shape))}
         </div>
       </div>
     ),
@@ -112,7 +114,7 @@ async function renderArt(input: CoverInput): Promise<ImageResponse> {
 
 export async function renderCover(input: CoverInput): Promise<ImageResponse> {
   if (input.variant === 'art') return renderArt(input)
-  const [fonts, knot] = await Promise.all([loadFonts(input), Promise.resolve(knotFor(input.seed))])
+  const [fonts, knot] = await Promise.all([loadFonts(input), Promise.resolve(knotFor(input.seed, input.shape))])
   const mono = 'Geist Mono, Noto Sans TC'
 
   return new ImageResponse(
