@@ -8,6 +8,7 @@ import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import ArticleLayout from '@/components/blog/ArticleLayout'
 import AuthorCard from '@/components/blog/AuthorCard'
 import { getViewCount } from '@/lib/view-counts'
+import { postCoverUrl } from '@/lib/og/post-cover'
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
@@ -76,7 +77,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       '@id': 'https://0xjoeytw.xyz/#person',
       name: 'Joey Chen',
     },
-    image: `https://0xjoeytw.xyz/blog/${slug}/opengraph-image`,
+    image: `https://0xjoeytw.xyz${postCoverUrl(slug)}`,
     mainEntityOfPage: { '@type': 'WebPage', '@id': `https://0xjoeytw.xyz/blog/${slug}` },
     ...(post.tags?.length ? { keywords: post.tags.join(', ') } : {}),
     inLanguage: 'zh-TW',
