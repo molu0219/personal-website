@@ -1,4 +1,4 @@
-import { parseBlocks, type FpCell } from '@/lib/ascii/fingerprint'
+import { parseBlocks, type FpCell } from '@/lib/ascii/blocks'
 import { MAT } from '@/lib/ascii/palette'
 import { hash2, hashString, vnoise } from '@/lib/ascii/noise'
 

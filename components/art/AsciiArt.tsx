@@ -1,4 +1,4 @@
-import type { FpCell } from '@/lib/ascii/fingerprint'
+import type { FpCell } from '@/lib/ascii/blocks'
 import { glyphClass } from '@/lib/ascii/palette'
 
 /** Server-rendered grid of coloured glyphs (palette classes), grouped into runs per row. */

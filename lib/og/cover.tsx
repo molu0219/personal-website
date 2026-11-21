@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og'
-import type { FpCell } from '@/lib/ascii/fingerprint'
+import type { FpCell } from '@/lib/ascii/blocks'
 import { landscape, landscapeLegend } from '@/lib/ascii/landscape'
 import { loadGoogleFont, type OgFont } from '@/lib/og/fonts'
 
