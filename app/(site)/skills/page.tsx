@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { getViewCount } from '@/lib/view-counts'
 import SkillsView from '@/components/skills/SkillsView'
+import PageHeader from '@/components/ui/PageHeader'
 
 export const metadata: Metadata = {
   title: 'Skills Hub — Joey Chen',
@@ -20,37 +21,20 @@ export default async function SkillsPage() {
       .eq('published', true)
       .order('stars', { ascending: false })
     skills = data ?? []
-  } catch {}
+  } catch (err) {
+    console.error('[skills] failed to load skills', err)
+  }
 
   const views = await getViewCount('/skills')
 
   return (
-    <div className="relative z-10 min-h-screen px-6 pt-32 pb-20 max-w-7xl mx-auto">
-      <div className="mb-10">
-        <div className="flex items-center gap-3 mb-4">
-          <p
-            className="font-mono uppercase text-xs"
-            style={{ color: 'var(--text-muted)', letterSpacing: '0.25em' }}
-          >
-            Skills Hub
-          </p>
-          {views > 0 && (
-            <span className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
-              {views.toLocaleString()} views
-            </span>
-          )}
-        </div>
-        <h1
-          className="text-4xl md:text-5xl font-bold mb-4"
-          style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}
-        >
-          AI <span className="gradient-text">Skills Hub</span>
-        </h1>
-        <p style={{ color: 'var(--text-secondary)' }}>
-          Curated collection of AI agent skills. Select, sort, and generate a single install script.
-        </p>
-      </div>
-
+    <div className="px-6 pb-24 max-w-6xl mx-auto">
+      <PageHeader
+        eyebrow={views > 0 ? `~/skills · ${views.toLocaleString()} views` : '~/skills'}
+        title="Skills Hub"
+        description="Curated AI agent skills. Select, sort, and generate a single install script."
+      />
+      <div className="pt-10" />
       <SkillsView skills={skills} />
     </div>
   )

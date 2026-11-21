@@ -426,18 +426,18 @@ export default function CheatSheet() {
       <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
         <div
           className="inline-flex rounded-lg overflow-hidden"
-          style={{ border: '1px solid var(--border)', background: 'var(--glass)' }}
+          style={{ border: '1px solid var(--border)' }}
         >
           {(['mac', 'win'] as const).map(o => (
             <button
               key={o}
               onClick={() => setOs(o)}
-              className="px-5 py-2 text-xs font-semibold transition-all"
+              aria-pressed={os === o}
+              className="px-4 h-9 text-xs transition-colors"
               style={{
-                fontFamily: 'var(--font-display)',
-                background: os === o ? 'var(--cyan)' : 'transparent',
-                color: os === o ? '#000' : 'var(--text-muted)',
-                boxShadow: os === o ? '0 0 12px rgba(0,212,255,0.4)' : 'none',
+                fontFamily: 'var(--font-mono)',
+                background: os === o ? 'var(--text-primary)' : 'transparent',
+                color: os === o ? 'var(--bg)' : 'var(--text-secondary)',
               }}
             >
               {o === 'mac' ? 'macOS' : 'Windows / Linux'}
@@ -449,12 +449,9 @@ export default function CheatSheet() {
           value={query}
           onChange={e => setQuery(e.target.value)}
           placeholder="Search commands, shortcuts, flags..."
-          className="w-full sm:w-80 px-3 py-2 rounded-lg text-sm outline-none transition-all"
-          style={{
-            border: '1px solid var(--border)',
-            background: 'var(--glass)',
-            color: 'var(--text-primary)',
-          }}
+          aria-label="Search commands"
+          className="w-full sm:w-80 h-9 px-3 rounded-md text-sm outline-none border bg-transparent transition-colors focus:border-[var(--text-primary)]"
+          style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}
         />
       </div>
 
@@ -463,22 +460,15 @@ export default function CheatSheet() {
         {CARDS.map(card => !isCardVisible(card) ? null : (
           <div
             key={card.id}
-            className="rounded-xl overflow-hidden transition-all"
-            style={{
-              background: 'var(--glass)',
-              border: '1px solid var(--glass-border, var(--border))',
-            }}
+            className="rounded-lg overflow-hidden border"
+            style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
           >
             {/* Header */}
             <div
-              className="px-3 py-2 text-xs font-bold uppercase tracking-widest"
-              style={{
-                fontFamily: 'var(--font-display)',
-                background: card.color,
-                color: '#000',
-                boxShadow: `0 2px 12px ${card.color}40`,
-              }}
+              className="flex items-center gap-2 px-3 py-2.5 text-xs font-medium border-b"
+              style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)', borderColor: 'var(--border)' }}
             >
+              <span className="h-1.5 w-1.5 rounded-full shrink-0" style={{ background: card.color }} aria-hidden="true" />
               {card.title}
             </div>
 
@@ -500,11 +490,11 @@ export default function CheatSheet() {
                     <div
                       key={row.key + row.val}
                       className="flex gap-2 py-1 items-baseline"
-                      style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
+                      style={{ borderBottom: '1px solid color-mix(in srgb, var(--border) 50%, transparent)' }}
                     >
                       <span
-                        className="font-mono text-xs font-medium whitespace-nowrap shrink-0"
-                        style={{ color: 'var(--cyan)' }}
+                        className="text-xs font-medium whitespace-nowrap shrink-0"
+                        style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}
                       >
                         {getKey(row)}
                       </span>
