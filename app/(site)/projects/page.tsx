@@ -3,9 +3,10 @@ import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { getViewCounts } from '@/lib/view-counts'
 import ProjectGrid from '@/components/sections/ProjectGrid'
+import { splitProjectArt } from '@/components/project/ProjectCardArt'
 import PageHeader from '@/components/ui/PageHeader'
 import type { ProjectSummary } from '@/components/project/ProjectCard'
-import { PROJECT_KNOT } from '@/lib/ascii-knot'
+import AsciiBars from '@/components/art/AsciiBars'
 
 export const metadata: Metadata = {
   title: 'Projects — Joey Chen',
@@ -15,15 +16,16 @@ export const metadata: Metadata = {
 
 export default async function ProjectsPage() {
   let projects: ProjectSummary[] = []
+  let arts: Record<string, React.ReactNode> = {}
 
   try {
     const supabase = await createClient()
     const { data } = await supabase
       .from('projects')
-      .select('id,slug,title,description,tags,featured,created_at')
+      .select('id,slug,title,description,tags,featured,created_at,content')
       .eq('published', true)
       .order('created_at', { ascending: false })
-    projects = data ?? []
+    ;({ projects, arts } = splitProjectArt(data ?? []))
   } catch (err) {
     unstable_rethrow(err)
     console.error('[projects] failed to load projects', err)
@@ -33,8 +35,17 @@ export default async function ProjectsPage() {
 
   return (
     <div className="px-6 pb-24 max-w-6xl mx-auto">
-      <PageHeader knot={PROJECT_KNOT} eyebrow="~/projects" title="Projects" description="Blockchain, AI, Web3 and open-source work." />
-      <ProjectGrid projects={projects} viewCounts={viewCounts} />
+      <PageHeader aside={<AsciiBars command="$ cat */stack | sort | uniq -c | head" rows={topTags(projects)} />} eyebrow="~/projects" title="Projects" description="Blockchain, AI, Web3 and open-source work." />
+      <ProjectGrid projects={projects} viewCounts={viewCounts} arts={arts} />
     </div>
   )
+}
+
+/** Most-used tags across projects (case-insensitive), top 6. */
+function topTags(projects: ProjectSummary[]) {
+  const counts = new Map<string, number>()
+  for (const p of projects) for (const t of p.tags ?? []) counts.set(t.toLowerCase(), (counts.get(t.toLowerCase()) ?? 0) + 1)
+  return Array.from(counts, ([label, value]) => ({ label, value }))
+    .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label))
+    .slice(0, 6)
 }

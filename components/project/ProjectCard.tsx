@@ -1,7 +1,5 @@
 import Link from 'next/link'
 import NeonBadge from '@/components/ui/NeonBadge'
-import AsciiStill from '@/components/art/AsciiStill'
-import { PROJECT_KNOT } from '@/lib/ascii-knot'
 
 export interface ProjectSummary {
   id: string
@@ -14,15 +12,24 @@ export interface ProjectSummary {
   created_at?: string | null
 }
 
-export default function ProjectCard({ project, views }: { project: ProjectSummary; views?: number }) {
+export default function ProjectCard({
+  project,
+  views,
+  art,
+}: {
+  project: ProjectSummary
+  views?: number
+  /** Server-rendered fingerprint of the project write-up. */
+  art?: React.ReactNode
+}) {
   return (
     <Link href={`/projects/${project.slug}`} className="group block">
       <div
         className="aspect-[16/10] overflow-hidden rounded-lg border"
         style={{ borderColor: 'var(--border)', background: 'var(--surface-2)' }}
       >
-        <div className="relative flex h-full items-center justify-center">
-          <AsciiStill seed={project.slug} shape={PROJECT_KNOT} cols={110} rows={40} className="text-[6px] leading-[6px]" />
+        <div className="relative h-full overflow-hidden px-4 pt-4">
+          {art}
           <span
             className="absolute bottom-3 left-3 text-xs"
             style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}

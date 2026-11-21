@@ -17,9 +17,12 @@ const time = (p: ProjectSummary) => (p.created_at ? new Date(p.created_at).getTi
 export default function ProjectGrid({
   projects,
   viewCounts = {},
+  arts = {},
 }: {
   projects: ProjectSummary[]
   viewCounts?: Record<string, number>
+  /** Server-rendered fingerprints keyed by slug. */
+  arts?: Record<string, React.ReactNode>
 }) {
   const [query, setQuery] = useState('')
   const [sort, setSort] = useState<SortKey>('newest')
@@ -77,7 +80,12 @@ export default function ProjectGrid({
       ) : (
         <div className="grid gap-x-6 gap-y-12 pt-10 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map(project => (
-            <ProjectCard key={project.id} project={project} views={viewCounts[`/projects/${project.slug}`]} />
+            <ProjectCard
+              key={project.id}
+              project={project}
+              views={viewCounts[`/projects/${project.slug}`]}
+              art={arts[project.slug]}
+            />
           ))}
         </div>
       )}

@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import PostRow, { type PostSummary } from '@/components/blog/PostRow'
+import type { PostSummary } from '@/components/blog/PostRow'
+import PostTimeline from '@/components/blog/PostTimeline'
 import FilterBar, { ALL_TAG } from '@/components/ui/FilterBar'
 import FeaturedPost from '@/components/blog/FeaturedPost'
 
@@ -15,9 +16,12 @@ const SORT_OPTIONS = [
 export default function BlogList({
   posts,
   viewCounts = {},
+  featuredArt,
 }: {
   posts: PostSummary[]
   viewCounts?: Record<string, number>
+  /** Server-rendered fingerprint of the newest post. */
+  featuredArt?: React.ReactNode
 }) {
   const [query, setQuery] = useState('')
   const [sort, setSort] = useState<SortKey>('newest')
@@ -56,7 +60,7 @@ export default function BlogList({
 
   return (
     <div>
-      {featured && <FeaturedPost post={featured} />}
+      {featured && <FeaturedPost post={featured} art={featuredArt} />}
       <FilterBar
         query={query}
         onQuery={setQuery}
@@ -75,11 +79,7 @@ export default function BlogList({
           No posts match.
         </p>
       ) : (
-        <ul>
-          {rows.map(post => (
-            <PostRow key={post.id} post={post} views={viewCounts[`/blog/${post.slug}`]} />
-          ))}
-        </ul>
+        <PostTimeline posts={rows} views={viewCounts} />
       )}
     </div>
   )

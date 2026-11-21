@@ -1,16 +1,15 @@
 import Link from 'next/link'
 import { formatPostDate, type PostSummary } from '@/components/blog/PostRow'
-import AsciiBanner from '@/components/art/AsciiBanner'
 
 /** Latest post, shown above the list with its generated cover art. */
-export default function FeaturedPost({ post }: { post: PostSummary }) {
+export default function FeaturedPost({ post, art }: { post: PostSummary; art?: React.ReactNode }) {
   return (
     <Link
       href={`/blog/${post.slug}`}
       className="group grid gap-6 py-10 border-b md:grid-cols-[1.15fr_1fr] md:items-center md:gap-10"
       style={{ borderColor: 'var(--border)' }}
     >
-      <AsciiBanner seed={post.slug} />
+      <div>{art}</div>
 
       <div>
         <p className="mb-4 text-xs" style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>

@@ -3,7 +3,10 @@ import Link from 'next/link'
 import SignalHero from '@/components/sections/SignalHero'
 import type { Signal } from '@/lib/ascii/signal-field'
 import ProjectCard, { type ProjectSummary } from '@/components/project/ProjectCard'
-import PostRow, { type PostSummary } from '@/components/blog/PostRow'
+import { splitProjectArt } from '@/components/project/ProjectCardArt'
+import type { PostSummary } from '@/components/blog/PostRow'
+import PostTimeline from '@/components/blog/PostTimeline'
+import { withPostMeta } from '@/components/blog/post-meta'
 import { createClient } from '@/lib/supabase/server'
 
 interface AboutRow {
@@ -35,7 +38,7 @@ function SectionHeader({ index, title, href }: { index: string; title: string; h
 }
 
 export default async function HomePage() {
-  let allProjects: (ProjectSummary & { featured?: boolean | null })[] = []
+  let allProjects: (ProjectSummary & { featured?: boolean | null; content?: string | null })[] = []
   let allPosts: PostSummary[] = []
   let about: AboutRow | null = null
 
@@ -44,18 +47,18 @@ export default async function HomePage() {
     const [{ data: p }, { data: b }, { data: a }] = await Promise.all([
       supabase
         .from('projects')
-        .select('id,slug,title,description,tags,featured')
+        .select('id,slug,title,description,tags,featured,content')
         .eq('published', true)
         .order('created_at', { ascending: false }),
       supabase
         .from('posts')
-        .select('id,slug,title,excerpt,tags,published_at')
+        .select('id,slug,title,excerpt,tags,published_at,content')
         .eq('published', true)
         .order('published_at', { ascending: false }),
       supabase.from('about').select('name,title,hero_description,status_text,status_active').single(),
     ])
     allProjects = p ?? []
-    allPosts = b ?? []
+    allPosts = withPostMeta(b ?? [])
     about = a
   } catch (err) {
     unstable_rethrow(err)
@@ -64,7 +67,7 @@ export default async function HomePage() {
   }
 
   const posts = allPosts.slice(0, 5)
-  const projects = allProjects.filter(p => p.featured).slice(0, 4)
+  const { projects, arts } = splitProjectArt(allProjects.filter(p => p.featured).slice(0, 4))
   // Everything real the hero lens can decode: post and project paths.
   const signals: Signal[] = [
     ...allPosts.map(p => ({ label: `~/blog/${p.slug}`, title: p.title, href: `/blog/${p.slug}` })),
@@ -92,9 +95,7 @@ export default async function HomePage() {
         <section className="px-6 py-16">
           <div className="max-w-6xl mx-auto">
             <SectionHeader index="01" title="Writing" href="/blog" />
-            <ul>
-              {posts.map(post => <PostRow key={post.id} post={post} />)}
-            </ul>
+            <PostTimeline posts={posts} />
           </div>
         </section>
       )}
@@ -104,7 +105,7 @@ export default async function HomePage() {
           <div className="max-w-6xl mx-auto">
             <SectionHeader index="02" title="Selected work" href="/projects" />
             <div className="grid gap-6 pt-6 sm:grid-cols-2">
-              {projects.map(project => <ProjectCard key={project.id} project={project} />)}
+              {projects.map(project => <ProjectCard key={project.id} project={project} art={arts[project.slug]} />)}
             </div>
           </div>
         </section>

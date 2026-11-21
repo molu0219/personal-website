@@ -1,20 +1,17 @@
-import AsciiKnot from '@/components/art/AsciiKnot'
-import type { KnotShape } from '@/lib/ascii-knot'
-
 interface PageHeaderProps {
   /** Small mono label above the title, e.g. "~/blog". */
   eyebrow: string
   title: string
   description?: string
   children?: React.ReactNode
-  /** ASCII knot shown on the right on desktop; each section uses its own shape. */
-  knot?: KnotShape
+  /** Right-hand panel on desktop, e.g. an ASCII chart of the section's data. */
+  aside?: React.ReactNode
 }
 
-export default function PageHeader({ eyebrow, title, description, children, knot }: PageHeaderProps) {
+export default function PageHeader({ eyebrow, title, description, children, aside }: PageHeaderProps) {
   return (
     <header
-      className="pt-32 pb-10 md:pt-40 md:pb-14 border-b md:grid md:grid-cols-[1fr_320px] md:items-end md:gap-10"
+      className="pt-32 pb-10 md:pt-40 md:pb-14 border-b md:grid md:grid-cols-[1fr_auto] md:items-end md:gap-10"
       style={{ borderColor: 'var(--border)' }}
     >
       <div>
@@ -35,14 +32,7 @@ export default function PageHeader({ eyebrow, title, description, children, knot
       )}
       {children}
       </div>
-      {knot && (
-        <AsciiKnot
-          shape={knot}
-          speed={0.6}
-          glyphClass="text-[7px] leading-[7px]"
-          className="hidden md:block h-[220px] -mb-6"
-        />
-      )}
+      {aside && <div className="hidden md:block">{aside}</div>}
     </header>
   )
 }

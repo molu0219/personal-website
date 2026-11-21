@@ -1,8 +1,7 @@
 import Link from 'next/link'
 import NeonBadge from '@/components/ui/NeonBadge'
 import TableOfContents from '@/components/blog/TableOfContents'
-import AsciiBanner from '@/components/art/AsciiBanner'
-import { PROJECT_KNOT } from '@/lib/ascii-knot'
+import ContentMap from '@/components/art/ContentMap'
 
 interface Project {
   slug: string
@@ -107,7 +106,9 @@ export default function ProjectLayout({
             )}
           </dl>
 
-          <AsciiBanner seed={project.slug} shape={PROJECT_KNOT} className="mt-10" />
+          {project.content && (
+            <ContentMap path={`~/projects/${project.slug}/README.md`} content={project.content} cols={84} maxRows={34} linkHeadings className="mt-10" />
+          )}
 
           <div className="prose-theme mt-10 max-w-[68ch]">{children}</div>
         </article>
