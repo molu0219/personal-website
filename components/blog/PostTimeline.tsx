@@ -41,13 +41,12 @@ function Spine({ value }: { value: string }) {
  * a glyph bar for reading time, the title, and a spine of its structure.
  */
 export default function PostTimeline({ posts, views = {} }: { posts: PostSummary[]; views?: Record<string, number> }) {
-  let year = ''
+  const yearOf = (p: PostSummary) => p.published_at?.slice(0, 4) ?? ''
   return (
     <ol className="relative">
-      {posts.map(post => {
-        const y = post.published_at?.slice(0, 4) ?? ''
-        const showYear = y !== year
-        year = y
+      {posts.map((post, i) => {
+        const y = yearOf(post)
+        const showYear = i === 0 || yearOf(posts[i - 1]) !== y
         const v = views[`/blog/${post.slug}`]
         return (
           <li key={post.id}>
