@@ -1,33 +1,46 @@
 import type { Metadata } from 'next'
-import AsciiKnot from '@/components/art/AsciiKnot'
-import NeonButton from '@/components/ui/NeonButton'
+import { unstable_rethrow } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
+import SignalHero from '@/components/sections/SignalHero'
+import type { Signal } from '@/lib/ascii/signal-field'
 
 export const metadata: Metadata = { title: 'Not found — Joey Chen', robots: { index: false } }
 
-export default function NotFound() {
+interface Row {
+  slug: string
+  title: string
+}
+
+// The missing page is lost in the noise; the lens still decodes everything that does exist.
+export default async function NotFound() {
+  let posts: Row[] = []
+  let projects: Row[] = []
+  try {
+    const supabase = await createClient()
+    const [{ data: b }, { data: p }] = await Promise.all([
+      supabase.from('posts').select('slug,title').eq('published', true),
+      supabase.from('projects').select('slug,title').eq('published', true),
+    ])
+    posts = b ?? []
+    projects = p ?? []
+  } catch (err) {
+    unstable_rethrow(err)
+    // The 404 must render even when the database is down.
+    console.error('[404] failed to load signals', err)
+  }
+
+  const signals: Signal[] = [
+    ...posts.map(p => ({ label: `~/blog/${p.slug}`, title: p.title, href: `/blog/${p.slug}` })),
+    ...projects.map(p => ({ label: `~/projects/${p.slug}`, title: p.title, href: `/projects/${p.slug}` })),
+  ]
+
   return (
-    <section className="px-6 pt-32 pb-16 md:pt-40">
-      <div className="max-w-6xl mx-auto grid gap-10 md:grid-cols-[1fr_1fr] md:items-center">
-        <div>
-          <p className="text-xs mb-4" style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
-            $ cd ./this-page
-          </p>
-          <h1
-            className="text-5xl md:text-7xl font-medium tracking-[-0.03em] leading-[1.02]"
-            style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}
-          >
-            404<span style={{ color: 'var(--accent)' }}>.</span>
-          </h1>
-          <p className="mt-6 max-w-md text-base leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-            No such file or directory. The page may have moved — Skills and the Cheat Sheet were retired.
-          </p>
-          <div className="mt-10 flex flex-wrap gap-3">
-            <NeonButton href="/" variant="cyan">Back home</NeonButton>
-            <NeonButton href="/blog" variant="purple">Read the blog</NeonButton>
-          </div>
-        </div>
-        <AsciiKnot shape={{ p: 3, q: 7 }} speed={0.8} className="h-[300px] md:h-[440px]" />
-      </div>
-    </section>
+    <SignalHero
+      name="404"
+      tagline="$ cd ./this-page — no such file or directory"
+      description="This page isn't here (Skills and the Cheat Sheet were retired). Everything that does exist is hidden in the noise — move the cursor to decode it."
+      signals={signals}
+      stats={{ posts: posts.length, projects: projects.length, lastWrite: null }}
+    />
   )
 }

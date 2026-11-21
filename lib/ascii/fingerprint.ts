@@ -58,7 +58,7 @@ export function parseBlocks(md: string): Block[] {
     const h = t.match(/^(#{1,6})\s+(.*)$/)
     if (h) {
       flush()
-      blocks.push({ kind: 'heading', level: h[1].length, text: h[2].replace(/[*_`]/g, '') })
+      blocks.push({ kind: 'heading', level: h[1].length, text: stripEmoji(h[2].replace(/[*_`]/g, '')) })
       continue
     }
     if (/^(-{3,}|\*{3,}|_{3,})$/.test(t)) {
@@ -109,12 +109,17 @@ export function parseBlocks(md: string): Block[] {
 }
 
 const isWide = (code: number) => code >= 0x2e80 // CJK and friends take two cells
+
+/** Emoji carry no structure and render inconsistently in monospace (and make next/og fetch images). */
+function stripEmoji(s: string): string {
+  return s.replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu, '').replace(/\s+/g, ' ').trim()
+}
 const CJK_GLYPHS = ':-:=-:'
 
 /** Turn prose into texture that mirrors it: words, spaces, CJK runs and punctuation stay visible. */
 function texture(text: string, mat: number, base: number): FpCell[] {
   const out: FpCell[] = []
-  const plain = text.replace(/\[([^\]]*)\]\([^)]*\)/g, '$1').replace(/[*_`]/g, '')
+  const plain = stripEmoji(text.replace(/\[([^\]]*)\]\([^)]*\)/g, '$1').replace(/[*_`]/g, ''))
   for (const ch of plain) {
     const code = ch.codePointAt(0) ?? 32
     if (ch === ' ') out.push({ ch: ' ', mat, lum: 0 })

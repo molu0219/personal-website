@@ -9,16 +9,17 @@ interface PostCoverRow {
   title: string
   tags: string[] | null
   published_at: string | null
+  content: string | null
 }
 
 /** Returns null when the post does not exist or is unpublished. */
-export async function renderPostCover(slug: string, variant: 'full' | 'art' = 'full') {
+export async function renderPostCover(slug: string) {
   let post: PostCoverRow | null = null
   try {
     const supabase = await createClient()
     const { data } = await supabase
       .from('posts')
-      .select('title,tags,published_at')
+      .select('title,tags,published_at,content')
       .eq('slug', slug)
       .eq('published', true)
       .single()
@@ -30,9 +31,9 @@ export async function renderPostCover(slug: string, variant: 'full' | 'art' = 'f
 
   if (!post) return null
   const meta = [formatPostDate(post.published_at), ...(post.tags ?? []).slice(0, 2)].join('  ·  ')
-  return renderCover({ section: '~/blog', title: post.title, meta, seed: slug, variant })
+  return renderCover({ section: '~/blog', title: post.title, meta, path: `~/blog/${slug}.md`, content: post.content ?? '' })
 }
 
 /** Generic cover for when the post cannot be loaded. */
-export const renderFallbackCover = (seed: string) =>
-  renderCover({ section: '~/blog', title: 'Joey Chen', meta: '0xjoeytw.xyz', seed })
+export const renderFallbackCover = (slug: string) =>
+  renderCover({ section: '~/blog', title: 'Joey Chen', meta: '0xjoeytw.xyz', path: `~/blog/${slug}.md`, content: '' })

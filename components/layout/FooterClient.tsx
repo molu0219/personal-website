@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { Github, Globe, Youtube, Instagram, Send } from 'lucide-react'
-import AsciiKnot from '@/components/art/AsciiKnot'
 
 function XIcon({ size = 16 }: { size?: number }) {
   return (
@@ -36,7 +35,7 @@ export default function FooterClient({ socials }: Props) {
 
   return (
     <footer className="mt-24 px-6 border-t" style={{ borderColor: 'var(--border)' }}>
-      <div className="max-w-6xl mx-auto grid gap-10 py-14 md:grid-cols-[1fr_auto_260px] md:items-end">
+      <div className="max-w-6xl mx-auto grid gap-10 py-14 md:grid-cols-[1fr_auto] md:items-end">
         <div>
           <Link href="/" className="text-sm" style={{ ...mono, color: 'var(--text-primary)' }}>
             joey<span style={{ color: 'var(--accent)' }}>@</span>chen
@@ -78,13 +77,6 @@ export default function FooterClient({ socials }: Props) {
             </Link>
           ))}
         </nav>
-
-        <AsciiKnot
-          shape={{ p: 3, q: 4 }}
-          speed={0.4}
-          glyphClass="text-[6px] leading-[6px]"
-          className="hidden md:block h-[160px]"
-        />
       </div>
 
       <div

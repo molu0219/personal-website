@@ -67,7 +67,9 @@ export default async function HomePage() {
   }
 
   const posts = allPosts.slice(0, 5)
-  const { projects, arts } = splitProjectArt(allProjects.filter(p => p.featured).slice(0, 4))
+  // Featured first; fall back to the newest so the section never silently disappears.
+  const featured = allProjects.filter(p => p.featured)
+  const { projects, arts } = splitProjectArt((featured.length ? featured : allProjects).slice(0, 4))
   // Everything real the hero lens can decode: post and project paths.
   const signals: Signal[] = [
     ...allPosts.map(p => ({ label: `~/blog/${p.slug}`, title: p.title, href: `/blog/${p.slug}` })),
