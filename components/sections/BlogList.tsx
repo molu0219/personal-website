@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react'
 import PostRow, { type PostSummary } from '@/components/blog/PostRow'
 import FilterBar, { ALL_TAG } from '@/components/ui/FilterBar'
+import FeaturedPost from '@/components/blog/FeaturedPost'
 
 type SortKey = 'newest' | 'oldest'
 
@@ -48,8 +49,14 @@ export default function BlogList({
     return [...matches].sort((a, b) => (sort === 'newest' ? time(b) - time(a) : time(a) - time(b)))
   }, [posts, query, sort, activeTag])
 
+  // The newest post gets the featured slot only in the default, unfiltered view.
+  const isDefaultView = !query.trim() && activeTag === ALL_TAG && sort === 'newest'
+  const featured = isDefaultView && filtered.length > 1 ? filtered[0] : null
+  const rows = featured ? filtered.slice(1) : filtered
+
   return (
     <div>
+      {featured && <FeaturedPost post={featured} />}
       <FilterBar
         query={query}
         onQuery={setQuery}
@@ -69,7 +76,7 @@ export default function BlogList({
         </p>
       ) : (
         <ul>
-          {filtered.map(post => (
+          {rows.map(post => (
             <PostRow key={post.id} post={post} views={viewCounts[`/blog/${post.slug}`]} />
           ))}
         </ul>

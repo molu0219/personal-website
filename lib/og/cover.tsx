@@ -31,6 +31,8 @@ export interface CoverInput {
   meta: string
   /** Stable seed (slug) so every post gets its own knot angle. */
   seed: string
+  /** 'art' drops the title for in-page thumbnails that already show it as text. */
+  variant?: 'full' | 'art'
 }
 
 function hash(s: string): number {
@@ -74,7 +76,48 @@ async function loadFonts(input: CoverInput): Promise<OgFont[]> {
   return fonts
 }
 
+// Plain function, not a component: satori does not render fragments returned by components.
+function knotLines(lines: string[]) {
+  return lines.map((line, i) => (
+    <div key={i} style={{ display: 'flex', flexShrink: 0, whiteSpace: 'pre', height: KNOT_FONT_PX }}>
+      {line}
+    </div>
+  ))
+}
+
+/** Title-less thumbnail: just the post's knot, centered. */
+async function renderArt(input: CoverInput): Promise<ImageResponse> {
+  const fonts = await loadGoogleFont('Geist Mono', 400, RAMP_CHARS)
+    .then(f => [f])
+    .catch(err => (console.error(err), [] as OgFont[]))
+  return new ImageResponse(
+    (
+      <div style={{ width: '100%', height: '100%', display: 'flex', background: C.bg, position: 'relative' }}>
+        <div
+          style={{
+            position: 'absolute',
+            left: (COVER_SIZE.width - KNOT_WIDTH) / 2,
+            top: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            width: KNOT_WIDTH,
+            height: '100%',
+            fontFamily: 'Geist Mono',
+            fontSize: KNOT_FONT_PX,
+            lineHeight: 1,
+            color: C.secondary,
+          }}
+        >
+          {knotLines(knotFor(input.seed))}
+        </div>
+      </div>
+    ),
+    { ...COVER_SIZE, ...(fonts.length > 0 ? { fonts } : {}) },
+  )
+}
+
 export async function renderCover(input: CoverInput): Promise<ImageResponse> {
+  if (input.variant === 'art') return renderArt(input)
   const [fonts, knot] = await Promise.all([loadFonts(input), Promise.resolve(knotFor(input.seed))])
   const mono = 'Geist Mono, Noto Sans TC'
 
@@ -96,11 +139,7 @@ export async function renderCover(input: CoverInput): Promise<ImageResponse> {
             color: C.knot,
           }}
         >
-          {knot.map((line, i) => (
-            <div key={i} style={{ display: 'flex', whiteSpace: 'pre', height: KNOT_FONT_PX }}>
-              {line}
-            </div>
-          ))}
+          {knotLines(knot)}
         </div>
 
         {/* Neutral mask so the title sits on calm space where it overlaps the knot. */}

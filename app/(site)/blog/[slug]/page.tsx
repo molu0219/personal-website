@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
-import { notFound } from 'next/navigation'
+import { notFound, unstable_rethrow } from 'next/navigation'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeSlug from 'rehype-slug'
@@ -8,7 +8,8 @@ import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import ArticleLayout from '@/components/blog/ArticleLayout'
 import AuthorCard from '@/components/blog/AuthorCard'
 import { getViewCount } from '@/lib/view-counts'
-import { postCoverUrl } from '@/lib/og/post-cover'
+import { postCoverUrl } from '@/lib/og/urls'
+import PostNav, { type PostNavLink } from '@/components/blog/PostNav'
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
@@ -55,7 +56,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   if (!post) notFound()
 
-  const views = await getViewCount(`/blog/${slug}`)
+  const [views, neighbours] = await Promise.all([getViewCount(`/blog/${slug}`), getNeighbours(slug)])
 
   const jsonLdArticle = {
     '@context': 'https://schema.org',
@@ -104,6 +105,27 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         {post.content}
       </ReactMarkdown>
       <AuthorCard />
+      <PostNav older={neighbours.older} newer={neighbours.newer} />
     </ArticleLayout>
   )
+}
+
+// Posts are few (tens), so one ordered slug/title list is cheaper than two range queries.
+async function getNeighbours(slug: string): Promise<{ older: PostNavLink | null; newer: PostNavLink | null }> {
+  try {
+    const supabase = await createClient()
+    const { data } = await supabase
+      .from('posts')
+      .select('slug,title')
+      .eq('published', true)
+      .order('published_at', { ascending: false })
+    const list: PostNavLink[] = data ?? []
+    const i = list.findIndex(p => p.slug === slug)
+    if (i === -1) return { older: null, newer: null }
+    return { newer: list[i - 1] ?? null, older: list[i + 1] ?? null }
+  } catch (err) {
+    unstable_rethrow(err)
+    console.error('[blog] failed to load neighbouring posts', slug, err)
+    return { older: null, newer: null }
+  }
 }

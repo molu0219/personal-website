@@ -8,7 +8,7 @@ import type { PostSummary } from '@/components/blog/PostRow'
 
 export const metadata: Metadata = {
   title: 'Blog — Joey Chen',
-  description: 'Thoughts on blockchain, code, and creativity.',
+  description: 'Notes on building with AI agents, Claude Code workflows, and on-chain work.',
   alternates: { canonical: '/blog' },
 }
 
@@ -32,7 +32,7 @@ export default async function BlogPage() {
 
   return (
     <div className="px-6 pb-24 max-w-6xl mx-auto">
-      <PageHeader eyebrow="~/blog" title="Writing" description="Thoughts on blockchain, code, and creativity." />
+      <PageHeader eyebrow="~/blog" title="Writing" description="Notes on building with AI agents, Claude Code workflows, and on-chain work." />
       <BlogList posts={posts} viewCounts={viewCounts} />
     </div>
   )
