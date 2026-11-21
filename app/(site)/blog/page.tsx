@@ -32,7 +32,7 @@ export default async function BlogPage() {
 
   return (
     <div className="px-6 pb-24 max-w-6xl mx-auto">
-      <PageHeader eyebrow="~/blog" title="Writing" description="Notes on building with AI agents, Claude Code workflows, and on-chain work." />
+      <PageHeader knot={{ p: 3, q: 5 }} eyebrow="~/blog" title="Writing" description="Notes on building with AI agents, Claude Code workflows, and on-chain work." />
       <BlogList posts={posts} viewCounts={viewCounts} />
     </div>
   )

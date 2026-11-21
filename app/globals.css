@@ -292,3 +292,12 @@ body {
 .prose-theme h3:hover [data-heading-link] {
   opacity: 1;
 }
+
+/* ASCII art scans in top → bottom once (reduced-motion override above disables animations). */
+@keyframes ascii-scan {
+  from { clip-path: inset(0 0 100% 0); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+.ascii-reveal {
+  animation: ascii-scan 900ms var(--ease-out) both;
+}

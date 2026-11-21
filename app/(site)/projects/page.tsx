@@ -32,7 +32,7 @@ export default async function ProjectsPage() {
 
   return (
     <div className="px-6 pb-24 max-w-6xl mx-auto">
-      <PageHeader eyebrow="~/projects" title="Projects" description="Blockchain, AI, Web3 and open-source work." />
+      <PageHeader knot={{ p: 2, q: 5 }} eyebrow="~/projects" title="Projects" description="Blockchain, AI, Web3 and open-source work." />
       <ProjectGrid projects={projects} viewCounts={viewCounts} />
     </div>
   )

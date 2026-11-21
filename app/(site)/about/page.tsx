@@ -23,6 +23,7 @@ export const metadata: Metadata = {
 }
 import NeonBadge from '@/components/ui/NeonBadge'
 import { Github, Globe, Youtube, Instagram, Send } from 'lucide-react'
+import AsciiPortrait from '@/components/art/AsciiPortrait'
 
 function XIcon({ size = 16 }: { size?: number }) {
   return (
@@ -88,7 +89,7 @@ export default async function AboutPage() {
             ~/about
           </p>
           <h1
-            className="text-4xl md:text-6xl font-semibold tracking-[-0.035em] leading-[1.05]"
+            className="text-4xl md:text-6xl font-medium tracking-[-0.03em] leading-[1.05]"
             style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}
           >
             {name}
@@ -99,12 +100,19 @@ export default async function AboutPage() {
           </p>
         </div>
         {about?.avatar_url && (
-          <img
-            src={about.avatar_url}
-            alt={name}
-            className="h-24 w-24 md:h-32 md:w-32 rounded-lg object-cover border grayscale hover:grayscale-0 transition-[filter] duration-500"
-            style={{ borderColor: 'var(--border)' }}
-          />
+          <div className="flex items-end gap-5">
+            <AsciiPortrait
+              src={about.avatar_url}
+              cols={56}
+              className="hidden sm:block text-[6px] leading-[6px] md:text-[7px] md:leading-[7px]"
+            />
+            <img
+              src={about.avatar_url}
+              alt={name}
+              className="h-24 w-24 md:h-32 md:w-32 rounded-lg object-cover border"
+              style={{ borderColor: 'var(--border)' }}
+            />
+          </div>
         )}
       </header>
 

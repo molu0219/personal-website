@@ -5,8 +5,12 @@
 const RAMP = ' .,-~:;=!*#$@'
 
 // (p, q) torus knot swept by a circular tube.
-const KNOT_P = 2
-const KNOT_Q = 3
+/** (p, q) winding numbers; coprime pairs give a single closed knot. (2,3) is the trefoil. */
+export interface KnotShape {
+  p: number
+  q: number
+}
+export const TREFOIL: KnotShape = { p: 2, q: 3 }
 const SEG_U = 520 // samples along the knot
 const SEG_V = 36 // samples around the tube
 const TUBE_R = 0.42
@@ -30,22 +34,24 @@ const norm = (a: Vec3): Vec3 => {
   return [a[0] / l, a[1] / l, a[2] / l]
 }
 
-function knotPoint(t: number): Vec3 {
-  const r = 2 + Math.cos(KNOT_Q * t)
-  return [r * Math.cos(KNOT_P * t), r * Math.sin(KNOT_P * t), -Math.sin(KNOT_Q * t)]
+function knotPoint(t: number, { p, q }: KnotShape): Vec3 {
+  const r = 2 + Math.cos(q * t)
+  return [r * Math.cos(p * t), r * Math.sin(p * t), -Math.sin(q * t)]
 }
 
 // Built once; per frame we only rotate + shade.
-export function buildGeometry(): Geometry {
-  const count = SEG_U * SEG_V
+export function buildGeometry(shape: KnotShape = TREFOIL): Geometry {
+  // More windings need more samples along the curve to stay gap-free.
+  const segU = Math.round(SEG_U * Math.max(1, Math.max(shape.p, shape.q) / 3))
+  const count = segU * SEG_V
   const pos = new Float32Array(count * 3)
   const nrm = new Float32Array(count * 3)
   const eps = 1e-3
   let k = 0
-  for (let i = 0; i < SEG_U; i++) {
-    const t = (i / SEG_U) * Math.PI * 2
-    const c = knotPoint(t)
-    const tangent = norm(sub(knotPoint(t + eps), knotPoint(t - eps)))
+  for (let i = 0; i < segU; i++) {
+    const t = (i / segU) * Math.PI * 2
+    const c = knotPoint(t, shape)
+    const tangent = norm(sub(knotPoint(t + eps, shape), knotPoint(t - eps, shape)))
     const n = norm(cross(tangent, [0, 0, 1]))
     const b = cross(tangent, n)
     for (let j = 0; j < SEG_V; j++) {

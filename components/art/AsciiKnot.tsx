@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { buildGeometry, renderFrame } from '@/lib/ascii-knot'
+import { buildGeometry, renderFrame, TREFOIL, type KnotShape } from '@/lib/ascii-knot'
 
 const FPS = 30
 const CHAR_ASPECT_FALLBACK = 0.6 // mono glyph width / line height
@@ -16,7 +16,23 @@ function measureCharAspect(el: HTMLElement): number {
   return w > 0 && lh > 0 ? w / lh : CHAR_ASPECT_FALLBACK
 }
 
-export default function AsciiKnot({ className = '' }: { className?: string }) {
+interface AsciiKnotProps {
+  className?: string
+  /** Knot winding numbers; defaults to the trefoil used in the hero. */
+  shape?: KnotShape
+  /** Rotation speed multiplier. */
+  speed?: number
+  /** Tailwind font-size/line-height classes for the glyph grid. */
+  glyphClass?: string
+}
+
+export default function AsciiKnot({
+  className = '',
+  shape = TREFOIL,
+  speed = 1,
+  glyphClass = 'text-[8px] leading-[8px] sm:text-[10px] sm:leading-[10px]',
+}: AsciiKnotProps) {
+  const { p, q } = shape
   const wrapRef = useRef<HTMLDivElement>(null)
   const preRef = useRef<HTMLPreElement>(null)
 
@@ -25,7 +41,7 @@ export default function AsciiKnot({ className = '' }: { className?: string }) {
     const pre = preRef.current
     if (!wrap || !pre) return
 
-    const geo = buildGeometry()
+    const geo = buildGeometry({ p, q })
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
     let cols = 0, rows = 0, charAspect = CHAR_ASPECT_FALLBACK
@@ -66,7 +82,7 @@ export default function AsciiKnot({ className = '' }: { className?: string }) {
       if (now - last < 1000 / FPS) return
       const dt = Math.min(0.1, (now - last) / 1000)
       last = now
-      t += dt
+      t += dt * speed
       tiltX += (targetX - tiltX) * 0.06
       tiltY += (targetY - tiltY) * 0.06
       draw()
@@ -112,13 +128,13 @@ export default function AsciiKnot({ className = '' }: { className?: string }) {
       document.removeEventListener('visibilitychange', onVisibility)
       window.removeEventListener('pointermove', onPointer)
     }
-  }, [])
+  }, [p, q, speed])
 
   return (
     <div ref={wrapRef} className={`relative overflow-hidden ${className}`} aria-hidden="true">
       <pre
         ref={preRef}
-        className="absolute inset-0 m-0 select-none whitespace-pre text-[8px] leading-[8px] sm:text-[10px] sm:leading-[10px]"
+        className={`absolute inset-0 m-0 select-none whitespace-pre ${glyphClass}`}
         style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)' }}
       />
     </div>
