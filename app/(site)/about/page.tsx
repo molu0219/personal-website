@@ -21,26 +21,8 @@ export const metadata: Metadata = {
     creator: '@0xjoeytw',
   },
 }
-import NeonBadge from '@/components/ui/NeonBadge'
-import { Github, Globe, Youtube, Instagram, Send } from 'lucide-react'
-import AsciiPortrait from '@/components/art/AsciiPortrait'
-
-function XIcon({ size = 16 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-    </svg>
-  )
-}
-
-const SOCIAL_ICONS: Record<string, React.ElementType> = {
-  github: Github,
-  twitter: XIcon,
-  x: XIcon,
-  youtube: Youtube,
-  instagram: Instagram,
-  telegram: Send,
-}
+import GlyphPortrait from '@/components/art/GlyphPortrait'
+import TerminalBlock from '@/components/ui/TerminalBlock'
 
 interface AboutData {
   name?: string | null
@@ -49,17 +31,6 @@ interface AboutData {
   skills?: string[] | null
   social_links?: Record<string, string> | null
   avatar_url?: string | null
-}
-
-function Row({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <section className="grid gap-4 py-10 border-b md:grid-cols-[200px_1fr] md:gap-10" style={{ borderColor: 'var(--border)' }}>
-      <h2 className="text-xs pt-1" style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
-        {label}
-      </h2>
-      <div>{children}</div>
-    </section>
-  )
 }
 
 export default async function AboutPage() {
@@ -83,7 +54,7 @@ export default async function AboutPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-6 pb-24">
-      <header className="pt-32 pb-12 md:pt-40 md:pb-16 border-b flex flex-col-reverse gap-8 sm:flex-row sm:items-end sm:justify-between" style={{ borderColor: 'var(--border)' }}>
+      <header className="grid gap-10 pt-24 pb-12 md:grid-cols-[1fr_auto] md:items-end md:pt-28">
         <div>
           <p className="text-xs mb-4" style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
             ~/about
@@ -100,23 +71,21 @@ export default async function AboutPage() {
           </p>
         </div>
         {about?.avatar_url && (
-          <div className="flex items-end gap-5">
-            <AsciiPortrait
-              src={about.avatar_url}
-              cols={56}
-              className="hidden sm:block text-[6px] leading-[6px] md:text-[7px] md:leading-[7px]"
+          <figure className="m-0">
+            <GlyphPortrait
+              src="/avatar.png"
+              alt={`${name}, drawn in ASCII`}
+              cols={120}
+              className="text-[4px] leading-[4px] md:text-[6px] md:leading-[6px]"
             />
-            <img
-              src={about.avatar_url}
-              alt={name}
-              className="h-24 w-24 md:h-32 md:w-32 rounded-lg object-cover border"
-              style={{ borderColor: 'var(--border)' }}
-            />
-          </div>
+            <figcaption className="mt-3 text-xs" style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
+              avatar.png → glyphs · move to disturb · click to scatter
+            </figcaption>
+          </figure>
         )}
       </header>
 
-      <Row label="About">
+      <TerminalBlock command="cat about.md">
         <div className="max-w-[62ch] space-y-5">
           {bio.split('\n\n').map((paragraph, i) => (
             <p key={i} className="text-base md:text-lg leading-[1.9]" style={{ color: 'var(--text-primary)' }}>
@@ -124,52 +93,86 @@ export default async function AboutPage() {
             </p>
           ))}
         </div>
-      </Row>
+      </TerminalBlock>
 
-      <Row label="Skills">
-        {skillCategories.length > 1 ? (
-          <dl className="space-y-6">
-            {skillCategories.map(({ label, items }) => (
-              <div key={label} className="grid gap-2 sm:grid-cols-[140px_1fr] sm:gap-6">
-                <dt className="text-sm" style={{ color: 'var(--text-secondary)' }}>{label}</dt>
-                <dd className="flex flex-wrap gap-1.5">
-                  {items.map(skill => <NeonBadge key={skill}>{skill}</NeonBadge>)}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        ) : (
-          <div className="flex flex-wrap gap-1.5">
-            {skills.map(skill => <NeonBadge key={skill}>{skill}</NeonBadge>)}
-          </div>
-        )}
-      </Row>
+      <TerminalBlock command="tree ~/skills">
+        <SkillTree groups={skillCategories.length ? skillCategories : [{ label: 'stack', items: skills }]} />
+      </TerminalBlock>
 
       {Object.keys(social).length > 0 && (
-        <Row label="Elsewhere">
-          <ul className="grid gap-x-10 gap-y-3 sm:grid-cols-2 max-w-xl">
-            {Object.entries(social).map(([key, url]) => {
-              const Icon = SOCIAL_ICONS[key.toLowerCase()] ?? Globe
-              return (
-                <li key={key}>
-                  <a
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer me"
-                    className="group flex items-center gap-3 text-sm transition-colors hover:text-[var(--accent)]"
-                    style={{ color: 'var(--text-primary)' }}
-                  >
-                    <Icon size={15} />
-                    <span className="capitalize">{key}</span>
-                    <span className="ml-auto opacity-0 -translate-x-1 transition-[opacity,transform] group-hover:opacity-100 group-hover:translate-x-0">↗</span>
-                  </a>
-                </li>
-              )
-            })}
-          </ul>
-        </Row>
+        <TerminalBlock command="ls -l ~/elsewhere">
+          <LinkList links={social} />
+        </TerminalBlock>
       )}
     </div>
+  )
+}
+
+const mono = { fontFamily: 'var(--font-mono)' }
+
+/** `tree` output: groups are directories, skills are files. Pure ASCII branches. */
+function SkillTree({ groups }: { groups: { label: string; items: string[] }[] }) {
+  const total = groups.reduce((n, g) => n + g.items.length, 0)
+  return (
+    <pre className="m-0 text-sm leading-7 overflow-x-auto" style={mono}>
+      <span style={{ color: 'var(--accent)' }}>~/skills</span>
+      {'\n'}
+      {groups.map((g, gi) => {
+        const lastGroup = gi === groups.length - 1
+        return (
+          <span key={g.label}>
+            <span style={{ color: 'var(--text-muted)' }}>{lastGroup ? '`-- ' : '|-- '}</span>
+            <span style={{ color: 'var(--accent)' }}>{g.label.toLowerCase().replace(/ & /g, '-').replace(/\s+/g, '-')}/</span>
+            {'\n'}
+            {g.items.map((item, ii) => (
+              <span key={item}>
+                <span style={{ color: 'var(--text-muted)' }}>
+                  {lastGroup ? '    ' : '|   '}
+                  {ii === g.items.length - 1 ? '`-- ' : '|-- '}
+                </span>
+                <span style={{ color: 'var(--text-primary)' }}>{item}</span>
+                {'\n'}
+              </span>
+            ))}
+          </span>
+        )
+      })}
+      {'\n'}
+      <span style={{ color: 'var(--text-muted)' }}>
+        {groups.length} directories, {total} files
+      </span>
+    </pre>
+  )
+}
+
+/** `ls -l` output: each social link is a symlink. */
+function LinkList({ links }: { links: Record<string, string> }) {
+  const entries = Object.entries(links)
+  const width = Math.max(...entries.map(([k]) => k.length))
+  return (
+    <pre className="m-0 text-sm leading-8 overflow-x-auto" style={mono}>
+      <span style={{ color: 'var(--text-muted)' }}>total {entries.length}</span>
+      {'\n'}
+      {entries.map(([key, url]) => (
+        <span key={key}>
+          <span style={{ color: 'var(--text-muted)' }}>lrwxr-xr-x  joey  </span>
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer me"
+            className="group transition-colors hover:text-[var(--accent)]"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            {key.toLowerCase().padEnd(width)}
+            <span style={{ color: 'var(--text-muted)' }}> -&gt; </span>
+            <span className="underline decoration-[var(--border-strong)] underline-offset-4 group-hover:decoration-[var(--accent)]">
+              {url.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+            </span>
+          </a>
+          {'\n'}
+        </span>
+      ))}
+    </pre>
   )
 }
 

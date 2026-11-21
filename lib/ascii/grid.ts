@@ -15,11 +15,13 @@ export class AsciiGrid {
   chars: string[] = []
   mats = new Uint8Array(0)
   lums = new Float32Array(0)
+  /** Optional per-cell CSS colour; overrides the material palette when set. */
+  colors: (string | null)[] = []
 
   constructor(private pre: HTMLPreElement) {}
 
-  /** Fit the grid to `width × height` px at the pre's current font size. */
-  measure(width: number, height: number) {
+  /** Measure the glyph cell at the pre's current font size. */
+  private measureCell() {
     const probe = document.createElement('span')
     probe.textContent = 'M'.repeat(100)
     this.pre.textContent = ''
@@ -29,17 +31,36 @@ export class AsciiGrid {
     const fs = parseFloat(getComputedStyle(this.pre).fontSize) || 12
     this.cw = r.width / 100 || fs * 0.6
     this.ch = fs // line-height: 1
-    this.cols = Math.max(1, Math.floor(width / this.cw))
-    this.rows = Math.max(1, Math.floor(height / this.ch))
+  }
+
+  private alloc() {
     const n = this.cols * this.rows
     this.chars = new Array(n).fill(' ')
     this.mats = new Uint8Array(n)
     this.lums = new Float32Array(n)
+    this.colors = new Array(n).fill(null)
+  }
+
+  /** Fixed `cols × rows` grid (the pre sizes itself to its content). */
+  setSize(cols: number, rows: number) {
+    this.measureCell()
+    this.cols = cols
+    this.rows = rows
+    this.alloc()
+  }
+
+  /** Fit the grid to `width × height` px at the pre's current font size. */
+  measure(width: number, height: number) {
+    this.measureCell()
+    this.cols = Math.max(1, Math.floor(width / this.cw))
+    this.rows = Math.max(1, Math.floor(height / this.ch))
+    this.alloc()
   }
 
   clear() {
     this.chars.fill(' ')
     this.lums.fill(0)
+    this.colors.fill(null)
   }
 
   set(col: number, row: number, ch: string, mat: number, lum: number) {
@@ -75,15 +96,16 @@ export class AsciiGrid {
           run += ' '
           continue
         }
-        const cls = glyphClass(this.mats[k], this.lums[k])
+        const color = this.colors[k]
+        const cls = color ? `style="color:${color}"` : `class=${glyphClass(this.mats[k], this.lums[k])}`
         if (cls !== cur) {
-          if (run) html += cur ? `<i class=${cur}>${run}</i>` : run
+          if (run) html += cur ? `<i ${cur}>${run}</i>` : run
           run = ''
           cur = cls
         }
         run += ESC[ch] ?? ch
       }
-      if (run) html += cur ? `<i class=${cur}>${run}</i>` : run
+      if (run) html += cur ? `<i ${cur}>${run}</i>` : run
       html += '\n'
     }
     this.pre.innerHTML = html
