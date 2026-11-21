@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import NeonBadge from '@/components/ui/NeonBadge'
+import AsciiStill from '@/components/art/AsciiStill'
 
 export interface ProjectSummary {
   id: string
@@ -28,11 +29,14 @@ export default function ProjectCard({ project, views }: { project: ProjectSummar
             className="h-full w-full object-cover"
           />
         ) : (
-          <div
-            className="flex h-full items-center justify-center text-xs"
-            style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}
-          >
-            ./{project.slug}
+          <div className="relative flex h-full items-center justify-center">
+            <AsciiStill seed={project.slug} cols={110} rows={40} className="text-[6px] leading-[6px]" />
+            <span
+              className="absolute bottom-3 left-3 text-xs"
+              style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}
+            >
+              ./{project.slug}
+            </span>
           </div>
         )}
       </div>

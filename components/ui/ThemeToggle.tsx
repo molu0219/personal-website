@@ -1,53 +1,42 @@
 'use client'
 
+import { useSyncExternalStore } from 'react'
 import { useTheme } from 'next-themes'
 import { Sun, Moon } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+
+const noopSubscribe = () => () => {}
+
+/** false during SSR/hydration, true after — the theme is only known on the client. */
+function useIsClient() {
+  return useSyncExternalStore(noopSubscribe, () => true, () => false)
+}
+
+const ICON =
+  'absolute inset-0 grid place-items-center transition-[opacity,transform] duration-150 ease-[cubic-bezier(0.22,1,0.36,1)]'
 
 export default function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
+  const isClient = useIsClient()
 
-  useEffect(() => setMounted(true), [])
-
-  if (!mounted) return <div className="w-9 h-9" />
+  if (!isClient) return <div className="w-9 h-9" />
 
   const isDark = resolvedTheme === 'dark'
 
   return (
-    <motion.button
+    <button
+      type="button"
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
-      className="relative w-9 h-9 rounded-md flex items-center justify-center transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)]"
+      className="relative w-9 h-9 rounded-md transition-[background-color,color,transform] duration-150 hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)] active:scale-[0.92]"
       style={{ color: 'var(--text-secondary)' }}
-      whileTap={{ scale: 0.92 }}
-      aria-label="Toggle theme"
+      aria-label={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
     >
-      <AnimatePresence mode="wait" initial={false}>
-        {isDark ? (
-          <motion.span
-            key="sun"
-            initial={{ rotate: -90, opacity: 0 }}
-            animate={{ rotate: 0, opacity: 1 }}
-            exit={{ rotate: 90, opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            style={{ display: 'flex' }}
-          >
-            <Sun size={16} />
-          </motion.span>
-        ) : (
-          <motion.span
-            key="moon"
-            initial={{ rotate: 90, opacity: 0 }}
-            animate={{ rotate: 0, opacity: 1 }}
-            exit={{ rotate: -90, opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            style={{ display: 'flex' }}
-          >
-            <Moon size={16} />
-          </motion.span>
-        )}
-      </AnimatePresence>
-    </motion.button>
+      {/* Both icons stay mounted and cross-fade with a quarter turn. */}
+      <span className={`${ICON} ${isDark ? 'opacity-100 rotate-0' : 'opacity-0 -rotate-90'}`}>
+        <Sun size={16} />
+      </span>
+      <span className={`${ICON} ${isDark ? 'opacity-0 rotate-90' : 'opacity-100 rotate-0'}`}>
+        <Moon size={16} />
+      </span>
+    </button>
   )
 }

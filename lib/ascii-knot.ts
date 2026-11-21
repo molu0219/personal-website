@@ -153,3 +153,24 @@ export function renderKnotText(frame: Frame, geo: Geometry = buildGeometry()): s
   const size = frame.cols * frame.rows
   return renderFrame(geo, frame, new Float32Array(size), new Uint8Array(size))
 }
+
+const geometryCache = new Map<string, Geometry>()
+
+/** Memoised geometry per shape: building one costs ~20k samples, frames only rotate it. */
+export function getGeometry(shape: KnotShape = TREFOIL): Geometry {
+  const key = `${shape.p},${shape.q}`
+  let geo = geometryCache.get(key)
+  if (!geo) {
+    geo = buildGeometry(shape)
+    geometryCache.set(key, geo)
+  }
+  return geo
+}
+
+/** Deterministic 32-bit FNV-1a hash, used to give each slug its own knot angle. */
+export function hashSeed(s: string): number {
+  let h = 2166136261
+  for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619)
+  return h >>> 0
+}
+

@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og'
-import { renderKnotText } from '@/lib/ascii-knot'
+import { getGeometry, hashSeed, renderKnotText } from '@/lib/ascii-knot'
 import { loadGoogleFont, type OgFont } from '@/lib/og/fonts'
 
 export const COVER_SIZE = { width: 1200, height: 630 }
@@ -35,14 +35,8 @@ export interface CoverInput {
   variant?: 'full' | 'art'
 }
 
-function hash(s: string): number {
-  let h = 2166136261
-  for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619)
-  return h >>> 0
-}
-
 function knotFor(seed: string): string[] {
-  const h = hash(seed)
+  const h = hashSeed(seed)
   const angle = (shift: number) => (((h >>> shift) & 0xff) / 255) * Math.PI * 2
   return renderKnotText({
     cols: KNOT_COLS,
@@ -52,7 +46,7 @@ function knotFor(seed: string): string[] {
     rotX: 0.75 + (angle(0) / (Math.PI * 2)) * 0.5,
     rotY: (angle(8) / (Math.PI * 2) - 0.5) * 0.9,
     rotZ: angle(16),
-  }).split('\n')
+  }, getGeometry()).split('\n')
 }
 
 function titleSize(title: string): number {
