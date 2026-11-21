@@ -38,10 +38,12 @@ const NAME_RAMP = ':-=+*#%@'
 const LENS_PX = 90 // radius used for the name's light falloff
 const BODY_REVEAL_PX = 70 // body this close to a signal decodes it
 const FOOT_REVEAL_PX = 26 // a planted foot this close decodes it
-const CLEAR_PX = 44 // noise cleared around the spider so it stays readable
+const CLEAR_PX = 40 // noise cleared around the spider body so it stays readable
+const FOOT_GLOW_PX = 16 // glyphs this close to a planted foot light up
+const GLOW_DECAY = 2.2 // per second: footprints fade after the foot lifts
 const NAV_PX = 56 // fixed navbar height: keep it clear of noise
 const BOOT_END = 2.2
-const AUTOPILOT_IDLE = 2.5 // s without pointer input before the lens drives itself
+const AUTOPILOT_IDLE = 2.5 // s after the pointer leaves before the crawler wanders on its own
 const AUTOPILOT_DWELL = 3.2 // s spent on each signal
 const RIPPLE_SPEED = 70 // cells / s
 const RIPPLE_LIFE = 0.9
@@ -63,6 +65,8 @@ export class SignalField {
   private lensTarget = { c: -100, r: -100 }
   private pointer: { c: number; r: number } | null = null
   private spider: Spider | null = null
+  /** Per-cell footprint glow (0..1), stamped by planted feet and decaying over time. */
+  private heat = new Float32Array(0)
   private lastInput = -Infinity
   private pilotIndex = 0
   private pilotSince = 0
@@ -105,6 +109,7 @@ export class SignalField {
       : null
 
     this.place(cols, rows)
+    this.heat = new Float32Array(cols * rows)
 
     this.reveal = new Float32Array(cols * rows)
     for (let r = 0; r < rows; r++)
@@ -184,7 +189,8 @@ export class SignalField {
 
   step(dt: number) {
     this.t += dt
-    const idle = this.t - this.lastInput > AUTOPILOT_IDLE
+    // Follow the pointer whenever it is inside the field; wander only when it's gone (or on touch, after a pause).
+    const idle = !this.pointer && this.t - this.lastInput > AUTOPILOT_IDLE
     if (idle && this.placed.length) {
       if (this.t - this.pilotSince > AUTOPILOT_DWELL) {
         this.pilotIndex = (this.pilotIndex + 1) % this.placed.length
@@ -200,6 +206,7 @@ export class SignalField {
     this.lens = { c: sp.x / cw, r: sp.y / ch }
 
     const feet = sp.feet()
+    this.stampFootprints(feet, dt)
     // Distance in px from a point to a signal's text span.
     const toSpan = (p: Placed, x: number, y: number) =>
       Math.hypot(Math.max(0, Math.abs(x / cw - (p.col + p.label.length / 2)) - p.label.length / 2) * cw, y - p.row * ch - ch / 2)
@@ -220,6 +227,27 @@ export class SignalField {
     this.hovered = ptr ? this.signalAt(ptr.c, ptr.r) : null
     if (this.hovered && this.hovered.reveal < 0.5) this.hovered = null
     this.ripples = this.ripples.filter(r => this.t - r.t0 < RIPPLE_LIFE)
+  }
+
+  /** Light up the glyphs under planted feet; older footprints fade. */
+  private stampFootprints(feet: { x: number; y: number }[], dt: number) {
+    const { cols, rows, cw, ch } = this.grid
+    const h = this.heat
+    if (h.length !== cols * rows) return
+    const k = Math.exp(-dt * GLOW_DECAY)
+    for (let i = 0; i < h.length; i++) h[i] *= k
+    const rc = Math.ceil(FOOT_GLOW_PX / cw)
+    const rr = Math.ceil(FOOT_GLOW_PX / ch)
+    for (const f of feet) {
+      const fc = Math.round(f.x / cw)
+      const fr = Math.round(f.y / ch)
+      for (let r = fr - rr; r <= fr + rr; r++)
+        for (let c = fc - rc; c <= fc + rc; c++) {
+          if (c < 0 || r < 0 || c >= cols || r >= rows) continue
+          const d = Math.hypot((c - f.x / cw) * cw, (r - f.y / ch) * ch) / FOOT_GLOW_PX
+          if (d < 1) h[r * cols + c] = Math.max(h[r * cols + c], 1 - d * 0.6)
+        }
+    }
   }
 
   render() {
@@ -268,7 +296,9 @@ export class SignalField {
             const lambert = Math.max(0, nx * dx + ny * dy + nz * dz)
             const near = Math.max(0, 1 - Math.hypot((lx - c) * cw, (ly - r) * ch) / (LENS_PX * 1.6))
             const lum = 0.5 + 0.5 * lambert * (0.5 + 0.5 * near)
-            if (edge) g.set(c, r, edgeGlyph(-gx, gy), MAT.ink, 0.7)
+            const glow = this.heat[r * cols + c] ?? 0
+            if (glow > 0.15) g.set(c, r, edge ? edgeGlyph(-gx, gy) : rampChar(Math.max(lum, glow), NAME_RAMP), MAT.accent, 0.5 + glow * 0.5)
+            else if (edge) g.set(c, r, edgeGlyph(-gx, gy), MAT.ink, 0.7)
             else g.set(c, r, rampChar(lum, NAME_RAMP), near > 0.5 && lum > 0.8 ? MAT.accent : MAT.ink, lum)
             continue
           }
@@ -279,9 +309,15 @@ export class SignalField {
         // ── noise: a slow ledger of hex pairs ────────────────
         if (c % 3 === 2 || r < navRows) continue
         const n = vnoise(c * 0.045 + t * 0.05, r * 0.11 - t * 0.025)
-        if (n < 0.4) continue
+        const glow = this.heat[r * cols + c] ?? 0
         const epoch = Math.floor(t * 0.7 + hash2(c, r) * 9)
         const hex = HEX[Math.floor(hash2(c * 7 + epoch, r * 13) * 16)]
+        if (glow > 0.08) {
+          // A footprint: the glyphs the crawler grips light up, then fade.
+          g.set(c, r, hex, MAT.accent, 0.35 + glow * 0.65)
+          continue
+        }
+        if (n < 0.4) continue
         if (Math.hypot((c - lx) * cw, (r - ly) * ch) < CLEAR_PX) continue
         g.set(c, r, hex, MAT.noise, (n - 0.4) * 1.1)
       }

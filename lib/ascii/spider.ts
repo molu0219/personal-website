@@ -21,22 +21,22 @@ interface Leg {
   t: number
 }
 
-const BODY_R = 9
-const HIP_R = 6
-const L1 = 30
-const L2 = 34
-const STEP_DIST = 24
+const BODY_R = 11
+const HIP_R = 8
+const L1 = 54
+const L2 = 62
+const STEP_DIST = 42
 const STEP_TIME = 0.11
-const MAX_SPEED = 560
+const MAX_SPEED = 3200
 const LEAD = 0.12 // s of velocity added to the step target, so feet land ahead of the body
 
 const deg = (d: number) => (d * Math.PI) / 180
 const LEG_LAYOUT: [number, number, number][] = [
   // rest angle, rest distance, hip angle (degrees, relative to heading; mirrored per side)
-  [38, 52, 30],
-  [78, 50, 65],
-  [112, 50, 105],
-  [150, 52, 140],
+  [36, 96, 30],
+  [76, 92, 65],
+  [112, 92, 105],
+  [152, 98, 140],
 ]
 
 export class Spider {
@@ -90,15 +90,16 @@ export class Spider {
     // Body: critically-damped chase, capped speed.
     const dx = tx - this.x
     const dy = ty - this.y
-    let vx = dx * 7
-    let vy = dy * 7
+    // Stiff chase so the body stays on the cursor; legs catch up via the stranded-foot rule.
+    let vx = dx * 18
+    let vy = dy * 18
     const sp = Math.hypot(vx, vy)
     if (sp > MAX_SPEED) {
       vx *= MAX_SPEED / sp
       vy *= MAX_SPEED / sp
     }
-    this.vx += (vx - this.vx) * Math.min(1, dt * 10)
-    this.vy += (vy - this.vy) * Math.min(1, dt * 10)
+    this.vx += (vx - this.vx) * Math.min(1, dt * 30)
+    this.vy += (vy - this.vy) * Math.min(1, dt * 30)
     this.x += this.vx * dt
     this.y += this.vy * dt
     if (Math.hypot(this.vx, this.vy) > 25) {

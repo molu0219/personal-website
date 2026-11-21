@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import NeonButton from '@/components/ui/NeonButton'
 import { SignalField, type FieldStats, type Signal } from '@/lib/ascii/signal-field'
 
-const FPS = 30
+const FPS = 60 // the crawler tracks the pointer; 30fps read as lag
 const BOOT_KEY = 'ascii-boot-seen'
 
 interface Props {
@@ -49,7 +49,6 @@ export default function SignalHero({ name, tagline, description, signals, stats 
     } catch {}
     if (seenBoot || reduceMotion) field.skipBoot()
 
-    section.style.cursor = 'none' // the spider is the cursor in the field
     let lastHud = ''
     const syncHud = () => {
       const s = field.hovered ?? field.focus
@@ -57,8 +56,7 @@ export default function SignalHero({ name, tagline, description, signals, stats 
       if (key === lastHud) return
       lastHud = key
       setHud(s ? { title: s.title, href: s.href, hovered: !!field.hovered } : null)
-      // The spider is the cursor inside the field.
-      section.style.cursor = field.hovered ? 'pointer' : 'none'
+      section.style.cursor = field.hovered ? 'pointer' : ''
     }
 
     const layout = () => {
