@@ -1,3 +1,4 @@
+import { unstable_rethrow } from 'next/navigation'
 import Link from 'next/link'
 import HeroSection from '@/components/sections/HeroSection'
 import ProjectCard, { type ProjectSummary } from '@/components/project/ProjectCard'
@@ -59,6 +60,7 @@ export default async function HomePage() {
     posts = b ?? []
     about = a
   } catch (err) {
+    unstable_rethrow(err)
     // Render the static hero even if Supabase is unreachable.
     console.error('[home] failed to load content', err)
   }

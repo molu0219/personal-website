@@ -1,3 +1,4 @@
+import { unstable_rethrow } from 'next/navigation'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { getViewCount } from '@/lib/view-counts'
@@ -22,6 +23,7 @@ export default async function SkillsPage() {
       .order('stars', { ascending: false })
     skills = data ?? []
   } catch (err) {
+    unstable_rethrow(err)
     console.error('[skills] failed to load skills', err)
   }
 

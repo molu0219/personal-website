@@ -1,3 +1,4 @@
+import { unstable_rethrow } from 'next/navigation'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { getViewCounts } from '@/lib/view-counts'
@@ -23,6 +24,7 @@ export default async function BlogPage() {
       .order('published_at', { ascending: false })
     posts = data ?? []
   } catch (err) {
+    unstable_rethrow(err)
     console.error('[blog] failed to load posts', err)
   }
 

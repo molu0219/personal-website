@@ -1,3 +1,4 @@
+import { unstable_rethrow } from 'next/navigation'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 
@@ -68,6 +69,7 @@ export default async function AboutPage() {
     const { data } = await supabase.from('about').select('*').single()
     about = data
   } catch (err) {
+    unstable_rethrow(err)
     console.error('[about] failed to load about', err)
   }
 
