@@ -9,8 +9,6 @@ const links = [
   { href: '/about', label: 'About' },
   { href: '/projects', label: 'Projects' },
   { href: '/blog', label: 'Blog' },
-  { href: '/skills', label: 'Skills' },
-  { href: '/cheatsheet', label: 'Cheat Sheet' },
 ]
 
 function isActive(pathname: string, href: string): boolean {

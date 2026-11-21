@@ -54,11 +54,6 @@ export default async function AdminDashboard() {
           <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>Update your bio and skills</p>
           <NeonButton href="/admin/about" variant="pink">Edit →</NeonButton>
         </GlassCard>
-        <GlassCard className="p-6">
-          <h2 className="font-semibold mb-3" style={{ color: 'var(--cyan)' }}>AI Skills</h2>
-          <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>Curate AI agent skills</p>
-          <NeonButton href="/admin/skills" variant="cyan">Manage →</NeonButton>
-        </GlassCard>
       </div>
     </div>
   )

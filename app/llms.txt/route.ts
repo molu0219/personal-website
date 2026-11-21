@@ -17,8 +17,6 @@ const LLMS_TXT = `# Joey Chen — Developer & Builder
 - [Projects](https://0xjoeytw.xyz/projects): Portfolio of development projects
 
 ## Resources
-- [Skills Hub](https://0xjoeytw.xyz/skills): Technical skills and Claude Code skill marketplace
-- [Cheat Sheet](https://0xjoeytw.xyz/cheatsheet): Developer reference materials
 `
 
 export function GET() {
