@@ -34,7 +34,7 @@ const HEX = '0123456789abcdef'
 const GLITCH = '#$%?!*+=/\\|01{}[]~^'
 const NAME_EDGE = 0.35
 const NAME_RAMP = ':-=+*#%@'
-const LENS_PX = 150
+const LENS_PX = 90
 const NAV_PX = 56 // fixed navbar height: keep it clear of noise
 const BOOT_END = 2.2
 const AUTOPILOT_IDLE = 2.5 // s without pointer input before the lens drives itself
@@ -199,7 +199,7 @@ export class SignalField {
       const dx = Math.max(0, Math.abs(this.lens.c - ctr.c) - p.label.length / 2) * cw
       const dy = (this.lens.r - ctr.r) * ch
       const d = Math.hypot(dx, dy)
-      const inside = d < LENS_PX * 0.8
+      const inside = d < LENS_PX * 1.1
       p.reveal = Math.min(1, Math.max(0, p.reveal + (inside ? dt * 2.4 : -dt * 1.2)))
       if (inside && d < bestD) {
         best = p
@@ -286,7 +286,7 @@ export class SignalField {
     }
 
     // ── lens rim ─────────────────────────────────────────────
-    const steps = 72
+    const steps = 44
     for (let i = 0; i < steps; i++) {
       if (i % 3 === 2) continue
       const a = (i / steps) * Math.PI * 2 + t * 0.4

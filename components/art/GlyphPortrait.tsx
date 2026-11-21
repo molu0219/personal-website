@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { useTheme } from 'next-themes'
 import { AsciiGrid } from '@/lib/ascii/grid'
 import { hash1 } from '@/lib/ascii/noise'
 
@@ -84,14 +83,14 @@ function toCss([r, g, b]: [number, number, number], dark: boolean): string {
 }
 
 export default function GlyphPortrait({ src, alt, cols = 96, className = '' }: Props) {
-  const { resolvedTheme } = useTheme()
   const preRef = useRef<HTMLPreElement>(null)
   const [failed, setFailed] = useState(false)
 
   useEffect(() => {
     const pre = preRef.current
     if (!pre) return
-    const dark = resolvedTheme === 'dark'
+    // Always drawn as on a dark screen (the portrait sits on its own dark panel in both themes).
+    const dark = true
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const grid = new AsciiGrid(pre)
     let glyphs: Glyph[] = []
@@ -211,16 +210,19 @@ export default function GlyphPortrait({ src, alt, cols = 96, className = '' }: P
       pre.removeEventListener('pointerleave', onLeave)
       pre.removeEventListener('click', scatter)
     }
-  }, [src, cols, resolvedTheme])
+  }, [src, cols])
 
   if (failed) return null
   return (
-    <pre
-      ref={preRef}
-      role="img"
-      aria-label={alt}
-      className={`ascii m-0 cursor-crosshair select-none whitespace-pre ${className}`}
-      style={{ fontFamily: 'var(--font-mono)' }}
-    />
+    // Dark panel in both themes so the portrait reads the same everywhere.
+    <div className="inline-block rounded-xl p-5" style={{ background: '#0a0a0a' }}>
+      <pre
+        ref={preRef}
+        role="img"
+        aria-label={alt}
+        className={`ascii m-0 block cursor-crosshair select-none whitespace-pre ${className}`}
+        style={{ fontFamily: 'var(--font-mono)' }}
+      />
+    </div>
   )
 }
