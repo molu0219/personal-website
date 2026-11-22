@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import { isAuthorized, unauthorizedResponse } from '@/lib/api-auth'
 import { createServiceClient } from '@/lib/supabase/server'
 import { createClient } from '@/lib/supabase/server'
+import { normalizeTags } from '@/lib/tags'
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -19,6 +20,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   if (!isAuthorized(req)) return unauthorizedResponse()
   const { id } = await params
   const body = await req.json()
+  if ('tags' in body) body.tags = normalizeTags(body.tags) ?? []
 
   if (body.published && !body.published_at) {
     body.published_at = new Date().toISOString()
