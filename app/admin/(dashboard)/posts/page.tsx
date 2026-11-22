@@ -70,7 +70,7 @@ export default function AdminPosts() {
   if (editing !== null) {
     return (
       <div className="max-w-2xl">
-        <h1 className="text-2xl font-bold mb-8" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-primary)' }}>
+        <h1 className="text-2xl font-bold mb-8" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
           {editing.id ? 'Edit Post' : 'New Post'}
         </h1>
         <GlassCard className="p-6 space-y-4">
@@ -90,7 +90,7 @@ export default function AdminPosts() {
             onChange={v => setEditing({ ...editing, content: v })}
             minHeight="320px"
           />
-          <label className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)', cursor: 'none' }}>
+          <label className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)', cursor: 'pointer' }}>
             <input type="checkbox" checked={editing.published ?? false} onChange={e => setEditing({ ...editing, published: e.target.checked })} />
             Published
           </label>
@@ -107,7 +107,7 @@ export default function AdminPosts() {
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-primary)' }}>Blog Posts</h1>
+        <h1 className="text-2xl font-bold" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>Blog Posts</h1>
         <NeonButton variant="purple" onClick={() => setEditing({})}>+ New Post</NeonButton>
       </div>
 

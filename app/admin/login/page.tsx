@@ -35,7 +35,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center px-6" style={{ background: 'var(--bg)' }}>
       <GlassCard className="w-full max-w-sm p-8">
-        <h1 className="text-2xl font-bold mb-2 text-center" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-primary)' }}>
+        <h1 className="text-2xl font-bold mb-2 text-center" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
           Admin Login
         </h1>
         <p className="text-sm text-center mb-8" style={{ color: 'var(--text-secondary)' }}>

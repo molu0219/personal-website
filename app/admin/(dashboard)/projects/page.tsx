@@ -73,7 +73,7 @@ export default function AdminProjects() {
   if (editing !== null) {
     return (
       <div className="max-w-2xl">
-        <h1 className="text-2xl font-bold mb-8" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-primary)' }}>
+        <h1 className="text-2xl font-bold mb-8" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
           {editing.id ? 'Edit Project' : 'New Project'}
         </h1>
         <GlassCard className="p-6 space-y-4">
@@ -94,11 +94,11 @@ export default function AdminProjects() {
             onChange={v => setEditing({ ...editing, content: v } as any)}
           />
           <div className="flex items-center gap-6">
-            <label className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)', cursor: 'none' }}>
+            <label className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)', cursor: 'pointer' }}>
               <input type="checkbox" checked={editing.published ?? false} onChange={e => setEditing({ ...editing, published: e.target.checked })} />
               Published
             </label>
-            <label className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)', cursor: 'none' }}>
+            <label className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)', cursor: 'pointer' }}>
               <input type="checkbox" checked={editing.featured ?? false} onChange={e => setEditing({ ...editing, featured: e.target.checked })} />
               Featured
             </label>
@@ -116,7 +116,7 @@ export default function AdminProjects() {
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-primary)' }}>Projects</h1>
+        <h1 className="text-2xl font-bold" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>Projects</h1>
         <NeonButton variant="cyan" onClick={() => setEditing({})}>+ New Project</NeonButton>
       </div>
 

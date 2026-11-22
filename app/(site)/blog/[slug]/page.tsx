@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
-import { notFound } from 'next/navigation'
+import { notFound, unstable_rethrow } from 'next/navigation'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeSlug from 'rehype-slug'
@@ -8,12 +8,15 @@ import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import ArticleLayout from '@/components/blog/ArticleLayout'
 import AuthorCard from '@/components/blog/AuthorCard'
 import { getViewCount } from '@/lib/view-counts'
+import { postCoverUrl } from '@/lib/og/urls'
+import PostNav, { type PostNavLink } from '@/components/blog/PostNav'
+import { MARKDOWN_COMPONENTS } from '@/components/blog/markdown'
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
   try {
     const supabase = await createClient()
-    const { data } = await supabase.from('posts').select('title, excerpt, excerpt_en, cover_url').eq('slug', slug).eq('published', true).single()
+    const { data } = await supabase.from('posts').select('title, excerpt, excerpt_en').eq('slug', slug).eq('published', true).single()
     if (data) {
       const title = `${data.title} — Joey Chen`
       const description = data.excerpt_en || data.excerpt || undefined
@@ -28,14 +31,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
           type: 'article',
           siteName: 'Joey Chen',
           locale: 'zh_TW',
-          ...(data.cover_url ? { images: [{ url: data.cover_url }] } : {}),
         },
         twitter: {
-          card: data.cover_url ? 'summary_large_image' : 'summary',
+          // Images come from the generated opengraph-image / twitter-image routes.
+          card: 'summary_large_image',
           title,
           description,
           creator: '@0xjoeytw',
-          ...(data.cover_url ? { images: [data.cover_url] } : {}),
         },
       }
     }
@@ -55,7 +57,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   if (!post) notFound()
 
-  const views = await getViewCount(`/blog/${slug}`)
+  const [views, neighbours] = await Promise.all([getViewCount(`/blog/${slug}`), getNeighbours(slug)])
 
   const jsonLdArticle = {
     '@context': 'https://schema.org',
@@ -77,7 +79,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       '@id': 'https://0xjoeytw.xyz/#person',
       name: 'Joey Chen',
     },
-    ...(post.cover_url ? { image: post.cover_url } : {}),
+    image: `https://0xjoeytw.xyz${postCoverUrl(slug)}`,
     mainEntityOfPage: { '@type': 'WebPage', '@id': `https://0xjoeytw.xyz/blog/${slug}` },
     ...(post.tags?.length ? { keywords: post.tags.join(', ') } : {}),
     inLanguage: 'zh-TW',
@@ -97,13 +99,34 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     <ArticleLayout post={post} views={views}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdArticle) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdBreadcrumb) }} />
-      <ReactMarkdown
+      <ReactMarkdown components={MARKDOWN_COMPONENTS}
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeSlug, rehypeAutolinkHeadings]}
       >
         {post.content}
       </ReactMarkdown>
       <AuthorCard />
+      <PostNav older={neighbours.older} newer={neighbours.newer} />
     </ArticleLayout>
   )
+}
+
+// Posts are few (tens), so one ordered slug/title list is cheaper than two range queries.
+async function getNeighbours(slug: string): Promise<{ older: PostNavLink | null; newer: PostNavLink | null }> {
+  try {
+    const supabase = await createClient()
+    const { data } = await supabase
+      .from('posts')
+      .select('slug,title')
+      .eq('published', true)
+      .order('published_at', { ascending: false })
+    const list: PostNavLink[] = data ?? []
+    const i = list.findIndex(p => p.slug === slug)
+    if (i === -1) return { older: null, newer: null }
+    return { newer: list[i - 1] ?? null, older: list[i + 1] ?? null }
+  } catch (err) {
+    unstable_rethrow(err)
+    console.error('[blog] failed to load neighbouring posts', slug, err)
+    return { older: null, newer: null }
+  }
 }

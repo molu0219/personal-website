@@ -1,63 +1,72 @@
+import { unstable_rethrow } from 'next/navigation'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
-import { getViewCounts } from '@/lib/view-counts'
-import ProjectGrid from '@/components/sections/ProjectGrid'
+import PageHeader from '@/components/ui/PageHeader'
+import ProjectInline, { type InlineProject } from '@/components/project/ProjectInline'
+import AsciiBars from '@/components/art/AsciiBars'
+import ProjectMap from '@/components/project/ProjectMap'
+import AsciiArt from '@/components/art/AsciiArt'
+import { contentArt } from '@/lib/ascii/motifs'
+import { layoutProjectMap } from '@/lib/ascii/project-map'
 
 export const metadata: Metadata = {
   title: 'Projects — Joey Chen',
-  description: 'Blockchain, AI, and Web3 projects by Joey Chen.',
+  description: 'Joey Chen 的作品：AI agent、交易監控與預測市場、Solana 代幣分析、3D 桌面夥伴與開發者工具，依共用技術畫成一張地圖。',
   alternates: { canonical: '/projects' },
 }
 
 export default async function ProjectsPage() {
-  let projects: any[] = []
+  let rows: (InlineProject & { id: string; featured?: boolean | null; created_at?: string | null })[] = []
 
   try {
     const supabase = await createClient()
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('projects')
-      .select('*')
+      .select('id,slug,title,description,tags,featured,created_at,content,url,github_url')
       .eq('published', true)
       .order('created_at', { ascending: false })
-    projects = data ?? []
-  } catch {}
+    // Supabase reports query errors in `error` instead of throwing; don't let the page go silently empty.
+    if (error) console.error('[projects] query failed', error.message)
+    rows = data ?? []
+  } catch (err) {
+    unstable_rethrow(err)
+    console.error('[projects] failed to load projects', err)
+  }
 
-  const viewCounts = await getViewCounts(projects.map((p: any) => `/projects/${p.slug}`))
+  const layout = layoutProjectMap(rows)
+  // Everything that needs the markdown is rendered here, on the server.
+  const minis: Record<string, React.ReactNode> = {}
+  const bodies: Record<string, React.ReactNode> = {}
+  for (const p of rows) {
+    minis[p.slug] = (
+      <AsciiArt
+        grid={contentArt({ content: p.content ?? '', seed: p.slug, tags: p.tags }, 34, 12)}
+        className="p-1.5 text-[3.5px] leading-[4.5px] sm:text-[4.5px] sm:leading-[5.5px]"
+      />
+    )
+    bodies[p.slug] = <ProjectInline project={p} />
+  }
+  const projects = rows.map(({ slug, title, description, tags }) => ({ slug, title, description, tags }))
+  const initial = (rows.find(p => p.featured) ?? rows[0])?.slug ?? ''
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
-      <div className="px-8 pt-32 pb-12 max-w-6xl mx-auto">
-        <p
-          className="font-mono uppercase text-xs mb-4"
-          style={{ color: 'var(--text-muted)', letterSpacing: '0.25em' }}
-        >
-          Portfolio
-        </p>
-        <h1
-          className="font-bold uppercase mb-6"
-          style={{
-            fontFamily: 'Space Grotesk, sans-serif',
-            fontSize: 'clamp(2.5rem, 8vw, 5rem)',
-            color: 'var(--text-primary)',
-            letterSpacing: '0.18em',
-            lineHeight: 1,
-          }}
-        >
-          Projects
-        </h1>
-        <p
-          className="font-mono text-xs uppercase"
-          style={{ color: 'var(--text-muted)', letterSpacing: '0.2em' }}
-        >
-          Blockchain · AI · Web3 · Open Source
-        </p>
-      </div>
-
-      <div style={{ borderTop: '1px solid var(--border)' }} />
-
-      <div className="px-8 py-16 max-w-6xl mx-auto">
-        <ProjectGrid projects={projects} viewCounts={viewCounts} />
-      </div>
+    <div className="px-6 pb-24 max-w-6xl mx-auto">
+      <PageHeader
+        aside={<AsciiBars command="$ cat */stack | sort | uniq -c | head" rows={topTags(projects)} />}
+        eyebrow="~/projects"
+        title="Projects"
+        description="Blockchain, AI, Web3 and open-source work — mapped by what they share."
+      />
+      {projects.length > 0 && <ProjectMap layout={layout} projects={projects} minis={minis} bodies={bodies} initial={initial} />}
     </div>
   )
+}
+
+/** Most-used tags across projects (case-insensitive), top 6. */
+function topTags(projects: { tags?: string[] | null }[]) {
+  const counts = new Map<string, number>()
+  for (const p of projects) for (const t of p.tags ?? []) counts.set(t.toLowerCase(), (counts.get(t.toLowerCase()) ?? 0) + 1)
+  return Array.from(counts, ([label, value]) => ({ label, value }))
+    .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label))
+    .slice(0, 6)
 }

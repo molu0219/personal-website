@@ -1,196 +1,117 @@
-import AuroraCanvas from '@/components/art/AuroraCanvas'
-import HeroSection from '@/components/sections/HeroSection'
-import { createClient } from '@/lib/supabase/server'
-import NeonButton from '@/components/ui/NeonButton'
-import NeonBadge from '@/components/ui/NeonBadge'
-import ScrollCarousel from '@/components/ui/ScrollCarousel'
+import { unstable_rethrow } from 'next/navigation'
 import Link from 'next/link'
+import SignalHero from '@/components/sections/SignalHero'
+import type { Signal } from '@/lib/ascii/signal-field'
+import ProjectCard, { type ProjectSummary } from '@/components/project/ProjectCard'
+import { splitProjectArt } from '@/components/project/ProjectCardArt'
+import type { PostSummary } from '@/components/blog/PostRow'
+import PostTimeline from '@/components/blog/PostTimeline'
+import { withPostMeta } from '@/components/blog/post-meta'
+import { postThumbs } from '@/components/blog/PostThumb'
+import { createClient } from '@/lib/supabase/server'
 
-const TAG_COLORS: Record<string, string> = {
-  'Solidity':   '20,80,180',
-  'DeFi':       '0,160,100',
-  'NFT':        '120,0,200',
-  'AI':         '200,40,100',
-  'ZK Proofs':  '80,0,200',
-  'TypeScript': '0,100,200',
-  'Ethereum':   '80,60,200',
-  'Solana':     '100,200,80',
-  'Security':   '200,0,60',
+interface AboutRow {
+  name: string | null
+  title: string | null
+  hero_description: string | null
+  status_text: string | null
+  status_active: boolean | null
 }
 
-function tagGradient(tags: string[]) {
-  const rgb = TAG_COLORS[tags?.[0]] ?? '0,100,160'
-  return `linear-gradient(135deg, rgba(${rgb},0.3) 0%, rgba(${rgb},0.05) 100%)`
+function SectionHeader({ index, title, href }: { index: string; title: string; href: string }) {
+  return (
+    <div className="flex items-baseline justify-between border-b pb-4 mb-2" style={{ borderColor: 'var(--border)' }}>
+      <h2 className="flex items-baseline gap-3 text-xl font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>
+        <span className="text-xs font-normal" style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
+          {index}
+        </span>
+        {title}
+      </h2>
+      <Link
+        href={href}
+        className="text-sm transition-colors hover:text-[var(--text-primary)]"
+        style={{ color: 'var(--text-secondary)' }}
+      >
+        View all →
+      </Link>
+    </div>
+  )
 }
 
 export default async function HomePage() {
-  let projects: any[] = []
-  let posts: any[] = []
-  let about: any = null
+  let allProjects: (ProjectSummary & { featured?: boolean | null; content?: string | null })[] = []
+  let allPosts: PostSummary[] = []
+  let thumbs: Record<string, React.ReactNode> = {}
+  let about: AboutRow | null = null
 
   try {
     const supabase = await createClient()
     const [{ data: p }, { data: b }, { data: a }] = await Promise.all([
       supabase
         .from('projects')
-        .select('id,slug,title,description,tags,cover_url,featured')
+        .select('id,slug,title,description,tags,featured,content')
         .eq('published', true)
-        .eq('featured', true)
-        .order('created_at', { ascending: false })
-        .limit(5),
+        .order('created_at', { ascending: false }),
       supabase
         .from('posts')
-        .select('id,slug,title,excerpt,tags,cover_url,published_at')
+        .select('id,slug,title,excerpt,tags,published_at,content')
         .eq('published', true)
-        .order('published_at', { ascending: false })
-        .limit(5),
+        .order('published_at', { ascending: false }),
       supabase.from('about').select('name,title,hero_description,status_text,status_active').single(),
     ])
-    projects = p ?? []
-    posts = b ?? []
+    allProjects = p ?? []
+    thumbs = postThumbs((b ?? []).slice(0, 5))
+    allPosts = withPostMeta(b ?? [])
     about = a
-  } catch {}
+  } catch (err) {
+    unstable_rethrow(err)
+    // Render the static hero even if Supabase is unreachable.
+    console.error('[home] failed to load content', err)
+  }
+
+  const posts = allPosts.slice(0, 5)
+  // Featured first; fall back to the newest so the section never silently disappears.
+  const featured = allProjects.filter(p => p.featured)
+  const { projects, arts } = splitProjectArt((featured.length ? featured : allProjects).slice(0, 4))
+  // Everything real the hero lens can decode: post and project paths.
+  const signals: Signal[] = [
+    ...allPosts.map(p => ({ label: `~/blog/${p.slug}`, title: p.title, href: `/blog/${p.slug}` })),
+    ...allProjects.map(p => ({ label: `~/projects/${p.slug}`, title: p.title, href: `/projects/${p.slug}` })),
+  ]
 
   return (
     <>
-      <AuroraCanvas />
-      <HeroSection
-        name={about?.name}
-        tagline={about?.title}
-        description={about?.hero_description}
-        statusText={about?.status_text}
-        statusActive={about?.status_active ?? true}
+      <SignalHero
+        name={about?.name ?? 'Joey Chen'}
+        tagline={about?.title ?? 'Blockchain developer · AI agent workflows'}
+        description={
+          about?.hero_description ??
+          'I build AI agent workflows and on-chain tools, and write about how they work.'
+        }
+        signals={signals}
+        stats={{
+          posts: allPosts.length,
+          projects: allProjects.length,
+          lastWrite: allPosts[0]?.published_at?.slice(0, 10) ?? null,
+        }}
       />
 
-      {/* Recent Posts */}
       {posts.length > 0 && (
-        <section className="relative z-10 pt-20 pb-10">
-          <div className="flex items-center justify-between mb-8 px-6 max-w-6xl mx-auto">
-            <h2
-              className="text-3xl font-bold"
-              style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-primary)' }}
-            >
-              Recent <span className="gradient-text">Posts</span>
-            </h2>
-            <NeonButton href="/blog" variant="ghost">View All →</NeonButton>
-          </div>
-          <div className="pl-6 max-w-6xl mx-auto">
-            <ScrollCarousel>
-              {posts.map(post => (
-                <Link
-                  key={post.id}
-                  href={`/blog/${post.slug}`}
-                  className="flex-shrink-0"
-                  style={{ width: 280, scrollSnapAlign: 'start' }}
-                >
-                  <div className="card-hover-purple h-full rounded-xl overflow-hidden group">
-                    {/* Cover */}
-                    <div className="overflow-hidden" style={{ height: 160 }}>
-                      {post.cover_url ? (
-                        <img
-                          src={post.cover_url}
-                          alt={post.title}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                      ) : (
-                        <div
-                          className="w-full h-full"
-                          style={{ background: tagGradient(post.tags) }}
-                        />
-                      )}
-                    </div>
-                    {/* Content */}
-                    <div className="p-4">
-                      {post.published_at && (
-                        <p className="text-xs mb-2 font-mono" style={{ color: 'var(--text-muted)' }}>
-                          {new Date(post.published_at).toLocaleDateString('en-US', {
-                            month: 'short', day: 'numeric', year: 'numeric',
-                          })}
-                        </p>
-                      )}
-                      <h3
-                        className="font-semibold text-sm leading-snug mb-2 line-clamp-2"
-                        style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-primary)' }}
-                      >
-                        {post.title}
-                      </h3>
-                      {post.excerpt && (
-                        <p className="text-xs line-clamp-2 mb-3" style={{ color: 'var(--text-secondary)' }}>
-                          {post.excerpt}
-                        </p>
-                      )}
-                      <div className="flex flex-wrap gap-1.5">
-                        {post.tags?.slice(0, 2).map((tag: string) => (
-                          <NeonBadge key={tag} color="purple">{tag}</NeonBadge>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </ScrollCarousel>
+        <section className="px-6 py-16">
+          <div className="max-w-6xl mx-auto">
+            <SectionHeader index="01" title="Writing" href="/blog" />
+            <PostTimeline posts={posts} thumbs={thumbs} />
           </div>
         </section>
       )}
 
-      {/* Featured Projects */}
       {projects.length > 0 && (
-        <section className="relative z-10 pt-10 pb-20">
-          <div className="flex items-center justify-between mb-8 px-6 max-w-6xl mx-auto">
-            <h2
-              className="text-3xl font-bold"
-              style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-primary)' }}
-            >
-              Featured <span className="gradient-text">Projects</span>
-            </h2>
-            <NeonButton href="/projects" variant="ghost">View All →</NeonButton>
-          </div>
-          <div className="pl-6 max-w-6xl mx-auto">
-            <ScrollCarousel>
-              {projects.map(project => (
-                <Link
-                  key={project.id}
-                  href={`/projects/${project.slug}`}
-                  className="flex-shrink-0"
-                  style={{ width: 300, scrollSnapAlign: 'start' }}
-                >
-                  <div className="card-hover-cyan h-full rounded-xl overflow-hidden group">
-                    {/* Cover */}
-                    <div className="overflow-hidden" style={{ height: 180 }}>
-                      {project.cover_url ? (
-                        <img
-                          src={project.cover_url}
-                          alt={project.title}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                      ) : (
-                        <div
-                          className="w-full h-full"
-                          style={{ background: tagGradient(project.tags) }}
-                        />
-                      )}
-                    </div>
-                    {/* Content */}
-                    <div className="p-4">
-                      <h3
-                        className="font-semibold text-sm mb-2 line-clamp-2"
-                        style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-primary)' }}
-                      >
-                        {project.title}
-                      </h3>
-                      <p className="text-xs line-clamp-2 mb-3" style={{ color: 'var(--text-secondary)' }}>
-                        {project.description}
-                      </p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {project.tags?.slice(0, 3).map((tag: string) => (
-                          <NeonBadge key={tag} color="cyan">{tag}</NeonBadge>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </ScrollCarousel>
+        <section className="px-6 py-16">
+          <div className="max-w-6xl mx-auto">
+            <SectionHeader index="02" title="Selected work" href="/projects" />
+            <div className="grid gap-6 pt-6 sm:grid-cols-2">
+              {projects.map(project => <ProjectCard key={project.id} project={project} art={arts[project.slug]} />)}
+            </div>
           </div>
         </section>
       )}

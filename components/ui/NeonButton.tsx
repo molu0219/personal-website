@@ -1,6 +1,4 @@
-'use client'
-
-import { motion } from 'framer-motion'
+import Link from 'next/link'
 
 type Variant = 'cyan' | 'purple' | 'pink' | 'ghost'
 
@@ -12,13 +10,49 @@ interface NeonButtonProps {
   className?: string
   type?: 'button' | 'submit' | 'reset'
   disabled?: boolean
+  /** Trailing arrow keycap. Defaults to on for link buttons with a solid/outline variant. */
+  arrow?: boolean
 }
 
-const variantVars: Record<Variant, string> = {
-  cyan: '--cyan',
-  purple: '--purple',
-  pink: '--pink',
-  ghost: '',
+// Legacy variant names kept for call-site compatibility:
+// cyan → primary (solid), purple → secondary (raised), pink → danger, ghost → quiet.
+// Depth comes from a top inner highlight + a 1px hairline shadow, never a glow.
+const VARIANT_CLASS: Record<Variant, string> = {
+  cyan:
+    'bg-[var(--text-primary)] text-[var(--bg)] border-transparent ' +
+    'shadow-[inset_0_1px_0_rgb(255_255_255/0.14),0_1px_2px_rgb(0_0_0/0.12)] hover:bg-[color-mix(in_srgb,var(--text-primary)_88%,var(--bg))]',
+  purple:
+    'bg-[var(--surface)] text-[var(--text-primary)] border-[var(--border)] ' +
+    'shadow-[inset_0_1px_0_rgb(255_255_255/0.05),0_1px_2px_rgb(0_0_0/0.04)] hover:bg-[var(--surface-2)] hover:border-[var(--border-strong)]',
+  pink: 'bg-transparent text-[var(--accent)] border-[color-mix(in_srgb,var(--accent)_45%,transparent)] hover:bg-[color-mix(in_srgb,var(--accent)_8%,transparent)]',
+  ghost: 'bg-transparent text-[var(--text-secondary)] border-transparent hover:text-[var(--text-primary)] hover:bg-[var(--surface-2)]',
+}
+
+// Arrow sits in a small keycap that takes a tint of the button's own text color.
+const KEYCAP_CLASS: Record<Variant, string> = {
+  cyan: 'bg-[color-mix(in_srgb,var(--bg)_14%,transparent)]',
+  purple: 'bg-[var(--surface-2)] border border-[var(--border)]',
+  pink: 'bg-[color-mix(in_srgb,var(--accent)_10%,transparent)]',
+  ghost: 'bg-[var(--surface-2)]',
+}
+
+const BASE =
+  'group/btn inline-flex items-center justify-center gap-3 h-11 rounded-lg border text-sm font-medium ' +
+  'transition-[background-color,border-color,color,transform] duration-150 ease-[cubic-bezier(0.22,1,0.36,1)] ' +
+  'active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 select-none'
+
+function Keycap({ variant }: { variant: Variant }) {
+  return (
+    <span
+      aria-hidden
+      className={`grid h-6 w-6 place-items-center rounded-md text-xs ${KEYCAP_CLASS[variant]}`}
+      style={{ fontFamily: 'var(--font-mono)' }}
+    >
+      <span className="transition-transform duration-150 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/btn:translate-x-0.5">
+        →
+      </span>
+    </span>
+  )
 }
 
 export default function NeonButton({
@@ -29,47 +63,34 @@ export default function NeonButton({
   className = '',
   type = 'button',
   disabled,
+  arrow,
 }: NeonButtonProps) {
-  const isGhost = variant === 'ghost'
-  const colorVar = isGhost ? 'var(--text-secondary)' : `var(${variantVars[variant]})`
-
-  const inner = (
-    <motion.button
-      type={type}
-      disabled={disabled}
-      onClick={onClick}
-      className={`relative px-6 py-2.5 rounded-lg font-medium text-sm tracking-wide ${className}`}
-      style={{
-        color: colorVar,
-        border: `1px solid ${isGhost ? 'var(--border)' : `color-mix(in srgb, ${colorVar} 50%, transparent)`}`,
-        background: 'var(--surface)',
-        backdropFilter: 'blur(10px)',
-        cursor: disabled ? 'not-allowed' : 'none',
-        opacity: disabled ? 0.5 : 1,
-        transition: 'box-shadow 0.2s, border-color 0.2s, background 0.2s',
-      }}
-      whileHover={
-        disabled
-          ? {}
-          : {
-              boxShadow: isGhost
-                ? 'var(--shadow-md)'
-                : `0 0 20px color-mix(in srgb, ${colorVar} 30%, transparent), 0 0 40px color-mix(in srgb, ${colorVar} 15%, transparent)`,
-              borderColor: colorVar,
-            }
-      }
-      whileTap={disabled ? {} : { scale: 0.97 }}
-    >
+  const showArrow = arrow ?? (Boolean(href) && (variant === 'cyan' || variant === 'purple'))
+  const padding = showArrow ? 'pl-5 pr-2.5' : 'px-5'
+  const cls = `${BASE} ${padding} ${VARIANT_CLASS[variant]} ${className}`
+  const content = (
+    <>
       {children}
-    </motion.button>
+      {showArrow && <Keycap variant={variant} />}
+    </>
   )
 
   if (href) {
-    return (
-      <a href={href} target={href.startsWith('http') ? '_blank' : undefined} rel="noreferrer">
-        {inner}
+    const isExternal = /^https?:\/\//.test(href)
+    return isExternal ? (
+      <a href={href} target="_blank" rel="noopener noreferrer" className={cls}>
+        {content}
       </a>
+    ) : (
+      <Link href={href} className={cls}>
+        {content}
+      </Link>
     )
   }
-  return inner
+
+  return (
+    <button type={type} disabled={disabled} onClick={onClick} className={cls}>
+      {content}
+    </button>
+  )
 }

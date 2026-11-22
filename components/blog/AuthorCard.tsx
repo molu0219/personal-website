@@ -55,7 +55,7 @@ export default async function AuthorCard() {
       <div className="min-w-0">
         <p
           className="font-semibold text-sm mb-1"
-          style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-primary)' }}
+          style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}
         >
           {name}
         </p>

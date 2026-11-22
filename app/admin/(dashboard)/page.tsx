@@ -18,7 +18,7 @@ export default async function AdminDashboard() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-8" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-primary)' }}>
+      <h1 className="text-3xl font-bold mb-8" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
         Dashboard
       </h1>
 
@@ -30,7 +30,7 @@ export default async function AdminDashboard() {
           { label: 'Published Posts', value: stats.publishedPosts, color: 'var(--purple)' },
         ].map(stat => (
           <GlassCard key={stat.label} className="p-6 text-center">
-            <div className="text-3xl font-bold mb-1" style={{ color: stat.color, fontFamily: 'Space Grotesk, sans-serif' }}>
+            <div className="text-3xl font-bold mb-1" style={{ color: stat.color, fontFamily: 'var(--font-display)' }}>
               {stat.value}
             </div>
             <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>{stat.label}</div>
@@ -42,22 +42,17 @@ export default async function AdminDashboard() {
         <GlassCard className="p-6">
           <h2 className="font-semibold mb-3" style={{ color: 'var(--cyan)' }}>Projects</h2>
           <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>Manage your portfolio projects</p>
-          <NeonButton href="/admin/projects" variant="cyan">Manage →</NeonButton>
+          <NeonButton href="/admin/projects" variant="cyan">Manage</NeonButton>
         </GlassCard>
         <GlassCard className="p-6">
           <h2 className="font-semibold mb-3" style={{ color: 'var(--purple)' }}>Blog Posts</h2>
           <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>Write and publish articles</p>
-          <NeonButton href="/admin/posts" variant="purple">Manage →</NeonButton>
+          <NeonButton href="/admin/posts" variant="purple">Manage</NeonButton>
         </GlassCard>
         <GlassCard className="p-6">
           <h2 className="font-semibold mb-3" style={{ color: 'var(--pink)' }}>About</h2>
           <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>Update your bio and skills</p>
-          <NeonButton href="/admin/about" variant="pink">Edit →</NeonButton>
-        </GlassCard>
-        <GlassCard className="p-6">
-          <h2 className="font-semibold mb-3" style={{ color: 'var(--cyan)' }}>AI Skills</h2>
-          <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>Curate AI agent skills</p>
-          <NeonButton href="/admin/skills" variant="cyan">Manage →</NeonButton>
+          <NeonButton href="/admin/about" variant="pink">Edit</NeonButton>
         </GlassCard>
       </div>
     </div>

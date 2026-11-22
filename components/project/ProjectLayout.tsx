@@ -1,20 +1,32 @@
-'use client'
-
 import Link from 'next/link'
-import { ArrowLeft, ExternalLink, Github, Circle } from 'lucide-react'
 import NeonBadge from '@/components/ui/NeonBadge'
 import TableOfContents from '@/components/blog/TableOfContents'
+import ContentArt from '@/components/art/ContentArt'
 
 interface Project {
+  slug: string
   title: string
-  description?: string
+  description?: string | null
   content: string
-  tags?: string[]
-  cover_url?: string
-  url?: string
-  github_url?: string
-  status?: string
+  tags?: string[] | null
+  cover_url?: string | null
+  url?: string | null
+  github_url?: string | null
+  status?: string | null
 }
+
+function MetaItem({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <dt className="text-xs mb-2" style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
+        {label}
+      </dt>
+      <dd className="text-sm" style={{ color: 'var(--text-primary)' }}>{children}</dd>
+    </div>
+  )
+}
+
+const linkCls = 'underline underline-offset-4 decoration-[var(--border-strong)] hover:decoration-[var(--accent)] transition-colors'
 
 export default function ProjectLayout({
   project,
@@ -25,158 +37,89 @@ export default function ProjectLayout({
   children: React.ReactNode
   views?: number
 }) {
-  const isLive = !project.status || project.status === 'live'
+  const status = project.status || 'live'
+  const isLive = status === 'live'
 
   return (
-    <div className="relative z-10 min-h-screen pb-20">
-      {/* Full-width cover image */}
-      {project.cover_url && (
-        <div className="relative h-64 md:h-80 overflow-hidden">
-          <img
-            src={project.cover_url}
-            alt={project.title}
-            className="w-full h-full object-cover"
-            style={{ transform: 'scale(1.03)' }}
-          />
-          <div
-            className="absolute inset-0"
-            style={{
-              background: 'linear-gradient(to bottom, color-mix(in srgb, var(--bg) 20%, transparent) 0%, var(--bg) 100%)',
-            }}
-          />
-        </div>
-      )}
+    <div className="max-w-6xl mx-auto px-6 pt-28 md:pt-36 pb-24">
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_220px] gap-16">
+        <article className="min-w-0">
+          <Link
+            href="/projects"
+            className="inline-block mb-10 text-xs transition-colors hover:text-[var(--text-primary)]"
+            style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}
+          >
+            ← ~/projects
+          </Link>
 
-      <div className={`max-w-6xl mx-auto px-6 ${project.cover_url ? 'pt-4' : 'pt-28'}`}>
-        <Link
-          href="/projects"
-          className="inline-flex items-center gap-1.5 text-sm mb-8 transition-colors hover:opacity-80"
-          style={{ color: 'var(--text-secondary)' }}
-        >
-          <ArrowLeft size={14} />
-          Back to Projects
-        </Link>
+          <h1
+            className="text-3xl md:text-5xl font-semibold leading-[1.15] tracking-[-0.03em]"
+            style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}
+          >
+            {project.title}
+          </h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-12 items-start">
-          {/* Main content */}
-          <article>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {project.tags?.map(tag => (
-                <NeonBadge key={tag} color="cyan">{tag}</NeonBadge>
-              ))}
-            </div>
+          {project.description && (
+            <p className="mt-5 max-w-[60ch] text-lg leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+              {project.description}
+            </p>
+          )}
 
-            <h1
-              className="text-4xl md:text-5xl font-bold mb-4"
-              style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-primary)' }}
-            >
-              {project.title}
-            </h1>
-
-            {project.description && (
-              <p
-                className="text-lg mb-4"
-                style={{
-                  color: 'var(--text-secondary)',
-                  lineHeight: '1.7',
-                }}
-              >
-                {project.description}
-              </p>
+          <dl className="mt-10 grid grid-cols-2 sm:grid-cols-4 gap-6 py-6 border-y" style={{ borderColor: 'var(--border)' }}>
+            <MetaItem label="Status">
+              <span className="inline-flex items-center gap-2 capitalize">
+                <span
+                  className="h-1.5 w-1.5 rounded-full"
+                  style={{ background: isLive ? 'var(--accent)' : 'var(--text-muted)' }}
+                />
+                {status}
+              </span>
+            </MetaItem>
+            {(project.url || project.github_url) && (
+              <MetaItem label="Links">
+                <span className="flex flex-col gap-1">
+                  {project.url && (
+                    <a href={project.url} target="_blank" rel="noopener noreferrer" className={linkCls}>
+                      Live ↗
+                    </a>
+                  )}
+                  {project.github_url && (
+                    <a href={project.github_url} target="_blank" rel="noopener noreferrer" className={linkCls}>
+                      GitHub ↗
+                    </a>
+                  )}
+                </span>
+              </MetaItem>
             )}
-            <div className="mb-8 pb-8" style={{ borderBottom: '1px solid var(--border)' }}>
-              {views != null && views > 0 && (
-                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-                  {views.toLocaleString()} views
-                </p>
-              )}
-            </div>
-
-            <div className="prose-theme">{children}</div>
-          </article>
-
-          {/* Sticky sidebar */}
-          <aside className="hidden lg:block sticky top-24 self-start max-h-[calc(100vh-8rem)] overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: 'var(--border) transparent' }}>
-            <div
-              className="rounded-2xl p-5 space-y-5"
-              style={{
-                background: 'var(--surface)',
-                border: '1px solid var(--border)',
-                boxShadow: 'var(--shadow-sm)',
-              }}
-            >
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--text-muted)' }}>
-                  Project Info
-                </p>
-                <div className="flex items-center gap-2">
-                  <Circle
-                    size={8}
-                    fill={isLive ? 'var(--cyan)' : 'var(--text-muted)'}
-                    style={{ color: isLive ? 'var(--cyan)' : 'var(--text-muted)' }}
-                  />
-                  <span className="text-sm" style={{ color: isLive ? 'var(--cyan)' : 'var(--text-muted)' }}>
-                    {project.status ? project.status.charAt(0).toUpperCase() + project.status.slice(1) : 'Live'}
-                  </span>
-                </div>
+            {views != null && views > 0 && (
+              <MetaItem label="Views">
+                <span className="tabular-nums">{views.toLocaleString()}</span>
+              </MetaItem>
+            )}
+            {project.tags && project.tags.length > 0 && (
+              <div className="col-span-2 sm:col-span-4">
+                <dt className="sr-only">Stack</dt>
+                <dd className="flex flex-wrap gap-1.5">
+                  {project.tags.map(tag => <NeonBadge key={tag}>{tag}</NeonBadge>)}
+                </dd>
               </div>
+            )}
+          </dl>
 
-              {project.tags && project.tags.length > 0 && (
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--text-muted)' }}>
-                    Stack
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {project.tags.map(tag => (
-                      <NeonBadge key={tag} color="white">{tag}</NeonBadge>
-                    ))}
-                  </div>
-                </div>
-              )}
+          {project.content && (
+            <ContentArt content={project.content} seed={project.slug} tags={project.tags} cols={176} rows={52} glyphClass="text-[3.2px] leading-[4px] md:text-[7px] md:leading-[8px]" className="mt-10" />
+          )}
 
-              {(project.url || project.github_url) && (
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--text-muted)' }}>
-                    Links
-                  </p>
-                  <div className="space-y-2">
-                    {project.url && (
-                      <a
-                        href={project.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="flex items-center gap-2 text-sm transition-opacity hover:opacity-70"
-                        style={{ color: 'var(--cyan)', cursor: 'none' }}
-                      >
-                        <ExternalLink size={14} />
-                        Live Demo
-                      </a>
-                    )}
-                    {project.github_url && (
-                      <a
-                        href={project.github_url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="flex items-center gap-2 text-sm transition-opacity hover:opacity-70"
-                        style={{ color: 'var(--text-secondary)', cursor: 'none' }}
-                      >
-                        <Github size={14} />
-                        GitHub
-                      </a>
-                    )}
-                  </div>
-                </div>
-              )}
+          <div className="prose-theme mt-10 max-w-[68ch]">{children}</div>
+        </article>
 
-              {/* TOC */}
-              {project.content && (
-                <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1.25rem' }}>
-                  <TableOfContents content={project.content} />
-                </div>
-              )}
+        {project.content && (
+          <aside className="hidden lg:block">
+            <div className="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto">
+              <TableOfContents content={project.content} />
             </div>
           </aside>
-        </div>
+        )}
       </div>
     </div>
   )
