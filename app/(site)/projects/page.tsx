@@ -1,11 +1,9 @@
 import { unstable_rethrow } from 'next/navigation'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
-import { getViewCounts } from '@/lib/view-counts'
 import PageHeader from '@/components/ui/PageHeader'
-import type { ProjectSummary } from '@/components/project/ProjectCard'
+import ProjectInline, { type InlineProject } from '@/components/project/ProjectInline'
 import AsciiBars from '@/components/art/AsciiBars'
-import Link from 'next/link'
 import ProjectMap from '@/components/project/ProjectMap'
 import AsciiArt from '@/components/art/AsciiArt'
 import { contentArt } from '@/lib/ascii/motifs'
@@ -18,35 +16,37 @@ export const metadata: Metadata = {
 }
 
 export default async function ProjectsPage() {
-  let rows: (ProjectSummary & { content?: string | null; featured?: boolean | null })[] = []
+  let rows: (InlineProject & { id: string; featured?: boolean | null; created_at?: string | null })[] = []
 
   try {
     const supabase = await createClient()
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('projects')
-      .select('id,slug,title,description,tags,featured,created_at,content')
+      .select('id,slug,title,description,tags,featured,created_at,content,url,github_url')
       .eq('published', true)
       .order('created_at', { ascending: false })
+    // Supabase reports query errors in `error` instead of throwing; don't let the page go silently empty.
+    if (error) console.error('[projects] query failed', error.message)
     rows = data ?? []
   } catch (err) {
     unstable_rethrow(err)
     console.error('[projects] failed to load projects', err)
   }
 
-  const viewCounts = await getViewCounts(rows.map(p => `/projects/${p.slug}`))
   const layout = layoutProjectMap(rows)
-  // Side-panel art, rendered on the server so the markdown never ships to the client.
-  const arts: Record<string, React.ReactNode> = {}
+  // Everything that needs the markdown is rendered here, on the server.
   const minis: Record<string, React.ReactNode> = {}
+  const bodies: Record<string, React.ReactNode> = {}
   for (const p of rows) {
     minis[p.slug] = (
-      <AsciiArt grid={contentArt({ content: p.content ?? '', seed: p.slug, tags: p.tags }, 34, 12)} className="text-[3.5px] leading-[4.5px] p-1.5 sm:text-[4.5px] sm:leading-[5.5px]" />
+      <AsciiArt
+        grid={contentArt({ content: p.content ?? '', seed: p.slug, tags: p.tags }, 34, 12)}
+        className="p-1.5 text-[3.5px] leading-[4.5px] sm:text-[4.5px] sm:leading-[5.5px]"
+      />
     )
-    arts[p.slug] = (
-      <AsciiArt grid={contentArt({ content: p.content ?? '', seed: p.slug, tags: p.tags }, 100, 34)} className="text-[5.5px] leading-[7px] p-3" />
-    )
+    bodies[p.slug] = <ProjectInline project={p} />
   }
-  const projects = rows.map(({ id, slug, title, description, tags, featured, created_at }) => ({ id, slug, title, description, tags, featured, created_at }))
+  const projects = rows.map(({ slug, title, description, tags }) => ({ slug, title, description, tags }))
   const initial = (rows.find(p => p.featured) ?? rows[0])?.slug ?? ''
 
   return (
@@ -57,25 +57,13 @@ export default async function ProjectsPage() {
         title="Projects"
         description="Blockchain, AI, Web3 and open-source work — mapped by what they share."
       />
-      {projects.length > 0 && (
-        <ProjectMap layout={layout} projects={projects} arts={arts} minis={minis} views={viewCounts} initial={initial} />
-      )}
-      {/* Plain index for small screens and assistive tech. */}
-      <ul className="lg:hidden border-t pt-6 space-y-3" style={{ borderColor: 'var(--border)' }}>
-        {projects.map(p => (
-          <li key={p.slug}>
-            <Link href={`/projects/${p.slug}`} className="text-sm" style={{ color: 'var(--text-primary)' }}>
-              {p.title}
-            </Link>
-          </li>
-        ))}
-      </ul>
+      {projects.length > 0 && <ProjectMap layout={layout} projects={projects} minis={minis} bodies={bodies} initial={initial} />}
     </div>
   )
 }
 
 /** Most-used tags across projects (case-insensitive), top 6. */
-function topTags(projects: ProjectSummary[]) {
+function topTags(projects: { tags?: string[] | null }[]) {
   const counts = new Map<string, number>()
   for (const p of projects) for (const t of p.tags ?? []) counts.set(t.toLowerCase(), (counts.get(t.toLowerCase()) ?? 0) + 1)
   return Array.from(counts, ([label, value]) => ({ label, value }))

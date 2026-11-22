@@ -124,8 +124,8 @@ export default function BlogExplorer({ posts, previews, views = {} }: Props) {
         </div>
 
         <div
-          className="grid overflow-hidden rounded-b-xl border md:grid-cols-[180px_1fr] lg:grid-cols-[190px_1fr_1.15fr]"
-          style={{ borderColor: 'var(--border)', minHeight: 420 }}
+          className="grid content-start overflow-hidden rounded-b-xl border md:min-h-[420px] md:grid-cols-[180px_1fr] lg:grid-cols-[190px_1fr_1.15fr]"
+          style={{ borderColor: 'var(--border)' }}
         >
           {/* directories */}
           <nav aria-label="Topics" className={`${pane} flex gap-1 overflow-x-auto p-2 md:block md:overflow-visible`} style={{ borderColor: 'var(--border)' }}>
@@ -137,11 +137,11 @@ export default function BlogExplorer({ posts, previews, views = {} }: Props) {
                   type="button"
                   onClick={() => setDir(d.name)}
                   aria-pressed={on}
-                  className="flex shrink-0 items-center justify-between gap-3 whitespace-nowrap rounded px-2 py-1 text-left text-xs transition-colors md:w-full"
+                  className="flex h-8 w-40 shrink-0 items-center justify-between gap-3 whitespace-nowrap rounded px-2 text-left text-xs transition-colors md:w-full"
                   style={{ ...mono, background: on ? 'var(--accent)' : 'transparent', color: on ? 'var(--bg)' : 'var(--text-secondary)' }}
                 >
-                  <span className="truncate">{d.name === ALL ? './' : `${d.name}/`}</span>
-                  <span style={{ opacity: 0.6 }}>{d.count}</span>
+                  <span className="min-w-0 truncate" title={d.name}>{d.name === ALL ? './' : `${d.name}/`}</span>
+                  <span className="shrink-0 tabular-nums" style={{ opacity: 0.6 }}>{d.count}</span>
                 </button>
               )
             })}

@@ -1,7 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import Link from 'next/link'
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { AsciiGrid } from '@/lib/ascii/grid'
 import { GlyphCanvas } from '@/lib/ascii/canvas'
 import { MAT } from '@/lib/ascii/palette'
@@ -18,15 +17,20 @@ export interface MapEntry {
 interface Props {
   layout: ProjectMapLayout
   projects: MapEntry[]
-  /** Server-rendered art per slug, shown in the side panel. */
-  arts: Record<string, React.ReactNode>
   /** Small server-rendered art per slug, drawn as the node itself. */
   minis: Record<string, React.ReactNode>
-  views?: Record<string, number>
+  /** Server-rendered full write-up per slug, opened under the map on click. */
+  bodies: Record<string, React.ReactNode>
   initial: string
 }
 
 const mono = { fontFamily: 'var(--font-mono)' } as const
+
+const subscribeHash = (cb: () => void) => {
+  window.addEventListener('hashchange', cb)
+  return () => window.removeEventListener('hashchange', cb)
+}
+const readHash = () => decodeURIComponent(window.location.hash.slice(1))
 
 /** Draw edges (shared stack), cluster spokes and grain into the map's <pre>. */
 function drawEdges(
@@ -71,11 +75,16 @@ function drawEdges(
   grid.compose()
 }
 
-export default function ProjectMap({ layout, projects, arts, minis, views = {}, initial }: Props) {
+export default function ProjectMap({ layout, projects, minis, bodies, initial }: Props) {
   const boxRef = useRef<HTMLDivElement>(null)
   const preRef = useRef<HTMLPreElement>(null)
-  const [active, setActive] = useState(initial)
+  const articleRef = useRef<HTMLDivElement>(null)
+  const [hover, setHover] = useState<string | null>(null)
   const [cluster, setCluster] = useState<ClusterKey | null>(null)
+  // The open project lives in the URL hash (/projects#slug): shareable, and Back returns to the previous one.
+  const hash = useSyncExternalStore(subscribeHash, readHash, () => '')
+  const open = hash && bodies[hash] ? hash : initial
+  const active = hover ?? open
 
   useEffect(() => {
     const box = boxRef.current
@@ -89,15 +98,20 @@ export default function ProjectMap({ layout, projects, arts, minis, views = {}, 
     return () => ro.disconnect()
   }, [layout, active, cluster])
 
-  const current = projects.find(p => p.slug === active) ?? projects[0]
-  const v = current ? views[`/projects/${current.slug}`] : undefined
+  const choose = (slug: string) => {
+    // pushState keeps Back working; it doesn't emit hashchange, so announce it for the store above.
+    history.pushState(null, '', `#${encodeURIComponent(slug)}`)
+    window.dispatchEvent(new HashChangeEvent('hashchange'))
+    requestAnimationFrame(() => articleRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
+  }
 
   return (
-    <div className="grid gap-6 py-10 lg:grid-cols-[1fr_380px]">
+    <>
       <div
         ref={boxRef}
-        className="ascii-dark relative h-[62vh] min-h-[460px] overflow-hidden rounded-xl border lg:h-[70vh] lg:min-h-[560px]"
+        className="ascii-dark relative mt-10 h-[62vh] min-h-[460px] overflow-hidden rounded-xl border lg:h-[72vh] lg:min-h-[560px]"
         style={{ borderColor: '#232323', background: '#0a0a0a' }}
+        onMouseLeave={() => setHover(null)}
       >
         <pre
           ref={preRef}
@@ -132,74 +146,54 @@ export default function ProjectMap({ layout, projects, arts, minis, views = {}, 
         {layout.nodes.map(n => {
           const p = projects.find(x => x.slug === n.slug)
           if (!p) return null
+          const isOpen = n.slug === open
           const isActive = n.slug === active
           const dim = cluster !== null && n.cluster !== cluster
           return (
-            <Link
+            <button
               key={n.slug}
-              href={`/projects/${n.slug}`}
-              onMouseEnter={() => setActive(n.slug)}
-              onFocus={() => setActive(n.slug)}
+              type="button"
+              onClick={() => choose(n.slug)}
+              onMouseEnter={() => setHover(n.slug)}
+              onFocus={() => setHover(n.slug)}
+              onBlur={() => setHover(null)}
               aria-label={p.title}
+              aria-pressed={isOpen}
               className="absolute -translate-x-1/2 -translate-y-1/2 whitespace-nowrap text-center text-[11px] leading-tight transition-[color,opacity] duration-150"
               style={{
                 ...mono,
                 left: `${n.x}%`,
                 top: `${n.y}%`,
-                color: isActive ? '#ff7a2e' : '#ededeb',
+                color: isActive || isOpen ? '#ff7a2e' : '#ededeb',
                 opacity: dim ? 0.3 : 1,
               }}
             >
               <span
                 className="block overflow-hidden rounded-md border transition-[border-color,transform] duration-150"
-                style={{ borderColor: isActive ? '#ff7a2e' : '#2a2a27', background: '#0a0a0a', transform: isActive ? 'scale(1.06)' : undefined }}
+                style={{
+                  borderColor: isOpen ? '#ff7a2e' : isActive ? '#a3a39c' : '#2a2a27',
+                  background: '#0a0a0a',
+                  transform: isActive ? 'scale(1.06)' : undefined,
+                }}
               >
                 {minis[n.slug] ?? <span className="block px-2 text-sm">{MOTIF_GLYPH[n.motif]}</span>}
               </span>
-              <span className="mt-1 hidden sm:block">{n.slug}</span>
-            </Link>
+              <span className="mt-1 block max-w-[30vw] truncate sm:max-w-none">
+                {isOpen ? '> ' : ''}
+                {n.slug}
+              </span>
+            </button>
           )
         })}
 
-        <p className="absolute bottom-3 left-4 text-[11px]" style={{ ...mono, color: '#6b6b65' }}>
-          {projects.length} projects · {layout.clusters.length} clusters · lines = shared stack · click a cluster to isolate it
+        <p className="absolute bottom-3 left-4 right-4 text-[11px]" style={{ ...mono, color: '#6b6b65' }}>
+          {projects.length} projects · {layout.clusters.length} clusters · lines = shared stack · click a project to open it below
         </p>
       </div>
 
-      {current && (
-        <aside className="flex flex-col gap-4">
-          <div
-            className="ascii-dark overflow-hidden rounded-xl border"
-            style={{ borderColor: '#232323', background: '#0a0a0a' }}
-          >
-            {arts[current.slug]}
-          </div>
-          <p className="text-xs" style={{ ...mono, color: 'var(--text-muted)' }}>
-            ~/projects/{current.slug}
-            {v ? ` · ${v} views` : ''}
-          </p>
-          <h2 className="text-2xl font-medium leading-tight tracking-[-0.02em]" style={{ color: 'var(--text-primary)' }}>
-            {current.title}
-          </h2>
-          {current.description && (
-            <p className="text-[15px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-              {current.description}
-            </p>
-          )}
-          {current.tags && current.tags.length > 0 && (
-            <p className="text-xs" style={{ ...mono, color: 'var(--text-muted)' }}>
-              {current.tags.map(t => `#${t}`).join('  ')}
-            </p>
-          )}
-          <Link
-            href={`/projects/${current.slug}`}
-            className="group mt-2 text-sm"
-            style={{ color: 'var(--text-primary)' }}
-          >
-            Open project <span className="inline-block transition-transform duration-150 group-hover:translate-x-0.5">→</span>
-          </Link>
-        </aside>
-      )}
-    </div>
+      <div ref={articleRef} className="scroll-mt-20 pt-16">
+        {bodies[open]}
+      </div>
+    </>
   )
 }
