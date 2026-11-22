@@ -11,7 +11,7 @@ import type { PostSummary } from '@/components/blog/PostRow'
 
 export const metadata: Metadata = {
   title: 'Blog — Joey Chen',
-  description: 'Notes on building with AI agents, Claude Code workflows, and on-chain work.',
+  description: 'Joey Chen 的實作筆記：用 Claude Code 與 AI agent 開發的工作流、踩坑與工具，以及鏈上專案的紀錄。',
   alternates: { canonical: '/blog' },
 }
 
@@ -44,7 +44,7 @@ export default async function BlogPage() {
 
   return (
     <div className="px-6 pb-24 max-w-6xl mx-auto">
-      <PageHeader eyebrow="~/blog" title="Writing" description="Notes on building with AI agents, Claude Code workflows, and on-chain work." />
+      <PageHeader eyebrow="~/blog" title="Writing" description="Joey Chen 的實作筆記：用 Claude Code 與 AI agent 開發的工作流、踩坑與工具，以及鏈上專案的紀錄。" />
       <BlogExplorer posts={posts} previews={previews} views={viewCounts} />
     </div>
   )

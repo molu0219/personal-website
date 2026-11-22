@@ -14,13 +14,13 @@ const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://0xjoeytw.xyz'),
-  title: 'Joey Chen — Developer & Builder',
+  title: 'Joey Chen — Product Manager & AI Builder',
   description: 'Joey Chen 的個人網站：AI agent 開發工作流、Claude Code 實戰筆記，以及交易與區塊鏈工具作品。',
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: 'Joey Chen — Developer & Builder',
+    title: 'Joey Chen — Product Manager & AI Builder',
     description: 'Joey Chen 的個人網站：AI agent 開發工作流、Claude Code 實戰筆記，以及交易與區塊鏈工具作品。',
     url: 'https://0xjoeytw.xyz',
     siteName: 'Joey Chen',
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary',
-    title: 'Joey Chen — Developer & Builder',
+    title: 'Joey Chen — Product Manager & AI Builder',
     description: 'Joey Chen 的個人網站：AI agent 開發工作流、Claude Code 實戰筆記，以及交易與區塊鏈工具作品。',
     creator: '@0xjoeytw',
   },

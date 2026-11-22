@@ -30,7 +30,7 @@ export async function GET() {
   }
 
   const body = [
-    '# Joey Chen',
+    '# Joey Chen — Product Manager & AI Builder',
     '',
     '> Joey Chen（0xjoeytw）的個人網站：AI agent 開發工作流、Claude Code 實戰筆記，以及交易與區塊鏈工具的作品。Articles are written in Traditional Chinese.',
     '',
