@@ -2,13 +2,14 @@ import { unstable_rethrow } from 'next/navigation'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { getViewCounts } from '@/lib/view-counts'
-import ProjectGrid from '@/components/sections/ProjectGrid'
-import { splitProjectArt } from '@/components/project/ProjectCardArt'
 import PageHeader from '@/components/ui/PageHeader'
 import type { ProjectSummary } from '@/components/project/ProjectCard'
 import AsciiBars from '@/components/art/AsciiBars'
-import ContentArt from '@/components/art/ContentArt'
-import FeaturedEntry from '@/components/ui/FeaturedEntry'
+import Link from 'next/link'
+import ProjectMap from '@/components/project/ProjectMap'
+import AsciiArt from '@/components/art/AsciiArt'
+import { contentArt } from '@/lib/ascii/motifs'
+import { layoutProjectMap } from '@/lib/ascii/project-map'
 
 export const metadata: Metadata = {
   title: 'Projects — Joey Chen',
@@ -17,9 +18,7 @@ export const metadata: Metadata = {
 }
 
 export default async function ProjectsPage() {
-  let projects: ProjectSummary[] = []
-  let arts: Record<string, React.ReactNode> = {}
-  let featured: (ProjectSummary & { content?: string | null }) | null = null
+  let rows: (ProjectSummary & { content?: string | null; featured?: boolean | null })[] = []
 
   try {
     const supabase = await createClient()
@@ -28,42 +27,49 @@ export default async function ProjectsPage() {
       .select('id,slug,title,description,tags,featured,created_at,content')
       .eq('published', true)
       .order('created_at', { ascending: false })
-    const rows = data ?? []
-    // Pinned on top: the first project marked featured, otherwise the newest.
-    featured = rows.find(p => p.featured) ?? rows[0] ?? null
-    ;({ projects, arts } = splitProjectArt(rows.filter(p => p !== featured)))
+    rows = data ?? []
   } catch (err) {
     unstable_rethrow(err)
     console.error('[projects] failed to load projects', err)
   }
 
-  const viewCounts = await getViewCounts(projects.map(p => `/projects/${p.slug}`))
-  const allForChart = featured ? [featured, ...projects] : projects
+  const viewCounts = await getViewCounts(rows.map(p => `/projects/${p.slug}`))
+  const layout = layoutProjectMap(rows)
+  // Side-panel art, rendered on the server so the markdown never ships to the client.
+  const arts: Record<string, React.ReactNode> = {}
+  const minis: Record<string, React.ReactNode> = {}
+  for (const p of rows) {
+    minis[p.slug] = (
+      <AsciiArt grid={contentArt({ content: p.content ?? '', seed: p.slug, tags: p.tags }, 34, 12)} className="text-[3.5px] leading-[4.5px] p-1.5 sm:text-[4.5px] sm:leading-[5.5px]" />
+    )
+    arts[p.slug] = (
+      <AsciiArt grid={contentArt({ content: p.content ?? '', seed: p.slug, tags: p.tags }, 100, 34)} className="text-[5.5px] leading-[7px] p-3" />
+    )
+  }
+  const projects = rows.map(({ content: _c, ...p }) => p)
+  const initial = (rows.find(p => p.featured) ?? rows[0])?.slug ?? ''
 
   return (
     <div className="px-6 pb-24 max-w-6xl mx-auto">
-      <PageHeader aside={<AsciiBars command="$ cat */stack | sort | uniq -c | head" rows={topTags(allForChart)} />} eyebrow="~/projects" title="Projects" description="Blockchain, AI, Web3 and open-source work." />
-      {featured && (
-        <FeaturedEntry
-          href={`/projects/${featured.slug}`}
-          label="featured"
-          meta={(featured.tags ?? []).slice(0, 3).join(' · ')}
-          title={featured.title}
-          excerpt={featured.description}
-          cta="Open project"
-          art={
-            <ContentArt
-              content={featured.content ?? ''}
-              seed={featured.slug}
-              tags={featured.tags}
-              cols={124}
-              rows={44}
-              glyphClass="text-[4px] leading-[5px] md:text-[7px] md:leading-[8px]"
-            />
-          }
-        />
+      <PageHeader
+        aside={<AsciiBars command="$ cat */stack | sort | uniq -c | head" rows={topTags(projects)} />}
+        eyebrow="~/projects"
+        title="Projects"
+        description="Blockchain, AI, Web3 and open-source work — mapped by what they share."
+      />
+      {projects.length > 0 && (
+        <ProjectMap layout={layout} projects={projects} arts={arts} minis={minis} views={viewCounts} initial={initial} />
       )}
-      <ProjectGrid projects={projects} viewCounts={viewCounts} arts={arts} />
+      {/* Plain index for small screens and assistive tech. */}
+      <ul className="lg:hidden border-t pt-6 space-y-3" style={{ borderColor: 'var(--border)' }}>
+        {projects.map(p => (
+          <li key={p.slug}>
+            <Link href={`/projects/${p.slug}`} className="text-sm" style={{ color: 'var(--text-primary)' }}>
+              {p.title}
+            </Link>
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }
