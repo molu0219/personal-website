@@ -1,5 +1,5 @@
 import AsciiArt from '@/components/art/AsciiArt'
-import { landscape } from '@/lib/ascii/landscape'
+import { contentArt } from '@/lib/ascii/motifs'
 
 /** Small version of a post's generated landscape, for list rows. */
 export function PostThumb({ content, seed, tags }: { content: string; seed: string; tags?: string[] | null }) {
@@ -8,7 +8,7 @@ export function PostThumb({ content, seed, tags }: { content: string; seed: stri
       className="ascii-dark overflow-hidden rounded-md border"
       style={{ borderColor: '#232323', background: '#0a0a0a' }}
     >
-      <AsciiArt grid={landscape({ content, seed, tags }, 64, 20)} className="text-[3px] leading-[3.6px]" />
+      <AsciiArt grid={contentArt({ content, seed, tags }, 64, 20)} className="text-[3px] leading-[3.6px]" />
     </div>
   )
 }

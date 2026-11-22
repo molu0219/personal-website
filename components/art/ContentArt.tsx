@@ -1,5 +1,5 @@
 import AsciiArt from '@/components/art/AsciiArt'
-import { landscape, landscapeLegend } from '@/lib/ascii/landscape'
+import { contentArt, artLegend } from '@/lib/ascii/motifs'
 
 interface Props {
   content: string
@@ -30,14 +30,14 @@ export default function ContentArt({
       style={{ borderColor: '#232323', background: '#0a0a0a' }}
     >
       <div className="flex justify-center overflow-hidden">
-        <AsciiArt grid={landscape({ content, seed, tags }, cols, rows)} className={glyphClass} />
+        <AsciiArt grid={contentArt({ content, seed, tags }, cols, rows)} className={glyphClass} />
       </div>
       {legend && (
         <figcaption
           className="border-t px-4 py-2 text-[11px]"
           style={{ borderColor: '#232323', fontFamily: 'var(--font-mono)', color: '#6b6b65' }}
         >
-          {landscapeLegend(content, tags)}
+          {artLegend({ content, seed, tags })}
         </figcaption>
       )}
     </figure>

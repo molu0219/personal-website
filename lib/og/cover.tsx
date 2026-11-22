@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og'
 import type { FpCell } from '@/lib/ascii/blocks'
-import { landscape, landscapeLegend } from '@/lib/ascii/landscape'
+import { contentArt, artLegend } from '@/lib/ascii/motifs'
 import { loadGoogleFont, type OgFont } from '@/lib/og/fonts'
 
 export const COVER_SIZE = { width: 1200, height: 630 }
@@ -103,9 +103,9 @@ function mapLines(rows: FpCell[][]) {
 }
 
 export async function renderCover(input: CoverInput): Promise<ImageResponse> {
-  const rows = landscape({ content: input.content, seed: input.seed, tags: input.tags }, MAP_COLS, MAP_ROWS)
+  const rows = contentArt({ content: input.content, seed: input.seed, tags: input.tags }, MAP_COLS, MAP_ROWS)
   const mapText = Array.from(new Set(rows.flatMap(r => r.map(c => c.ch)))).join('')
-  const stats = landscapeLegend(input.content, input.tags)
+  const stats = artLegend({ content: input.content, seed: input.seed, tags: input.tags })
   const fonts = await loadFonts(input, mapText)
   const mono = 'Geist Mono, Noto Sans TC'
 
