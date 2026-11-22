@@ -321,6 +321,7 @@ export default function ProjectMap({ layout, projects, minis, bodies, initial }:
 
           <p className="absolute bottom-3 left-4 text-[11px]" style={{ ...mono, color: '#6b6b65' }}>
             {projects.length} projects · {layout.clusters.length} clusters · lines = shared stack · click a project to open it below
+            <span className="md:hidden" style={{ color: '#ff7a2e' }}> · swipe →</span>
           </p>
         </div>
       </div>
