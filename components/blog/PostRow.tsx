@@ -10,6 +10,8 @@ export interface PostSummary {
   published_at?: string | null
   /** Estimated reading minutes (server-computed from the markdown). */
   minutes?: number | null
+  /** Top-level section titles (h1/h2), for previews. */
+  outline?: string[] | null
 }
 
 export function formatPostDate(iso?: string | null): string {

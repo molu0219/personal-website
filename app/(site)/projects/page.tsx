@@ -46,7 +46,7 @@ export default async function ProjectsPage() {
       <AsciiArt grid={contentArt({ content: p.content ?? '', seed: p.slug, tags: p.tags }, 100, 34)} className="text-[5.5px] leading-[7px] p-3" />
     )
   }
-  const projects = rows.map(({ content: _c, ...p }) => p)
+  const projects = rows.map(({ id, slug, title, description, tags, featured, created_at }) => ({ id, slug, title, description, tags, featured, created_at }))
   const initial = (rows.find(p => p.featured) ?? rows[0])?.slug ?? ''
 
   return (
