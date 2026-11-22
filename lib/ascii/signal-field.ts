@@ -41,6 +41,7 @@ const FOOT_REVEAL_PX = 26 // a planted foot this close decodes it
 const CLEAR_PX = 40 // noise cleared around the spider body so it stays readable
 const FOOT_GLOW_PX = 16 // glyphs this close to a planted foot light up
 const GLOW_DECAY = 2.2 // per second: footprints fade after the foot lifts
+const HUD_PX = 84 // bottom band holding the HTML status line: no signals there
 const NAV_PX = 56 // fixed navbar height: keep it clear of noise
 const BOOT_END = 2.2
 const AUTOPILOT_IDLE = 2.5 // s after the pointer leaves before the crawler wanders on its own
@@ -126,7 +127,7 @@ export class SignalField {
     const nb = this.nameBox
     const blocked = (b: Rect) =>
       b.r0 < Math.ceil(64 / this.grid.ch) ||
-      b.r1 > rows - 3 ||
+      b.r1 > rows - Math.ceil(HUD_PX / this.grid.ch) ||
       b.c0 < 1 ||
       b.c1 > cols - 2 ||
       overlap(b, { c0: nb.c0 - 2, r0: nb.r0 - 1, c1: nb.c1 + 2, r1: nb.r1 + 1 }) ||
@@ -355,6 +356,11 @@ export class SignalField {
 
     // ── the crawler (the cursor) ─────────────────────────────
     this.spider?.draw(g)
+    // Keep the nav, the HTML copy and the status line clean: nothing is drawn under them.
+    const hudRow = rows - Math.ceil(HUD_PX / ch)
+    for (let r = 0; r < rows; r++)
+      for (let c = 0; c < cols; c++)
+        if (inRect(c, r, this.calm) || r >= hudRow + 2 || r < navRows) g.chars[r * cols + c] = ' '
 
     if (booting) this.renderBoot()
     g.compose()
