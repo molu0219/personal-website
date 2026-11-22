@@ -1,25 +1,27 @@
 import type { Metadata } from 'next'
-import Script from 'next/script'
 import './globals.css'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
-import NeonCursor from '@/components/art/NeonCursor'
+import { Geist, Geist_Mono } from 'next/font/google'
 import ThemeProvider from '@/components/ThemeProvider'
 import PageViewTracker from '@/components/PageViewTracker'
 // CrtAdLoader disabled until AdSense approval — placeholder ad slot triggers policy violation
 // import CrtAdLoader from '@/components/ad/CrtAdLoader'
 import ImageLightbox from '@/components/ui/ImageLightbox'
 
+const geistSans = Geist({ subsets: ['latin'], variable: '--font-geist-sans', display: 'swap' })
+const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono', display: 'swap' })
+
 export const metadata: Metadata = {
   metadataBase: new URL('https://0xjoeytw.xyz'),
-  title: 'Joey Chen — Developer & Builder',
-  description: 'Personal website of Joey Chen — blockchain developer, builder, and creator.',
+  title: 'Joey Chen — Product Manager & AI Builder',
+  description: 'Joey Chen 的個人網站：AI agent 開發工作流、Claude Code 實戰筆記，以及交易與區塊鏈工具作品。',
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: 'Joey Chen — Developer & Builder',
-    description: 'Personal website of Joey Chen — blockchain developer, builder, and creator.',
+    title: 'Joey Chen — Product Manager & AI Builder',
+    description: 'Joey Chen 的個人網站：AI agent 開發工作流、Claude Code 實戰筆記，以及交易與區塊鏈工具作品。',
     url: 'https://0xjoeytw.xyz',
     siteName: 'Joey Chen',
     type: 'website',
@@ -27,8 +29,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary',
-    title: 'Joey Chen — Developer & Builder',
-    description: 'Personal website of Joey Chen — blockchain developer, builder, and creator.',
+    title: 'Joey Chen — Product Manager & AI Builder',
+    description: 'Joey Chen 的個人網站：AI agent 開發工作流、Claude Code 實戰筆記，以及交易與區塊鏈工具作品。',
     creator: '@0xjoeytw',
   },
   other: {
@@ -43,7 +45,7 @@ const jsonLdWebSite = {
   name: 'Joey Chen',
   alternateName: '0xjoeytw',
   url: 'https://0xjoeytw.xyz',
-  description: 'Personal website of Joey Chen — blockchain developer, builder, and creator.',
+  description: 'Joey Chen 的個人網站：AI agent 開發工作流、Claude Code 實戰筆記，以及交易與區塊鏈工具作品。',
   inLanguage: ['zh-TW', 'en'],
   author: { '@id': 'https://0xjoeytw.xyz/#person' },
 }
@@ -65,7 +67,7 @@ const jsonLdPerson = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="zh-TW" suppressHydrationWarning>
+    <html lang="zh-TW" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
       <head>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdWebSite) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdPerson) }} />
@@ -78,7 +80,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <ThemeProvider>
           <PageViewTracker />
-          <NeonCursor />
           <Navbar />
           <main>{children}</main>
           <Footer />

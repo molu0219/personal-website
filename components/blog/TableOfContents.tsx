@@ -79,10 +79,7 @@ export default function TableOfContents({ content }: { content: string }) {
 
   return (
     <nav>
-      <p
-        className="text-xs font-semibold uppercase tracking-wider mb-4"
-        style={{ color: 'var(--text-muted)' }}
-      >
+      <p className="text-xs mb-4" style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
         On this page
       </p>
       <ul className="space-y-1">
@@ -95,13 +92,11 @@ export default function TableOfContents({ content }: { content: string }) {
                 const el = document.getElementById(h.id)
                 if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
               }}
-              className="text-sm block py-1 transition-all"
+              className="text-[13px] leading-snug block py-1.5 transition-colors hover:text-[var(--text-primary)]"
               style={{
-                color: activeId === h.id ? 'var(--cyan)' : 'var(--text-secondary)',
-                borderLeft: `2px solid ${activeId === h.id ? 'var(--cyan)' : 'transparent'}`,
-                paddingLeft: '8px',
-                fontWeight: activeId === h.id ? 500 : 400,
-                cursor: 'pointer',
+                color: activeId === h.id ? 'var(--text-primary)' : 'var(--text-muted)',
+                borderLeft: `1px solid ${activeId === h.id ? 'var(--accent)' : 'var(--border)'}`,
+                paddingLeft: '12px',
               }}
             >
               {h.text}

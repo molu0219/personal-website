@@ -1,12 +1,7 @@
 type Color = 'cyan' | 'purple' | 'pink' | 'white'
 
-const colorVar: Record<Color, string> = {
-  cyan: 'var(--cyan)',
-  purple: 'var(--purple)',
-  pink: 'var(--pink)',
-  white: 'var(--text-secondary)',
-}
-
+// Badges are deliberately neutral (mono, hairline border). `color` is kept for
+// call-site compatibility; only 'pink' renders with the accent.
 export default function NeonBadge({
   children,
   color = 'cyan',
@@ -16,15 +11,15 @@ export default function NeonBadge({
   color?: Color
   className?: string
 }) {
-  const c = colorVar[color]
-
+  const isAccent = color === 'pink'
   return (
     <span
-      className={`inline-block px-3 py-1 rounded-full text-xs font-medium border ${className}`}
+      className={`inline-block px-2 py-0.5 rounded text-[11px] leading-5 border ${className}`}
       style={{
-        background: `color-mix(in srgb, ${c} 12%, transparent)`,
-        borderColor: `color-mix(in srgb, ${c} 35%, transparent)`,
-        color: c,
+        fontFamily: 'var(--font-mono)',
+        borderColor: isAccent ? 'color-mix(in srgb, var(--accent) 40%, transparent)' : 'var(--border)',
+        color: isAccent ? 'var(--accent)' : 'var(--text-secondary)',
+        background: 'var(--surface)',
       }}
     >
       {children}

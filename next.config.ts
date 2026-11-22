@@ -1,9 +1,16 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
+  // Don't advertise the framework in every response (x-powered-by).
+  poweredByHeader: false,
   images: {
     unoptimized: true,
   },
+  // /skills and /cheatsheet were removed in F008; keep old links (search results, posts) working.
+  redirects: async () => [
+    { source: '/skills/:path*', destination: '/', permanent: true },
+    { source: '/cheatsheet/:path*', destination: '/blog/claude-code-cheatsheet-guide', permanent: true },
+  ],
   headers: async () => [
     {
       source: '/(.*)',

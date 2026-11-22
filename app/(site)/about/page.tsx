@@ -1,3 +1,4 @@
+import { unstable_rethrow } from 'next/navigation'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 
@@ -12,216 +13,169 @@ export const metadata: Metadata = {
     type: 'profile',
     siteName: 'Joey Chen',
     locale: 'zh_TW',
+    // This page defines its own openGraph, which replaces the inherited site card: re-add it.
+    images: [{ url: 'https://0xjoeytw.xyz/opengraph-image', width: 1200, height: 630 }],
   },
   twitter: {
-    card: 'summary',
+    card: 'summary_large_image',
+    images: ['https://0xjoeytw.xyz/opengraph-image'],
     title: 'About — Joey Chen',
     description: 'About Joey Chen — Product Manager & AI Builder. Focused on Claude Code workflows, AI-assisted development, and Web3.',
     creator: '@0xjoeytw',
   },
 }
-import GlassCard from '@/components/ui/GlassCard'
-import NeonBadge from '@/components/ui/NeonBadge'
-import NeonButton from '@/components/ui/NeonButton'
-import { Github, Globe, Youtube, Instagram, Send } from 'lucide-react'
+import GlyphPortrait from '@/components/art/GlyphPortrait'
+import TerminalBlock from '@/components/ui/TerminalBlock'
 
-function XIcon({ size = 16 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-    </svg>
-  )
-}
-
-const SOCIAL_ICONS: Record<string, React.ElementType> = {
-  github: Github,
-  twitter: XIcon,
-  x: XIcon,
-  youtube: Youtube,
-  instagram: Instagram,
-  telegram: Send,
+interface AboutData {
+  name?: string | null
+  title?: string | null
+  bio?: string | null
+  skills?: string[] | null
+  social_links?: Record<string, string> | null
+  avatar_url?: string | null
 }
 
 export default async function AboutPage() {
-  let about: any = null
+  let about: AboutData | null = null
 
   try {
     const supabase = await createClient()
     const { data } = await supabase.from('about').select('*').single()
     about = data
-  } catch {}
+  } catch (err) {
+    unstable_rethrow(err)
+    console.error('[about] failed to load about', err)
+  }
 
   const name = about?.name ?? 'Joey Chen'
   const title = about?.title ?? 'Product Manager & AI Builder'
   const bio = about?.bio ?? '我是 Joey Chen，一個對去中心化技術和 AI 開發充滿熱情的 PM。目前專注於用 Claude Code 打造高效的 AI 輔助開發工作流，並將實踐經驗寫成系列文章分享。\n\n這個網站是我的數位花園，記錄技術探索、專案作品、以及從實戰中學到的東西。所有內容都是真實開發經驗的結晶，不是理論空談。'
   const skills: string[] = about?.skills ?? ['Solidity', 'TypeScript', 'React', 'Next.js', 'Rust', 'Python', 'SQL', 'Web3.js', 'Supabase', 'Cloudflare']
-  const social = about?.social_links ?? {}
-
+  const social: Record<string, string> = about?.social_links ?? {}
   const skillCategories = groupSkills(skills)
 
   return (
-    <div className="relative z-10 min-h-screen pb-24">
-      {/* ── Hero Banner ── */}
-      <div
-        className="relative overflow-hidden"
-        style={{
-          background: 'linear-gradient(180deg, color-mix(in srgb, var(--cyan) 6%, var(--bg)) 0%, var(--bg) 100%)',
-          borderBottom: '1px solid var(--border)',
-        }}
-      >
-        {/* grid decoration */}
-        <div
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage: 'linear-gradient(var(--cyan) 1px, transparent 1px), linear-gradient(90deg, var(--cyan) 1px, transparent 1px)',
-            backgroundSize: '48px 48px',
-          }}
-        />
-
-        <div className="relative max-w-5xl mx-auto px-6 pt-36 pb-20 flex flex-col sm:flex-row items-center sm:items-end gap-10">
-          {/* Avatar */}
-          <div className="relative shrink-0">
-            <div
-              className="w-36 h-36 rounded-2xl overflow-hidden"
-              style={{
-                border: '1px solid color-mix(in srgb, var(--cyan) 40%, transparent)',
-                boxShadow: '0 0 0 1px color-mix(in srgb, var(--cyan) 15%, transparent), 0 0 40px color-mix(in srgb, var(--cyan) 18%, transparent), 0 0 80px color-mix(in srgb, var(--purple) 12%, transparent)',
-              }}
-            >
-              {about?.avatar_url ? (
-                <img src={about.avatar_url} alt={name} className="w-full h-full object-cover" />
-              ) : (
-                <div
-                  className="w-full h-full flex items-center justify-center text-4xl font-bold"
-                  style={{
-                    background: 'linear-gradient(135deg, color-mix(in srgb, var(--cyan) 18%, var(--surface)), color-mix(in srgb, var(--purple) 18%, var(--surface)))',
-                    fontFamily: 'Space Grotesk, sans-serif',
-                    color: 'var(--cyan)',
-                  }}
-                >
-                  {name.charAt(0)}
-                </div>
-              )}
-            </div>
-            {/* glow ring */}
-            <div
-              className="absolute -inset-2 rounded-2xl -z-10"
-              style={{
-                background: 'linear-gradient(135deg, var(--cyan), var(--purple))',
-                opacity: 0.2,
-                filter: 'blur(10px)',
-              }}
-            />
-          </div>
-
-          {/* Identity */}
-          <div className="flex-1 text-center sm:text-left">
-            <p
-              className="text-xs uppercase tracking-widest mb-2 font-medium"
-              style={{ color: 'var(--cyan)', fontFamily: 'Space Grotesk, sans-serif', letterSpacing: '0.2em' }}
-            >
-              {title}
-            </p>
-            <h1
-              className="text-4xl sm:text-5xl font-bold leading-none mb-5"
-              style={{
-                fontFamily: 'Space Grotesk, sans-serif',
-                color: 'var(--text-primary)',
-              }}
-            >
-              {name}
-            </h1>
-
-            {Object.keys(social).length > 0 && (
-              <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
-                {Object.entries(social).map(([key, url]) => {
-                  const Icon = SOCIAL_ICONS[key.toLowerCase()] ?? Globe
-                  return (
-                    <NeonButton key={key} href={url as string} variant="ghost" aria-label={key}>
-                      <Icon size={16} />
-                    </NeonButton>
-                  )
-                })}
-              </div>
-            )}
-          </div>
+    <div className="max-w-6xl mx-auto px-6 pb-24">
+      <header className="grid gap-10 pt-24 pb-12 md:grid-cols-[1fr_auto] md:items-end md:pt-28">
+        <div>
+          <p className="text-xs mb-4" style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
+            ~/about
+          </p>
+          <h1
+            className="text-4xl md:text-6xl font-medium tracking-[-0.03em] leading-[1.05]"
+            style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}
+          >
+            {name}
+            <span style={{ color: 'var(--accent)' }}>.</span>
+          </h1>
+          <p className="mt-4 text-sm" style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)' }}>
+            {title}
+          </p>
         </div>
-      </div>
+        {about?.avatar_url && (
+          <figure className="m-0">
+            <GlyphPortrait
+              src="/avatar.png"
+              alt={`${name}, drawn in ASCII`}
+              cols={120}
+              className="text-[4px] leading-[4px] md:text-[6px] md:leading-[6px]"
+            />
+            <figcaption className="mt-3 text-xs" style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
+              avatar.png → glyphs · move to disturb · click to scatter
+            </figcaption>
+          </figure>
+        )}
+      </header>
 
-      {/* ── Body ── */}
-      <div className="max-w-5xl mx-auto px-6 mt-14 space-y-8">
-        {/* Bio */}
-        <GlassCard className="p-8 sm:p-10">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-1 h-6 rounded-full" style={{ background: 'linear-gradient(180deg, var(--cyan), var(--purple))' }} />
-            <h2
-              className="text-sm uppercase tracking-widest font-semibold"
-              style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-muted)', letterSpacing: '0.15em' }}
-            >
-              About
-            </h2>
-          </div>
-          <div className="space-y-4 max-w-3xl">
-            {bio.split('\n\n').map((paragraph: string, i: number) => (
-              <p
-                key={i}
-                className="text-base sm:text-lg leading-loose"
-                style={{
-                  color: 'var(--text-secondary)',
-                  fontFamily: 'Inter, sans-serif',
-                  lineHeight: '1.95',
-                }}
-              >
-                {paragraph}
-              </p>
-            ))}
-          </div>
-        </GlassCard>
+      <TerminalBlock command="cat about.md">
+        <div className="max-w-[62ch] space-y-5">
+          {bio.split('\n\n').map((paragraph, i) => (
+            <p key={i} className="text-base md:text-lg leading-[1.9]" style={{ color: 'var(--text-primary)' }}>
+              {paragraph}
+            </p>
+          ))}
+        </div>
+      </TerminalBlock>
 
-        {/* Skills */}
-        <GlassCard className="p-8 sm:p-10">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-1 h-6 rounded-full" style={{ background: 'linear-gradient(180deg, var(--purple), var(--pink))' }} />
-            <h2
-              className="text-sm uppercase tracking-widest font-semibold"
-              style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--text-muted)', letterSpacing: '0.15em' }}
-            >
-              Skills & Technologies
-            </h2>
-          </div>
+      <TerminalBlock command="tree ~/skills">
+        <SkillTree groups={skillCategories.length ? skillCategories : [{ label: 'stack', items: skills }]} />
+      </TerminalBlock>
 
-          {skillCategories.length > 1 ? (
-            <div className="space-y-6">
-              {skillCategories.map(({ label, items, color }, ci) => (
-                <div key={label}>
-                  <p
-                    className="text-xs font-medium mb-3 uppercase tracking-wider"
-                    style={{ color: 'var(--text-muted)', fontFamily: 'Space Grotesk, sans-serif' }}
-                  >
-                    {label}
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {items.map((skill, i) => (
-                      <NeonBadge key={skill} color={color}>
-                        {skill}
-                      </NeonBadge>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {skills.map((skill, i) => (
-                <NeonBadge key={skill} color={i % 3 === 0 ? 'cyan' : i % 3 === 1 ? 'purple' : 'pink'}>
-                  {skill}
-                </NeonBadge>
-              ))}
-            </div>
-          )}
-        </GlassCard>
-      </div>
+      {Object.keys(social).length > 0 && (
+        <TerminalBlock command="ls -l ~/elsewhere">
+          <LinkList links={social} />
+        </TerminalBlock>
+      )}
     </div>
+  )
+}
+
+const mono = { fontFamily: 'var(--font-mono)' }
+
+/** `tree` output: groups are directories, skills are files. Pure ASCII branches. */
+function SkillTree({ groups }: { groups: { label: string; items: string[] }[] }) {
+  const total = groups.reduce((n, g) => n + g.items.length, 0)
+  return (
+    <pre className="m-0 text-sm leading-7 overflow-x-auto" style={mono}>
+      <span style={{ color: 'var(--accent)' }}>~/skills</span>
+      {'\n'}
+      {groups.map((g, gi) => {
+        const lastGroup = gi === groups.length - 1
+        return (
+          <span key={g.label}>
+            <span style={{ color: 'var(--text-muted)' }}>{lastGroup ? '`-- ' : '|-- '}</span>
+            <span style={{ color: 'var(--accent)' }}>{g.label.toLowerCase().replace(/ & /g, '-').replace(/\s+/g, '-')}/</span>
+            {'\n'}
+            {g.items.map((item, ii) => (
+              <span key={item}>
+                <span style={{ color: 'var(--text-muted)' }}>
+                  {lastGroup ? '    ' : '|   '}
+                  {ii === g.items.length - 1 ? '`-- ' : '|-- '}
+                </span>
+                <span style={{ color: 'var(--text-primary)' }}>{item}</span>
+                {'\n'}
+              </span>
+            ))}
+          </span>
+        )
+      })}
+      {'\n'}
+      <span style={{ color: 'var(--text-muted)' }}>
+        {groups.length} directories, {total} files
+      </span>
+    </pre>
+  )
+}
+
+/** `ls -l` output: each social link is a symlink. */
+function LinkList({ links }: { links: Record<string, string> }) {
+  const entries = Object.entries(links)
+  const width = Math.max(...entries.map(([k]) => k.length))
+  return (
+    <pre className="m-0 text-sm leading-8 overflow-x-auto" style={mono}>
+      <span style={{ color: 'var(--text-muted)' }}>total {entries.length}</span>
+      {'\n'}
+      {entries.map(([key, url]) => (
+        <span key={key}>
+          <span style={{ color: 'var(--text-muted)' }}>lrwxr-xr-x  joey  </span>
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer me"
+            className="group transition-colors hover:text-[var(--accent)]"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            {key.toLowerCase().padEnd(width)}
+            <span style={{ color: 'var(--text-muted)' }}> -&gt; </span>
+            <span className="underline decoration-[var(--border-strong)] underline-offset-4 group-hover:decoration-[var(--accent)]">
+              {url.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+            </span>
+          </a>
+          {'\n'}
+        </span>
+      ))}
+    </pre>
   )
 }
 
