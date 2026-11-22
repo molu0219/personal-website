@@ -5,6 +5,7 @@ import { AsciiGrid } from '@/lib/ascii/grid'
 import { GlyphCanvas } from '@/lib/ascii/canvas'
 import { MAT } from '@/lib/ascii/palette'
 import { hash2 } from '@/lib/ascii/noise'
+import { Spider } from '@/lib/ascii/spider'
 import { MOTIF_GLYPH, type ClusterKey, type ProjectMapLayout } from '@/lib/ascii/project-map'
 
 export interface MapEntry {
@@ -32,47 +33,78 @@ const subscribeHash = (cb: () => void) => {
 }
 const readHash = () => decodeURIComponent(window.location.hash.slice(1))
 
-/** Draw edges (shared stack), cluster spokes and grain into the map's <pre>. */
-function drawEdges(
-  pre: HTMLPreElement,
-  box: HTMLElement,
+const FPS = 30
+const PACKET_SPEED = 0.18 // edge lengths per second
+const PILOT_DWELL = 3.5 // s the crawler spends at each project when idle
+
+/** One frame: twinkling grain, rotating cluster rings, links with packets in flight. */
+function drawFrame(
+  grid: AsciiGrid,
   layout: ProjectMapLayout,
   active: string,
   cluster: ClusterKey | null,
+  t: number,
 ) {
-  const grid = new AsciiGrid(pre)
-  grid.measure(box.clientWidth, box.clientHeight)
   const cv = new GlyphCanvas(grid.cols, grid.rows, grid.cw / grid.ch)
   const at = (x: number, y: number): [number, number] => [(x / 100) * grid.cols, (y / 100) * grid.rows]
-  cv.grain((c, r) => hash2(c * 7, r * 13), 0.025, MAT.noise, 0.7)
-  // Each cluster is a dashed ring around its members.
+
+  // Starfield: sparse dots that slowly breathe at their own phase.
+  for (let r = 0; r < grid.rows; r++)
+    for (let c = 0; c < grid.cols; c++) {
+      const h = hash2(c * 7, r * 13)
+      if (h > 0.03) continue
+      const tw = 0.5 + 0.5 * Math.sin(t * (0.6 + h * 30) + h * 200)
+      cv.put(c, r, h < 0.004 && tw > 0.8 ? '+' : '.', MAT.noise, 0.25 + tw * 0.7)
+    }
+
+  // Cluster rings: dashed, slowly rotating (the active cluster spins faster and glows).
   for (const cl of layout.clusters) {
     const [cc, cr] = at(cl.x, cl.y)
     const on = cluster === cl.key
-    const radius = Math.min(grid.rows * 0.24, (grid.cols * cv.aspect) * 0.16)
-    cv.ring(cc, cr, radius, on ? MAT.accent : MAT.hud, on ? 0.8 : 0.3, '.', true)
+    const radius = Math.min(grid.rows * 0.24, grid.cols * cv.aspect * 0.16)
+    const steps = Math.ceil(radius * 14)
+    const phase = t * (on ? 0.5 : 0.12) * (cl.x > 50 ? -1 : 1)
+    for (let k = 0; k < steps; k++) {
+      if (k % 3 === 2) continue
+      const a = (k / steps) * Math.PI * 2 + phase
+      cv.put(cc + (Math.cos(a) * radius) / cv.aspect, cr + Math.sin(a) * radius, '.', on ? MAT.accent : MAT.hud, on ? 0.85 : 0.35)
+    }
   }
-  for (const e of layout.edges) {
+
+  // Links (shared stack) with packets travelling both ways.
+  layout.edges.forEach((e, ei) => {
     const a = layout.nodes[e.a]
     const b = layout.nodes[e.b]
     const hot = a.slug === active || b.slug === active
     const dim = cluster && a.cluster !== cluster && b.cluster !== cluster
     const [ac, ar] = at(a.x, a.y)
     const [bc, br] = at(b.x, b.y)
-    // Quiet dotted links; the hovered project's links become solid accent lines.
     cv.line(ac, ar, bc, br, hot ? MAT.accent : dim ? MAT.noise : MAT.code, hot ? 1 : dim ? 0.3 : 0.55, hot ? undefined : '.')
+    if (!dim) {
+      const len = Math.max(1, Math.hypot(bc - ac, (br - ar) / cv.aspect))
+      for (const [k, dir] of [[0, 1], [0.5, -1]] as const) {
+        const f = (t * PACKET_SPEED * (30 / len) + k + hash2(ei, 7)) % 1
+        const u = dir > 0 ? f : 1 - f
+        for (let tail = 0; tail < 3; tail++) {
+          const v = u - dir * tail * (1.2 / len)
+          if (v < 0 || v > 1) continue
+          cv.put(ac + (bc - ac) * v, ar + (br - ar) * v, tail === 0 ? '*' : '.', hot ? MAT.accent : MAT.signal, 1 - tail * 0.3)
+        }
+      }
+    }
     if (hot) {
       // Label the shared stack at the edge's midpoint.
       const label = e.tags.slice(0, 2).join('+')
       cv.text((ac + bc) / 2 - label.length / 2, (ar + br) / 2, ` ${label} `, MAT.accent, 1)
     }
-  }
+  })
+
+  grid.clear()
   for (let r = 0; r < grid.rows; r++)
     for (let c = 0; c < grid.cols; c++) {
       const cell = cv.cells[r][c]
-      grid.set(c, r, cell.ch, cell.mat, cell.lum)
+      if (cell.ch !== ' ') grid.set(c, r, cell.ch, cell.mat, cell.lum)
     }
-  grid.compose()
 }
 
 export default function ProjectMap({ layout, projects, minis, bodies, initial }: Props) {
@@ -86,17 +118,101 @@ export default function ProjectMap({ layout, projects, minis, bodies, initial }:
   const open = hash && bodies[hash] ? hash : initial
   const active = hover ?? open
 
+  // Latest interaction state for the animation loop (kept in refs so the loop never restarts).
+  const liveRef = useRef({ active, cluster })
+  useEffect(() => {
+    liveRef.current = { active, cluster }
+  }, [active, cluster])
+
   useEffect(() => {
     const box = boxRef.current
     const pre = preRef.current
     if (!box || !pre) return
-    const draw = () => drawEdges(pre, box, layout, active, cluster)
-    draw()
-    const ro = new ResizeObserver(draw)
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const grid = new AsciiGrid(pre)
+    let spider: Spider | null = null
+    let pointer: { x: number; y: number } | null = null
+    let t = 0
+    let last = 0
+    let raf = 0
+    let visible = true
+    let pilot = 0
+    let pilotSince = 0
+
+    const nodePx = (i: number) => {
+      const n = layout.nodes[i]
+      return { x: (n.x / 100) * box.clientWidth, y: (n.y / 100) * box.clientHeight }
+    }
+    const measure = () => {
+      grid.measure(box.clientWidth, box.clientHeight)
+      if (!spider) spider = new Spider(box.clientWidth * 0.5, box.clientHeight * 0.55)
+      frame(0)
+    }
+    const frame = (dt: number) => {
+      t += dt
+      const { active: a, cluster: c } = liveRef.current
+      drawFrame(grid, layout, a, c, t)
+      if (spider && layout.nodes.length) {
+        // The crawler follows the pointer inside the map; otherwise it tours the projects.
+        if (!pointer && t - pilotSince > PILOT_DWELL) {
+          pilot = (pilot + 1) % layout.nodes.length
+          pilotSince = t
+        }
+        const target = pointer ?? nodePx(pilot)
+        if (dt > 0) spider.step(dt, target.x, target.y - (pointer ? 0 : 34))
+        spider.draw(grid)
+      }
+      grid.compose()
+    }
+    const loop = (now: number) => {
+      raf = requestAnimationFrame(loop)
+      if (now - last < 1000 / FPS) return
+      const dt = Math.min(0.1, (now - last) / 1000)
+      last = now
+      frame(dt)
+    }
+    const start = () => {
+      if (reduceMotion || raf || !visible || document.hidden) return
+      last = performance.now()
+      raf = requestAnimationFrame(loop)
+    }
+    const stop = () => {
+      cancelAnimationFrame(raf)
+      raf = 0
+    }
+    const onMove = (e: PointerEvent) => {
+      const r = box.getBoundingClientRect()
+      pointer = { x: e.clientX - r.left, y: e.clientY - r.top }
+    }
+    const onLeave = () => {
+      pointer = null
+      pilotSince = t
+    }
+    const onVisibility = () => (document.hidden ? stop() : start())
+
+    const ro = new ResizeObserver(measure)
     ro.observe(box)
-    document.fonts?.ready.then(draw).catch(() => {})
-    return () => ro.disconnect()
-  }, [layout, active, cluster])
+    const io = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting
+      if (visible) start()
+      else stop()
+    })
+    io.observe(box)
+    box.addEventListener('pointermove', onMove)
+    box.addEventListener('pointerleave', onLeave)
+    document.addEventListener('visibilitychange', onVisibility)
+    document.fonts?.ready.then(measure).catch(() => {})
+    measure()
+    start()
+    return () => {
+      stop()
+      ro.disconnect()
+      io.disconnect()
+      box.removeEventListener('pointermove', onMove)
+      box.removeEventListener('pointerleave', onLeave)
+      document.removeEventListener('visibilitychange', onVisibility)
+    }
+  }, [layout])
 
   const choose = (slug: string) => {
     // pushState keeps Back working; it doesn't emit hashchange, so announce it for the store above.
