@@ -75,14 +75,14 @@ export interface ProjectMapLayout {
 }
 
 // Fixed spots for clusters (in % of the box) so the map reads the same on every visit.
-// A loose 3×2 grid with alternating offsets: clusters never collide.
+// One horizontal band, labels alternating low/high so neighbouring clusters never collide.
 const SPOTS: [number, number][] = [
-  [20, 34],
-  [52, 26],
-  [82, 36],
-  [22, 76],
-  [52, 72],
-  [82, 78],
+  [11, 72],
+  [30, 40],
+  [50, 72],
+  [70, 40],
+  [89, 72],
+  [50, 16],
 ]
 
 export function layoutProjectMap(projects: MapProject[]): ProjectMapLayout {
@@ -103,15 +103,15 @@ export function layoutProjectMap(projects: MapProject[]): ProjectMapLayout {
     clusters.push({ key, label: CLUSTER_LABEL[key], x: cx, y: cy, count: members.length })
     members.forEach((p, j) => {
       const rand = rng(hashString(p.slug))
-      // Single members sit just above their label; larger clusters fan out around it.
-      const a = members.length === 1 ? -Math.PI / 2 : (j / members.length) * Math.PI * 2 - Math.PI / 2 + rand() * 0.3
-      const d = members.length === 1 ? 13 : 14
+      // Members sit side by side just above (low labels) or below (high labels) their cluster label.
+      const spread = (j - (members.length - 1) / 2) * 9 + (rand() - 0.5) * 1.5
+      const dy = cy > 50 ? -30 : 30
       nodes.push({
         slug: p.slug,
         motif: motifOf.get(p.slug)!,
         cluster: key,
-        x: Math.min(90, Math.max(10, cx + Math.cos(a) * d * 0.9)),
-        y: Math.min(88, Math.max(12, cy + Math.sin(a) * d)),
+        x: Math.min(92, Math.max(8, cx + spread)),
+        y: Math.min(86, Math.max(14, cy + dy)),
       })
     })
   })

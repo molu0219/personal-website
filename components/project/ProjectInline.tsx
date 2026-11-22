@@ -4,6 +4,7 @@ import remarkGfm from 'remark-gfm'
 import rehypeSlug from 'rehype-slug'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import AsciiArt from '@/components/art/AsciiArt'
+import TableOfContents from '@/components/blog/TableOfContents'
 import { contentArt } from '@/lib/ascii/motifs'
 
 export interface InlineProject {
@@ -65,10 +66,17 @@ export default function ProjectInline({ project }: { project: InlineProject }) {
         </div>
       </header>
       {p.content && (
-        <div className="prose-theme mt-10 max-w-[68ch]">
-          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSlug, rehypeAutolinkHeadings]}>
-            {p.content}
-          </ReactMarkdown>
+        <div className="mt-10 grid gap-12 lg:grid-cols-[minmax(0,68ch)_220px] lg:justify-between">
+          <div className="prose-theme min-w-0">
+            <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSlug, rehypeAutolinkHeadings]}>
+              {p.content}
+            </ReactMarkdown>
+          </div>
+          <aside className="hidden lg:block">
+            <div className="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto">
+              <TableOfContents content={p.content} />
+            </div>
+          </aside>
         </div>
       )}
     </article>
