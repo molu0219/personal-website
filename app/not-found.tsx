@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import SignalHero from '@/components/sections/SignalHero'
 import type { Signal } from '@/lib/ascii/signal-field'
 
-export const metadata: Metadata = { title: 'Not found — Joey Chen', robots: { index: false } }
+export const metadata: Metadata = { title: 'Not found — Joey Chen', robots: { index: false }, alternates: { canonical: null } }
 
 interface Row {
   slug: string

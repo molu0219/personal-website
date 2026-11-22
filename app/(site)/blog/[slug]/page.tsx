@@ -10,6 +10,7 @@ import AuthorCard from '@/components/blog/AuthorCard'
 import { getViewCount } from '@/lib/view-counts'
 import { postCoverUrl } from '@/lib/og/urls'
 import PostNav, { type PostNavLink } from '@/components/blog/PostNav'
+import { MARKDOWN_COMPONENTS } from '@/components/blog/markdown'
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
@@ -98,7 +99,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     <ArticleLayout post={post} views={views}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdArticle) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdBreadcrumb) }} />
-      <ReactMarkdown
+      <ReactMarkdown components={MARKDOWN_COMPONENTS}
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeSlug, rehypeAutolinkHeadings]}
       >

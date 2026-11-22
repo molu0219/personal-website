@@ -1,26 +1,57 @@
-const LLMS_TXT = `# Joey Chen — Developer & Builder
+import { createClient } from '@/lib/supabase/server'
 
-> Personal website of Joey Chen — blockchain developer, AI development specialist, and creator. Focused on Claude Code workflows, AI agent design patterns, and Web3 development.
+const BASE = 'https://0xjoeytw.xyz'
 
-## About
-- [About Joey Chen](https://0xjoeytw.xyz/about): Background, skills, and experience
+interface Row {
+  slug: string
+  title: string
+  excerpt?: string | null
+  description?: string | null
+}
 
-## Blog Posts
-- [Claude Code Dev Workflow](https://0xjoeytw.xyz/blog/claude-code-dev-workflow): Complete workflow design for AI-assisted development with cross-session memory management
-- [Three-Layer AI Agent Enforcement](https://0xjoeytw.xyz/blog/three-layer-ai-agent-enforcement): Framework for controlling AI assistant behavior using text rules, automation hooks, and permission systems
-- [Claude Code Session Memory](https://0xjoeytw.xyz/blog/claude-code-session-memory): External memory system design for maintaining AI context across development sessions
-- [Claude Code Cheat Sheet Guide](https://0xjoeytw.xyz/blog/claude-code-cheatsheet-guide): Comprehensive command and configuration reference for Claude Code
-- [Claude Code Command Reference](https://0xjoeytw.xyz/blog/claude-code-command-reference): Detailed CLI command reference
-- [AI Session to Content Pipeline](https://0xjoeytw.xyz/blog/ai-session-to-content-pipeline): Automated pipeline for converting AI coding sessions into publishable content
+const line = (path: string, r: Row) =>
+  `- [${r.title}](${BASE}/${path}/${r.slug})${r.excerpt || r.description ? `: ${(r.excerpt ?? r.description ?? '').replace(/\s+/g, ' ').trim()}` : ''}`
 
-## Projects
-- [Projects](https://0xjoeytw.xyz/projects): Portfolio of development projects
+// Generated from the database so new posts and projects are listed automatically (llmstxt.org format).
+export async function GET() {
+  let posts: Row[] = []
+  let projects: Row[] = []
+  try {
+    const supabase = await createClient()
+    const [p, j] = await Promise.all([
+      supabase.from('posts').select('slug,title,excerpt').eq('published', true).order('published_at', { ascending: false }),
+      supabase.from('projects').select('slug,title,description').eq('published', true).order('created_at', { ascending: false }),
+    ])
+    if (p.error || j.error) console.error('[llms.txt] query failed', p.error?.message ?? j.error?.message)
+    posts = p.data ?? []
+    projects = j.data ?? []
+  } catch (err) {
+    console.error('[llms.txt] failed to load content', err)
+  }
 
-## Resources
-`
+  const body = [
+    '# Joey Chen',
+    '',
+    '> Joey Chen（0xjoeytw）的個人網站：AI agent 開發工作流、Claude Code 實戰筆記，以及交易與區塊鏈工具的作品。Articles are written in Traditional Chinese.',
+    '',
+    '## About',
+    `- [About Joey Chen](${BASE}/about): Background, skills and links`,
+    '',
+    '## Blog Posts',
+    ...posts.map(r => line('blog', r)),
+    '',
+    '## Projects',
+    ...projects.map(r => line('projects', r)),
+    '',
+    '## Optional',
+    `- [Sitemap](${BASE}/sitemap.xml)`,
+    '',
+  ].join('\n')
 
-export function GET() {
-  return new Response(LLMS_TXT, {
-    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+  return new Response(body, {
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Cache-Control': 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400',
+    },
   })
 }

@@ -19,6 +19,12 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/admin/', '/api/'],
       },
       {
+        // Search-citation crawlers (distinct from the training bots below).
+        userAgent: ['OAI-SearchBot', 'Claude-SearchBot'],
+        allow: '/',
+        disallow: ['/admin/', '/api/'],
+      },
+      {
         userAgent: 'ClaudeBot',
         allow: '/',
         disallow: ['/admin/', '/api/'],

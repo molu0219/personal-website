@@ -11,7 +11,7 @@ import { layoutProjectMap } from '@/lib/ascii/project-map'
 
 export const metadata: Metadata = {
   title: 'Projects — Joey Chen',
-  description: 'Blockchain, AI, and Web3 projects by Joey Chen.',
+  description: 'Joey Chen 的作品：AI agent、交易監控與預測市場、Solana 代幣分析、3D 桌面夥伴與開發者工具，依共用技術畫成一張地圖。',
   alternates: { canonical: '/projects' },
 }
 

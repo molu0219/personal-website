@@ -13,9 +13,12 @@ export const metadata: Metadata = {
     type: 'profile',
     siteName: 'Joey Chen',
     locale: 'zh_TW',
+    // This page defines its own openGraph, which replaces the inherited site card: re-add it.
+    images: [{ url: 'https://0xjoeytw.xyz/opengraph-image', width: 1200, height: 630 }],
   },
   twitter: {
-    card: 'summary',
+    card: 'summary_large_image',
+    images: ['https://0xjoeytw.xyz/opengraph-image'],
     title: 'About — Joey Chen',
     description: 'About Joey Chen — Product Manager & AI Builder. Focused on Claude Code workflows, AI-assisted development, and Web3.',
     creator: '@0xjoeytw',

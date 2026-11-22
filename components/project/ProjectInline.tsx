@@ -6,6 +6,7 @@ import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import AsciiArt from '@/components/art/AsciiArt'
 import TableOfContents from '@/components/blog/TableOfContents'
 import { contentArt } from '@/lib/ascii/motifs'
+import { MARKDOWN_COMPONENTS } from '@/components/blog/markdown'
 
 export interface InlineProject {
   slug: string
@@ -68,7 +69,7 @@ export default function ProjectInline({ project }: { project: InlineProject }) {
       {p.content && (
         <div className="mt-10 grid gap-12 lg:grid-cols-[minmax(0,68ch)_220px] lg:justify-between">
           <div className="prose-theme min-w-0">
-            <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSlug, rehypeAutolinkHeadings]}>
+            <ReactMarkdown components={MARKDOWN_COMPONENTS} remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSlug, rehypeAutolinkHeadings]}>
               {p.content}
             </ReactMarkdown>
           </div>

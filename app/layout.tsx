@@ -15,13 +15,13 @@ const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono'
 export const metadata: Metadata = {
   metadataBase: new URL('https://0xjoeytw.xyz'),
   title: 'Joey Chen — Developer & Builder',
-  description: 'Personal website of Joey Chen — blockchain developer, builder, and creator.',
+  description: 'Joey Chen 的個人網站：AI agent 開發工作流、Claude Code 實戰筆記，以及交易與區塊鏈工具作品。',
   alternates: {
     canonical: '/',
   },
   openGraph: {
     title: 'Joey Chen — Developer & Builder',
-    description: 'Personal website of Joey Chen — blockchain developer, builder, and creator.',
+    description: 'Joey Chen 的個人網站：AI agent 開發工作流、Claude Code 實戰筆記，以及交易與區塊鏈工具作品。',
     url: 'https://0xjoeytw.xyz',
     siteName: 'Joey Chen',
     type: 'website',
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary',
     title: 'Joey Chen — Developer & Builder',
-    description: 'Personal website of Joey Chen — blockchain developer, builder, and creator.',
+    description: 'Joey Chen 的個人網站：AI agent 開發工作流、Claude Code 實戰筆記，以及交易與區塊鏈工具作品。',
     creator: '@0xjoeytw',
   },
   other: {
@@ -45,7 +45,7 @@ const jsonLdWebSite = {
   name: 'Joey Chen',
   alternateName: '0xjoeytw',
   url: 'https://0xjoeytw.xyz',
-  description: 'Personal website of Joey Chen — blockchain developer, builder, and creator.',
+  description: 'Joey Chen 的個人網站：AI agent 開發工作流、Claude Code 實戰筆記，以及交易與區塊鏈工具作品。',
   inLanguage: ['zh-TW', 'en'],
   author: { '@id': 'https://0xjoeytw.xyz/#person' },
 }
